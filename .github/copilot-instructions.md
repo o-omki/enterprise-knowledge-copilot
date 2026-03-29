@@ -138,56 +138,132 @@ Work is organized into **6 phases** with strict scope gates. Each phase has clea
 
 ```
 enterprise-knowledge-copilot/
-├── .github/                          # GitHub Actions, templates, this file
-│   └── copilot-instructions.md      # (You are here)
-├── docs/                             # Architecture & decision documentation (read-only reference)
-│   ├── architecture_overview.md
-│   ├── deployment.md
-│   ├── evaluation_framework.md
+├── README.md
+├── LICENSE
+├── .gitignore
+├── .editorconfig
+├── .env.example
+├── Makefile
+├── pyproject.toml
+├── package.json                    # only if frontend JS/TS
+├── docker-compose.yml
+├── docs/
+│   ├── index.md
+│   ├── problem-statement.md
+│   ├── product-requirements.md
+│   ├── architecture-overview.md
+│   ├── system-design.md
+│   ├── retrieval-architecture.md
+│   ├── agent-orchestration.md
+│   ├── ingestion-pipeline.md
+│   ├── data-model.md
+│   ├── model-serving.md
+│   ├── evaluation-framework.md
+│   ├── safety-guardrails.md
 │   ├── observability.md
-│   ├── problem_statement.md
-│   ├── product_requirements.md
-│   ├── roadmap.md
-│   └── milestones.md                # Progress tracking (updated per phase)
-├── data/                             # Raw, processed, and evaluation data
-│   ├── raw/                         # Source documents (read-only during development)
-│   │   ├── official_docs/          # Real-world reference docs (FastAPI, Qdrant, K8s, vLLM)
-│   │   ├── release_notes/          # Changelogs and release history
-│   │   └── synthetic/              # Enterprise-style synthetic data (internal wikis, runbooks, tickets)
-│   ├── processed/                   # Output of ingestion pipeline (generated; .gitignore)
-│   │   ├── parsed_documents/
-│   │   ├── chunks/
-│   │   ├── embeddings/
-│   │   └── hybrid_indexes/
-│   └── eval/                        # Evaluation datasets and results
-│       ├── retrieval/               # Retrieval benchmarks
-│       ├── generation/              # Answer quality benchmarks
-│       ├── safety/                  # Safety test suites
-│       └── agentic/                 # Multi-hop query tests
-├── apps/                             # Application services (to be created in Phase 1)
-│   ├── api/                         # FastAPI backend
-│   ├── worker/                      # Background jobs (ingestion, indexing)
-│   ├── evals/                       # Evaluation harness service
-│   └── frontend/                    # React/Flutter UI (Phase TBD)
-├── packages/                         # Shared libraries (to be created in Phase 1)
-│   ├── shared/                      # Common DTOs, config, utilities
-│   ├── rag/                         # Chunking, retrieval, ranking logic
-│   ├── agents/                      # Query planner, router, tool definitions
-│   ├── safety/                      # PII detection, prompt injection, policy
-│   ├── observability/               # Tracing, logging, metrics
-│   ├── llm_serving/                 # vLLM client, model routing
-│   └── benchmark/                   # Load testing, latency analysis
-├── project_structure.md              # Directory structure blueprint
-├── create_dirs.sh                    # Bootstrap script (run once)
-├── README.md                         # (Empty; will document for Phase 1)
-├── pyproject.toml                    # Python dependencies (Phase 1)
-├── package.json                      # Frontend dependencies (Phase TBD)
-├── Makefile                          # Build, test, run targets (Phase 1)
-├── docker-compose.yml                # Local dev stack (Phase 1)
-├── Dockerfile                        # Container images (Phase 1)
-├── .env.example                      # Environment variables template (Phase 1)
-├── .gitignore                        # (Should exclude: /data/processed/*, __pycache__/, node_modules/, etc.)
-└── terraform/                        # Infrastructure as Code (Phase 5+)
+│   ├── latency-cost-analysis.md
+│   ├── failure-modes.md
+│   ├── security-privacy.md
+│   ├── deployment.md
+│   ├── scalability-roadmap.md
+│   ├── adr/
+│   │   ├── 0001-monorepo.md
+│   │   ├── 0002-vector-db-choice.md
+│   │   ├── 0003-reranker-choice.md
+│   │   └── 0004-frontend-choice.md
+│   ├── diagrams/
+│   │   ├── high-level-architecture.png
+│   │   ├── sequence-query-flow.png
+│   │   ├── ingestion-flow.png
+│   │   └── deployment-topology.png
+│   └── demos/
+│       └── demo-script.md
+├── apps/
+│   ├── api/                        # FastAPI backend
+│   │   ├── app/
+│   │   │   ├── main.py
+│   │   │   ├── api/
+│   │   │   ├── core/
+│   │   │   ├── services/
+│   │   │   ├── schemas/
+│   │   │   └── middleware/
+│   │   ├── tests/
+│   │   └── Dockerfile
+│   ├── worker/                     # ingestion/background jobs
+│   │   ├── app/
+│   │   ├── tests/
+│   │   └── Dockerfile
+│   ├── frontend/                   # Flutter or React
+│   │   ├── src/ or lib/
+│   │   ├── public/
+│   │   ├── test/
+│   │   └── Dockerfile
+│   ├── evals/                      # evaluation harness service/UI
+│   │   ├── runners/
+│   │   ├── datasets/
+│   │   ├── judges/
+│   │   ├── reports/
+│   │   └── tests/
+│   └── gateway/                    # optional API gateway/BFF
+├── packages/
+│   ├── shared/                     # shared DTOs/config/utils
+│   ├── rag/                        # retrieval, chunking, ranking
+│   ├── agents/                     # planner, router, tool logic
+│   ├── safety/                     # PII, prompt injection, policy
+│   ├── observability/              # tracing/logging metrics
+│   ├── llm_serving/                # vLLM client/model routing
+│   └── benchmark/                  # latency/load test helpers
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   ├── eval/
+│   └── synthetic/
+├── scripts/
+│   ├── bootstrap.sh
+│   ├── ingest_docs.py
+│   ├── build_index.py
+│   ├── run_evals.py
+│   ├── load_test.py
+│   └── seed_demo_data.py
+├── infra/
+│   ├── docker/
+│   ├── k8s/
+│   │   ├── base/
+│   │   ├── overlays/dev/
+│   │   ├── overlays/staging/
+│   │   └── overlays/prod/
+│   ├── terraform/
+│   ├── helm/
+│   └── monitoring/
+│       ├── prometheus/
+│       ├── grafana/
+│       └── alerts/
+├── configs/
+│   ├── app.yaml
+│   ├── retrieval.yaml
+│   ├── models.yaml
+│   ├── safety.yaml
+│   └── evals.yaml
+├── benchmarks/
+│   ├── retrieval/
+│   ├── generation/
+│   ├── reranking/
+│   └── serving/
+├── notebooks/
+│   ├── retrieval_experiments/
+│   └── eval_analysis/
+├── .github/
+│   ├── workflows/
+│   │   ├── ci.yml
+│   │   ├── backend.yml
+│   │   ├── frontend.yml
+│   │   ├── evals.yml
+│   │   └── deploy.yml
+│   ├── ISSUE_TEMPLATE/
+│   └── PULL_REQUEST_TEMPLATE.md
+└── media/
+    ├── screenshots/
+    └── demo-video-link.md
 ```
 
 ### Data Directory Conventions
