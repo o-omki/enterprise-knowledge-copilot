@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.so
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Editor and OS
+.DS_Store
+.idea/
+.vscode/
+
+# Local environment files
+.env
+
+# Build artifacts
+build/
+dist/
+*.egg-info/
+
+# Project generated data
+data/processed/**
+!data/processed/.gitkeep
+
+# Runtime logs
+*.log
