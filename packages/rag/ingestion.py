@@ -26,8 +26,9 @@ class IngestionConfig(BaseSettings):
     # GCP Settings
     project_id: str = Field(alias="GCP_PROJECT_ID")
     location: str = Field(alias="GCP_LOCATION", default="us-central1")
-    embedding_model_name: str = Field(alias="GCP_EMBEDDING_MODEL", default="text-embedding-005")
-    
+    embedding_model_name: str = Field(
+        alias="GCP_EMBEDDING_MODEL", default="text-embedding-005")
+
     # AI Studio setting (optional)
     gemini_api_key: str | None = Field(alias="GEMINI_API_KEY", default=None)
 
@@ -46,13 +47,15 @@ class IngestionPipeline:
         self.config = config or IngestionConfig()
         self.client = AsyncQdrantClient(url=self.config.qdrant_url)
 
-        print(f"model and location from config: {self.config.embedding_model_name}, {self.config.location}\n\n\n\n\n")
+        print(
+            f"model and location from config: {self.config.embedding_model_name}, {self.config.location}\n\n\n\n\n")
 
         # Initialize the new Google Gen AI SDK for Vertex AI
         self.genai_client = genai.Client(
             vertexai=True, project=self.config.project_id, location=self.config.location
         )
-        print(f"GenAI Client initialized for model = {self.config.embedding_model_name}\n\n\n\n\n")
+        print(
+            f"GenAI Client initialized for model = {self.config.embedding_model_name}\n\n\n\n\n")
 
     async def list_corpora(self, official_docs_root: Path) -> list[Path]:
         """Lists each directory in official_docs as a separate corpus."""
@@ -69,7 +72,8 @@ class IngestionPipeline:
             try:
                 content = file_path.read_text(encoding="utf-8")
                 doc = Document(
-                    content=content, path=file_path, metadata={"filename": file_path.name}
+                    content=content, path=file_path, metadata={
+                        "filename": file_path.name}
                 )
                 documents.append(doc)
             except Exception as e:
@@ -89,7 +93,8 @@ class IngestionPipeline:
     async def initialize_collection(self, collection_name: str):
         """Creates a Qdrant collection if it doesn't exist."""
         collections = await self.client.get_collections()
-        exists = any(c.name == collection_name for c in collections.collections)
+        exists = any(
+            c.name == collection_name for c in collections.collections)
 
         if not exists:
             logger.info(f"Creating collection: {collection_name}")
@@ -102,7 +107,6 @@ class IngestionPipeline:
         else:
             logger.info(f"Collection {collection_name} already exists.")
 
-    
     async def get_embeddings(self, texts: list[str]) -> list[list[float]]:
         semaphore = asyncio.Semaphore(8)
 
@@ -127,7 +131,7 @@ class IngestionPipeline:
                 return embedding
 
         return await asyncio.gather(*(embed_one(text) for text in texts))
-    
+
     def generate_id(self, text: str, source: str) -> str:
         """Creates a deterministic UUID based on content and source."""
         hash_input = f"{source}_{text}"
@@ -137,7 +141,7 @@ class IngestionPipeline:
         """Embeds and uploads chunks to Qdrant."""
         batch_size = 50
         for i in range(0, len(chunks), batch_size):
-            batch = chunks[i : i + batch_size]
+            batch = chunks[i: i + batch_size]
             texts = [c.text for c in batch]
 
             # Get embeddings
@@ -150,36 +154,43 @@ class IngestionPipeline:
                     payload={
                         "text": chunk.text,
                         "source": chunk.source,
+                        "filename": Path(chunk.source).name,
                         "chunk_index": chunk.index,
-                    },
+                        "corpus": collection_name,
+                    }
                 )
                 for idx, chunk in enumerate(batch)
             ]
 
             await self.client.upsert(collection_name=collection_name, points=points)
-            logger.info(f"Upserted batch {i // batch_size + 1} into {collection_name}")
+            logger.info(
+                f"Upserted batch {i // batch_size + 1} into {collection_name}")
 
     async def run(self, raw_docs_root: Path):
         """Executes the full ingestion pipeline for all corpora."""
         logger.info(f"Starting ingestion from {raw_docs_root}")
 
         corpora = await self.list_corpora(raw_docs_root)
-        logger.info(f"Found {len(corpora)} corpora: {[c.name for c in corpora]}")
+        logger.info(
+            f"Found {len(corpora)} corpora: {[c.name for c in corpora]}")
 
         for corpus_path in corpora:
             collection_name = self.get_collection_name(corpus_path)
-            logger.info(f"Processing corpus: {corpus_path.name} -> {collection_name}")
+            logger.info(
+                f"Processing corpus: {corpus_path.name} -> {collection_name}")
 
             # 1. Load documents
             docs = await self.load_markdown_files(corpus_path)
             if not docs:
                 logger.warning(f"No documents found in {corpus_path}")
                 continue
-            logger.info(f"Loaded {len(docs)} documents from {corpus_path.name}.")
+            logger.info(
+                f"Loaded {len(docs)} documents from {corpus_path.name}.")
 
             # 2. Chunk documents
             chunks = await self.process_documents(docs)
-            logger.info(f"Generated {len(chunks)} chunks for {corpus_path.name}.")
+            logger.info(
+                f"Generated {len(chunks)} chunks for {corpus_path.name}.")
 
             # 3. Initialize Qdrant collection
             await self.initialize_collection(collection_name)
