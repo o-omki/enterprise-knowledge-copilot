@@ -85,7 +85,7 @@ class IngestionPipeline:
         all_chunks = []
         for doc in documents:
             chunks = chunk_text(
-                doc.content, source=str(doc.path), chunk_size=self.config.chunk_size
+                doc.content, source=str(doc.path), chunk_size=self.config.chunk_size, chunk_overlap=self.config.chunk_overlap
             )
             all_chunks.extend(chunks)
         return all_chunks
