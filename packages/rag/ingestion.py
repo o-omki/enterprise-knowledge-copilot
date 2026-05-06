@@ -25,9 +25,9 @@ class IngestionConfig(BaseSettings):
 
     # GCP Settings
     project_id: str = Field(alias="GCP_PROJECT_ID")
-    location: str = Field(alias="GCP_LOCATION", default="us-central1")
+    location: str = Field(alias="GCP_LOCATION", default="global")
     embedding_model_name: str = Field(
-        alias="GCP_EMBEDDING_MODEL", default="text-embedding-005")
+        alias="GCP_EMBEDDING_MODEL", default="gemini-embedding-2")
 
     # AI Studio setting (optional)
     gemini_api_key: str | None = Field(alias="GEMINI_API_KEY", default=None)
