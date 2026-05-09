@@ -16,17 +16,13 @@ requires-python = ">=3.11"
 dependencies = [
   "fastapi>=0.116.0",
   "uvicorn[standard]>=0.30.0",
-  "pydantic-settings>=2.4.0",
   "qdrant-client>=1.10.0",
-  "httpx>=0.28.0",
-]
-
-[project.optional-dependencies]
-dev = [
-  "mypy>=1.11.0",
+  "google-genai>=1.0.0",
   "pytest>=8.3.0",
   "ruff>=0.6.0",
   "pre-commit>=3.8.0",
+  "pydantic-settings[dotenv]>=2.14.0",
+  "google-cloud-aiplatform (>=1.149.0,<2.0.0)",
 ]
 
 [tool.pytest.ini_options]
