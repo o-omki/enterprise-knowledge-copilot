@@ -4,6 +4,7 @@ import logging
 import uuid
 from pathlib import Path
 
+from fastembed import SparseTextEmbedding
 from google import genai
 from google.genai import types
 from pydantic import BaseModel, Field
@@ -49,6 +50,9 @@ class IngestionPipeline:
         self.genai_client = genai.Client(
             vertexai=True, project=self.config.project_id, location=self.config.location
         )
+
+        # Initialize FastEmbed for Sparse Vectors
+        self.sparse_model = SparseTextEmbedding(model_name="Qdrant/bm25")
 
     async def list_corpora(self, official_docs_root: Path) -> list[Path]:
         """Lists each directory in official_docs as a separate corpus."""
@@ -124,6 +128,7 @@ class IngestionPipeline:
                 vectors_config=models.VectorParams(
                     size=self.config.vector_size, distance=models.Distance.COSINE
                 ),
+                sparse_vectors_config={"sparse": models.SparseVectorParams()},
             )
             # Create payload indexes for faster filtering
             await self.client.create_payload_index(
@@ -179,10 +184,19 @@ class IngestionPipeline:
             # Get embeddings
             embeddings = await self.get_embeddings(texts)
 
+            # Get Sparse Embeddings (BM25)
+            sparse_embeddings = list(self.sparse_model.embed(texts))
+
             points = [
                 models.PointStruct(
                     id=self.generate_id(chunk.text, chunk.source),
-                    vector=embeddings[idx],
+                    vector={
+                        "": embeddings[idx],
+                        "sparse": models.SparseVector(
+                            indices=sparse_embeddings[idx].indices.tolist(),
+                            values=sparse_embeddings[idx].values.tolist(),
+                        ),
+                    },
                     payload={
                         "text": chunk.text,
                         "source": chunk.source,
