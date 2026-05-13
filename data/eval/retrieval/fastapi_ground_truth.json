@@ -1,0 +1,82 @@
+[
+  {
+    "question": "How do I run a task in the background after returning a response?",
+    "expected_source": "fastapi/background-tasks.md"
+  },
+  {
+    "question": "What is the order of execution for FastAPI middleware?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "How do I declare a path parameter so that it matches a specific type?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "What happens if I declare a function parameter that is not part of the path parameters?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "How do I read a JSON request body using Pydantic?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "How can I filter output data to remove passwords using response_model?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "What is the recommended way to write tests for a FastAPI application?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "How should I run FastAPI in a Docker container for deployment?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "How do I implement OAuth2 with Password and Bearer token in FastAPI?",
+    "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "How do I install FastAPI and Uvicorn?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "Can I have optional query parameters in FastAPI?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "How do I restrict a path parameter to a set of predefined values using Python Enums?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "How do I use a custom middleware to modify request headers?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "Is it possible to return a Pydantic model directly from an endpoint?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "How can I process a large payload asynchronously after finishing the web request?",
+    "expected_source": "fastapi/background-tasks.md"
+  },
+  {
+    "question": "What's the best command to run for a production deployment with multiple workers?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "What testing module should I import to write test cases against my FastAPI TestClient?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "How do I extract a nested JSON object from the incoming request body?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "What is the minimal starter code to create a Hello World FastAPI app?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "How do I protect my endpoint with dependencies and predefined security schemes?",
+    "expected_source": "fastapi/security.md"
+  }
+]
