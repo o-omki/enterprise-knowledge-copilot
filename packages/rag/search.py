@@ -1,5 +1,6 @@
 import logging
 
+from fastembed import SparseTextEmbedding
 from google import genai
 from google.genai import types
 from pydantic import Field
@@ -34,6 +35,14 @@ class SearchService:
         self.config = config or SearchConfig()
         self.client = AsyncQdrantClient(url=self.config.qdrant_url)
         self._genai_client = None
+        self._sparse_model = None
+
+    @property
+    def sparse_model(self):
+        """Lazy loader for the fastembed sparse model."""
+        if self._sparse_model is None:
+            self._sparse_model = SparseTextEmbedding(model_name="Qdrant/bm25")
+        return self._sparse_model
 
     @property
     def genai_client(self):
@@ -60,13 +69,31 @@ class SearchService:
         return response.embeddings[0].values
 
     async def search(
-        self, query: str, limit: int = 5, domain: str | None = None, doc_type: str | None = None
+        self,
+        query: str,
+        limit: int = 5,
+        domain: str | None = None,
+        doc_type: str | None = None,
+        method: str = "dense",
     ) -> list[SearchResult]:
         """Performs vector search in the global collection with optional payload filtering."""
-        collection_name = "enterprise_knowledge"
-        vector = await self.get_query_embedding(query)
-
         from qdrant_client.http import models
+
+        collection_name = "enterprise_knowledge"
+
+        query_vector = None
+        using = None
+
+        if method == "dense":
+            query_vector = await self.get_query_embedding(query)
+        elif method == "sparse":
+            sparse_res = list(self.sparse_model.embed([query]))[0]
+            query_vector = models.SparseVector(
+                indices=sparse_res.indices.tolist(), values=sparse_res.values.tolist()
+            )
+            using = "sparse"
+        else:
+            raise ValueError("Method must be 'dense' or 'sparse'")
 
         # Build the payload filter query depending on provided parameters
         must_conditions = []
@@ -85,7 +112,8 @@ class SearchService:
 
         results = await self.client.query_points(
             collection_name=collection_name,
-            query=vector,
+            query=query_vector,
+            using=using,
             limit=limit,
             with_payload=True,
             query_filter=query_filter,
