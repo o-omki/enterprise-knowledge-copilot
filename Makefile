@@ -31,7 +31,15 @@ pre-commit-install:
 	pre-commit install
 
 ingest-docs:
-	@echo "Placeholder: ingestion pipeline to be added in Phase 1"
+	@echo "Running document ingestion..."
+	PYTHONPATH=. $(PYTHON) scripts/ingest_docs.py
+	@echo "Document ingestion complete."
 
-run-evals:
-	@echo "Placeholder: evaluation runner to be added in Phase 1"
+
+run-evals: eval-retrieval
+	@echo "All evaluations complete."
+
+eval-retrieval:
+	@echo "Running retrieval evaluation..."
+	PYTHONPATH=. $(PYTHON) benchmarks/retrieval/eval_retrieval.py
+	@echo "Retrieval evaluation complete."
