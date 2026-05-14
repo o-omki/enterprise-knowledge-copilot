@@ -32,9 +32,10 @@ async def main():
     metrics = {
         "dense": {"recall_at_1": 0, "recall_at_5": 0, "mrr": 0.0},
         "sparse": {"recall_at_1": 0, "recall_at_5": 0, "mrr": 0.0},
+        "hybrid": {"recall_at_1": 0, "recall_at_5": 0, "mrr": 0.0},
     }
 
-    for method in ["dense", "sparse"]:
+    for method in ["dense", "sparse", "hybrid"]:
         logger.info(f"\n--- Running Eval for method: {method.upper()} ---")
         rr_sum = 0.0
         hits_at_1 = 0
