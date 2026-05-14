@@ -9,11 +9,11 @@ logger = logging.getLogger(__name__)
 
 
 async def main():
-    # Root directory for official documentation
-    raw_docs_root = Path("data/raw/official_docs")
+    # Root directories for documentation
+    data_roots = [Path("data/raw"), Path("data/synthetic")]
 
     pipeline = IngestionPipeline()
-    await pipeline.run(raw_docs_root)
+    await pipeline.run(data_roots)
 
 
 if __name__ == "__main__":
