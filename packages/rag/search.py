@@ -27,6 +27,7 @@ class SearchResult(BaseSettings):
     text: str
     source: str
     score: float
+    diagnostics: dict = Field(default_factory=dict)
     model_config = SettingsConfigDict(arbitrary_types_allowed=True)
 
 
@@ -83,6 +84,7 @@ class SearchService:
 
         query_vector = None
         using = None
+        prefetch = None
 
         if method == "dense":
             query_vector = await self.get_query_embedding(query)
@@ -92,8 +94,20 @@ class SearchService:
                 indices=sparse_res.indices.tolist(), values=sparse_res.values.tolist()
             )
             using = "sparse"
+        elif method == "hybrid":
+            # For hybrid, we use Qdrant's Reciprocal Rank Fusion (RRF) via prefetch
+            dense_vector = await self.get_query_embedding(query)
+            sparse_res = list(self.sparse_model.embed([query]))[0]
+            sparse_vector = models.SparseVector(
+                indices=sparse_res.indices.tolist(), values=sparse_res.values.tolist()
+            )
+            query_vector = models.FusionQuery(fusion=models.Fusion.RRF)
+            prefetch = [
+                models.Prefetch(query=dense_vector, using="", limit=limit * 2),
+                models.Prefetch(query=sparse_vector, using="sparse", limit=limit * 2),
+            ]
         else:
-            raise ValueError("Method must be 'dense' or 'sparse'")
+            raise ValueError("Method must be 'dense', 'sparse', or 'hybrid'")
 
         # Build the payload filter query depending on provided parameters
         must_conditions = []
@@ -110,20 +124,32 @@ class SearchService:
 
         query_filter = models.Filter(must=must_conditions) if must_conditions else None
 
+        if method == "hybrid" and prefetch:
+            for p in prefetch:
+                p.filter = query_filter
+
+        import time
+
+        start_time = time.time()
+
         results = await self.client.query_points(
             collection_name=collection_name,
             query=query_vector,
+            prefetch=prefetch,
             using=using,
             limit=limit,
             with_payload=True,
             query_filter=query_filter,
         )
 
+        latency_ms = round((time.time() - start_time) * 1000, 2)
+
         return [
             SearchResult(
                 text=hit.payload.get("text", ""),
                 source=hit.payload.get("source", "unknown"),
                 score=hit.score,
+                diagnostics={"latency_ms": latency_ms, "method": method},
             )
             for hit in results.points
             if hit.payload  # Ensure payload exists
