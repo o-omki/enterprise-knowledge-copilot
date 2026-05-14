@@ -1,82 +1,982 @@
 [
   {
-    "question": "How do I run a task in the background after returning a response?",
+    "question": "What are the core concepts of background tasks in fastapi?",
     "expected_source": "fastapi/background-tasks.md"
   },
   {
-    "question": "What is the order of execution for FastAPI middleware?",
-    "expected_source": "fastapi/middleware.md"
-  },
-  {
-    "question": "How do I declare a path parameter so that it matches a specific type?",
-    "expected_source": "fastapi/path-params.md"
-  },
-  {
-    "question": "What happens if I declare a function parameter that is not part of the path parameters?",
-    "expected_source": "fastapi/query-params.md"
-  },
-  {
-    "question": "How do I read a JSON request body using Pydantic?",
-    "expected_source": "fastapi/body.md"
-  },
-  {
-    "question": "How can I filter output data to remove passwords using response_model?",
-    "expected_source": "fastapi/response-model.md"
-  },
-  {
-    "question": "What is the recommended way to write tests for a FastAPI application?",
-    "expected_source": "fastapi/testing.md"
-  },
-  {
-    "question": "How should I run FastAPI in a Docker container for deployment?",
-    "expected_source": "fastapi/deployment.md"
-  },
-  {
-    "question": "How do I implement OAuth2 with Password and Bearer token in FastAPI?",
-    "expected_source": "fastapi/security.md"
-  },
-  {
-    "question": "How do I install FastAPI and Uvicorn?",
-    "expected_source": "fastapi/getting_started.md"
-  },
-  {
-    "question": "Can I have optional query parameters in FastAPI?",
-    "expected_source": "fastapi/query-params.md"
-  },
-  {
-    "question": "How do I restrict a path parameter to a set of predefined values using Python Enums?",
-    "expected_source": "fastapi/path-params.md"
-  },
-  {
-    "question": "How do I use a custom middleware to modify request headers?",
-    "expected_source": "fastapi/middleware.md"
-  },
-  {
-    "question": "Is it possible to return a Pydantic model directly from an endpoint?",
-    "expected_source": "fastapi/response-model.md"
-  },
-  {
-    "question": "How can I process a large payload asynchronously after finishing the web request?",
+    "question": "How do I configure or use background tasks in fastapi?",
     "expected_source": "fastapi/background-tasks.md"
   },
   {
-    "question": "What's the best command to run for a production deployment with multiple workers?",
-    "expected_source": "fastapi/deployment.md"
+    "question": "Where can I find documentation and examples for background tasks within fastapi?",
+    "expected_source": "fastapi/background-tasks.md"
   },
   {
-    "question": "What testing module should I import to write test cases against my FastAPI TestClient?",
-    "expected_source": "fastapi/testing.md"
+    "question": "Can you explain the best practices or details regarding background tasks in fastapi?",
+    "expected_source": "fastapi/background-tasks.md"
   },
   {
-    "question": "How do I extract a nested JSON object from the incoming request body?",
+    "question": "How does FastAPI handle background tasks?",
+    "expected_source": "fastapi/background-tasks.md"
+  },
+  {
+    "question": "What are the core concepts of body in fastapi?",
     "expected_source": "fastapi/body.md"
   },
   {
-    "question": "What is the minimal starter code to create a Hello World FastAPI app?",
+    "question": "How do I configure or use body in fastapi?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for body within fastapi?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding body in fastapi?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "How does FastAPI handle body?",
+    "expected_source": "fastapi/body.md"
+  },
+  {
+    "question": "What are the core concepts of deployment in fastapi?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "How do I configure or use deployment in fastapi?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for deployment within fastapi?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding deployment in fastapi?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "How does FastAPI handle deployment?",
+    "expected_source": "fastapi/deployment.md"
+  },
+  {
+    "question": "What are the core concepts of getting started in fastapi?",
     "expected_source": "fastapi/getting_started.md"
   },
   {
-    "question": "How do I protect my endpoint with dependencies and predefined security schemes?",
+    "question": "How do I configure or use getting started in fastapi?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for getting started within fastapi?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding getting started in fastapi?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "How does FastAPI handle getting started?",
+    "expected_source": "fastapi/getting_started.md"
+  },
+  {
+    "question": "What are the core concepts of middleware in fastapi?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "How do I configure or use middleware in fastapi?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for middleware within fastapi?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding middleware in fastapi?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "How does FastAPI handle middleware?",
+    "expected_source": "fastapi/middleware.md"
+  },
+  {
+    "question": "What are the core concepts of path params in fastapi?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "How do I configure or use path params in fastapi?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for path params within fastapi?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding path params in fastapi?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "How does FastAPI handle path params?",
+    "expected_source": "fastapi/path-params.md"
+  },
+  {
+    "question": "What are the core concepts of query params in fastapi?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "How do I configure or use query params in fastapi?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for query params within fastapi?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding query params in fastapi?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "How does FastAPI handle query params?",
+    "expected_source": "fastapi/query-params.md"
+  },
+  {
+    "question": "What are the core concepts of response model in fastapi?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "How do I configure or use response model in fastapi?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for response model within fastapi?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding response model in fastapi?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "How does FastAPI handle response model?",
+    "expected_source": "fastapi/response-model.md"
+  },
+  {
+    "question": "What are the core concepts of security in fastapi?",
     "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "How do I configure or use security in fastapi?",
+    "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for security within fastapi?",
+    "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding security in fastapi?",
+    "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "How does FastAPI handle security?",
+    "expected_source": "fastapi/security.md"
+  },
+  {
+    "question": "What are the core concepts of testing in fastapi?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "How do I configure or use testing in fastapi?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for testing within fastapi?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding testing in fastapi?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "How does FastAPI handle testing?",
+    "expected_source": "fastapi/testing.md"
+  },
+  {
+    "question": "What are the core concepts of autoscaling in kubernetes?",
+    "expected_source": "kubernetes/autoscaling.md"
+  },
+  {
+    "question": "How do I configure or use autoscaling in kubernetes?",
+    "expected_source": "kubernetes/autoscaling.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for autoscaling within kubernetes?",
+    "expected_source": "kubernetes/autoscaling.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding autoscaling in kubernetes?",
+    "expected_source": "kubernetes/autoscaling.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for autoscaling?",
+    "expected_source": "kubernetes/autoscaling.md"
+  },
+  {
+    "question": "What are the core concepts of cron jobs in kubernetes?",
+    "expected_source": "kubernetes/cron-jobs.md"
+  },
+  {
+    "question": "How do I configure or use cron jobs in kubernetes?",
+    "expected_source": "kubernetes/cron-jobs.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for cron jobs within kubernetes?",
+    "expected_source": "kubernetes/cron-jobs.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding cron jobs in kubernetes?",
+    "expected_source": "kubernetes/cron-jobs.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for cron jobs?",
+    "expected_source": "kubernetes/cron-jobs.md"
+  },
+  {
+    "question": "What are the core concepts of debug application in kubernetes?",
+    "expected_source": "kubernetes/debug_application.md"
+  },
+  {
+    "question": "How do I configure or use debug application in kubernetes?",
+    "expected_source": "kubernetes/debug_application.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for debug application within kubernetes?",
+    "expected_source": "kubernetes/debug_application.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding debug application in kubernetes?",
+    "expected_source": "kubernetes/debug_application.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for debug application?",
+    "expected_source": "kubernetes/debug_application.md"
+  },
+  {
+    "question": "What are the core concepts of deployment in kubernetes?",
+    "expected_source": "kubernetes/deployment.md"
+  },
+  {
+    "question": "How do I configure or use deployment in kubernetes?",
+    "expected_source": "kubernetes/deployment.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for deployment within kubernetes?",
+    "expected_source": "kubernetes/deployment.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding deployment in kubernetes?",
+    "expected_source": "kubernetes/deployment.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for deployment?",
+    "expected_source": "kubernetes/deployment.md"
+  },
+  {
+    "question": "What are the core concepts of ingress in kubernetes?",
+    "expected_source": "kubernetes/ingress.md"
+  },
+  {
+    "question": "How do I configure or use ingress in kubernetes?",
+    "expected_source": "kubernetes/ingress.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for ingress within kubernetes?",
+    "expected_source": "kubernetes/ingress.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding ingress in kubernetes?",
+    "expected_source": "kubernetes/ingress.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for ingress?",
+    "expected_source": "kubernetes/ingress.md"
+  },
+  {
+    "question": "What are the core concepts of job in kubernetes?",
+    "expected_source": "kubernetes/job.md"
+  },
+  {
+    "question": "How do I configure or use job in kubernetes?",
+    "expected_source": "kubernetes/job.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for job within kubernetes?",
+    "expected_source": "kubernetes/job.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding job in kubernetes?",
+    "expected_source": "kubernetes/job.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for job?",
+    "expected_source": "kubernetes/job.md"
+  },
+  {
+    "question": "What are the core concepts of liveness readiness startup probes in kubernetes?",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+  },
+  {
+    "question": "How do I configure or use liveness readiness startup probes in kubernetes?",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for liveness readiness startup probes within kubernetes?",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding liveness readiness startup probes in kubernetes?",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for liveness readiness startup probes?",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+  },
+  {
+    "question": "What are the core concepts of persistent volumes in kubernetes?",
+    "expected_source": "kubernetes/persistent-volumes.md"
+  },
+  {
+    "question": "How do I configure or use persistent volumes in kubernetes?",
+    "expected_source": "kubernetes/persistent-volumes.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for persistent volumes within kubernetes?",
+    "expected_source": "kubernetes/persistent-volumes.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding persistent volumes in kubernetes?",
+    "expected_source": "kubernetes/persistent-volumes.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for persistent volumes?",
+    "expected_source": "kubernetes/persistent-volumes.md"
+  },
+  {
+    "question": "What are the core concepts of pods in kubernetes?",
+    "expected_source": "kubernetes/pods.md"
+  },
+  {
+    "question": "How do I configure or use pods in kubernetes?",
+    "expected_source": "kubernetes/pods.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for pods within kubernetes?",
+    "expected_source": "kubernetes/pods.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding pods in kubernetes?",
+    "expected_source": "kubernetes/pods.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for pods?",
+    "expected_source": "kubernetes/pods.md"
+  },
+  {
+    "question": "What are the core concepts of resource quotas in kubernetes?",
+    "expected_source": "kubernetes/resource-quotas.md"
+  },
+  {
+    "question": "How do I configure or use resource quotas in kubernetes?",
+    "expected_source": "kubernetes/resource-quotas.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for resource quotas within kubernetes?",
+    "expected_source": "kubernetes/resource-quotas.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding resource quotas in kubernetes?",
+    "expected_source": "kubernetes/resource-quotas.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for resource quotas?",
+    "expected_source": "kubernetes/resource-quotas.md"
+  },
+  {
+    "question": "What are the core concepts of secret in kubernetes?",
+    "expected_source": "kubernetes/secret.md"
+  },
+  {
+    "question": "How do I configure or use secret in kubernetes?",
+    "expected_source": "kubernetes/secret.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for secret within kubernetes?",
+    "expected_source": "kubernetes/secret.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding secret in kubernetes?",
+    "expected_source": "kubernetes/secret.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for secret?",
+    "expected_source": "kubernetes/secret.md"
+  },
+  {
+    "question": "What are the core concepts of service in kubernetes?",
+    "expected_source": "kubernetes/service.md"
+  },
+  {
+    "question": "How do I configure or use service in kubernetes?",
+    "expected_source": "kubernetes/service.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for service within kubernetes?",
+    "expected_source": "kubernetes/service.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding service in kubernetes?",
+    "expected_source": "kubernetes/service.md"
+  },
+  {
+    "question": "What are the Kubernetes specifications for service?",
+    "expected_source": "kubernetes/service.md"
+  },
+  {
+    "question": "What are the core concepts of api reference in qdrant?",
+    "expected_source": "qdrant/api-reference.md"
+  },
+  {
+    "question": "How do I configure or use api reference in qdrant?",
+    "expected_source": "qdrant/api-reference.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for api reference within qdrant?",
+    "expected_source": "qdrant/api-reference.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding api reference in qdrant?",
+    "expected_source": "qdrant/api-reference.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with api reference?",
+    "expected_source": "qdrant/api-reference.md"
+  },
+  {
+    "question": "What are the core concepts of collections in qdrant?",
+    "expected_source": "qdrant/collections.md"
+  },
+  {
+    "question": "How do I configure or use collections in qdrant?",
+    "expected_source": "qdrant/collections.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for collections within qdrant?",
+    "expected_source": "qdrant/collections.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding collections in qdrant?",
+    "expected_source": "qdrant/collections.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with collections?",
+    "expected_source": "qdrant/collections.md"
+  },
+  {
+    "question": "What are the core concepts of common errors in qdrant?",
+    "expected_source": "qdrant/common-errors.md"
+  },
+  {
+    "question": "How do I configure or use common errors in qdrant?",
+    "expected_source": "qdrant/common-errors.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for common errors within qdrant?",
+    "expected_source": "qdrant/common-errors.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding common errors in qdrant?",
+    "expected_source": "qdrant/common-errors.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with common errors?",
+    "expected_source": "qdrant/common-errors.md"
+  },
+  {
+    "question": "What are the core concepts of hybrid queries in qdrant?",
+    "expected_source": "qdrant/hybrid-queries.md"
+  },
+  {
+    "question": "How do I configure or use hybrid queries in qdrant?",
+    "expected_source": "qdrant/hybrid-queries.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for hybrid queries within qdrant?",
+    "expected_source": "qdrant/hybrid-queries.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding hybrid queries in qdrant?",
+    "expected_source": "qdrant/hybrid-queries.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with hybrid queries?",
+    "expected_source": "qdrant/hybrid-queries.md"
+  },
+  {
+    "question": "What are the core concepts of indexing in qdrant?",
+    "expected_source": "qdrant/indexing.md"
+  },
+  {
+    "question": "How do I configure or use indexing in qdrant?",
+    "expected_source": "qdrant/indexing.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for indexing within qdrant?",
+    "expected_source": "qdrant/indexing.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding indexing in qdrant?",
+    "expected_source": "qdrant/indexing.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with indexing?",
+    "expected_source": "qdrant/indexing.md"
+  },
+  {
+    "question": "What are the core concepts of overview in qdrant?",
+    "expected_source": "qdrant/overview.md"
+  },
+  {
+    "question": "How do I configure or use overview in qdrant?",
+    "expected_source": "qdrant/overview.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for overview within qdrant?",
+    "expected_source": "qdrant/overview.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding overview in qdrant?",
+    "expected_source": "qdrant/overview.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with overview?",
+    "expected_source": "qdrant/overview.md"
+  },
+  {
+    "question": "What are the core concepts of points in qdrant?",
+    "expected_source": "qdrant/points.md"
+  },
+  {
+    "question": "How do I configure or use points in qdrant?",
+    "expected_source": "qdrant/points.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for points within qdrant?",
+    "expected_source": "qdrant/points.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding points in qdrant?",
+    "expected_source": "qdrant/points.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with points?",
+    "expected_source": "qdrant/points.md"
+  },
+  {
+    "question": "What are the core concepts of qdrant fundamentals in qdrant?",
+    "expected_source": "qdrant/qdrant-fundamentals.md"
+  },
+  {
+    "question": "How do I configure or use qdrant fundamentals in qdrant?",
+    "expected_source": "qdrant/qdrant-fundamentals.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for qdrant fundamentals within qdrant?",
+    "expected_source": "qdrant/qdrant-fundamentals.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding qdrant fundamentals in qdrant?",
+    "expected_source": "qdrant/qdrant-fundamentals.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with qdrant fundamentals?",
+    "expected_source": "qdrant/qdrant-fundamentals.md"
+  },
+  {
+    "question": "What are the core concepts of quantization in qdrant?",
+    "expected_source": "qdrant/quantization.md"
+  },
+  {
+    "question": "How do I configure or use quantization in qdrant?",
+    "expected_source": "qdrant/quantization.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for quantization within qdrant?",
+    "expected_source": "qdrant/quantization.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding quantization in qdrant?",
+    "expected_source": "qdrant/quantization.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with quantization?",
+    "expected_source": "qdrant/quantization.md"
+  },
+  {
+    "question": "What are the core concepts of reranking semantic search in qdrant?",
+    "expected_source": "qdrant/reranking-semantic-search.md"
+  },
+  {
+    "question": "How do I configure or use reranking semantic search in qdrant?",
+    "expected_source": "qdrant/reranking-semantic-search.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for reranking semantic search within qdrant?",
+    "expected_source": "qdrant/reranking-semantic-search.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding reranking semantic search in qdrant?",
+    "expected_source": "qdrant/reranking-semantic-search.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with reranking semantic search?",
+    "expected_source": "qdrant/reranking-semantic-search.md"
+  },
+  {
+    "question": "What are the core concepts of snapshots in qdrant?",
+    "expected_source": "qdrant/snapshots.md"
+  },
+  {
+    "question": "How do I configure or use snapshots in qdrant?",
+    "expected_source": "qdrant/snapshots.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for snapshots within qdrant?",
+    "expected_source": "qdrant/snapshots.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding snapshots in qdrant?",
+    "expected_source": "qdrant/snapshots.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with snapshots?",
+    "expected_source": "qdrant/snapshots.md"
+  },
+  {
+    "question": "What are the core concepts of vectors in qdrant?",
+    "expected_source": "qdrant/vectors.md"
+  },
+  {
+    "question": "How do I configure or use vectors in qdrant?",
+    "expected_source": "qdrant/vectors.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for vectors within qdrant?",
+    "expected_source": "qdrant/vectors.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding vectors in qdrant?",
+    "expected_source": "qdrant/vectors.md"
+  },
+  {
+    "question": "How does Qdrant's vector database interact with vectors?",
+    "expected_source": "qdrant/vectors.md"
+  },
+  {
+    "question": "What are the core concepts of engine args in vllm?",
+    "expected_source": "vllm/engine_args.md"
+  },
+  {
+    "question": "How do I configure or use engine args in vllm?",
+    "expected_source": "vllm/engine_args.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for engine args within vllm?",
+    "expected_source": "vllm/engine_args.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding engine args in vllm?",
+    "expected_source": "vllm/engine_args.md"
+  },
+  {
+    "question": "What does vLLM documentation say about engine args?",
+    "expected_source": "vllm/engine_args.md"
+  },
+  {
+    "question": "What are the core concepts of faq in vllm?",
+    "expected_source": "vllm/faq.md"
+  },
+  {
+    "question": "How do I configure or use faq in vllm?",
+    "expected_source": "vllm/faq.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for faq within vllm?",
+    "expected_source": "vllm/faq.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding faq in vllm?",
+    "expected_source": "vllm/faq.md"
+  },
+  {
+    "question": "What does vLLM documentation say about faq?",
+    "expected_source": "vllm/faq.md"
+  },
+  {
+    "question": "What are the core concepts of installation cpu in vllm?",
+    "expected_source": "vllm/installation_cpu.md"
+  },
+  {
+    "question": "How do I configure or use installation cpu in vllm?",
+    "expected_source": "vllm/installation_cpu.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for installation cpu within vllm?",
+    "expected_source": "vllm/installation_cpu.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding installation cpu in vllm?",
+    "expected_source": "vllm/installation_cpu.md"
+  },
+  {
+    "question": "What does vLLM documentation say about installation cpu?",
+    "expected_source": "vllm/installation_cpu.md"
+  },
+  {
+    "question": "What are the core concepts of installation gpu in vllm?",
+    "expected_source": "vllm/installation_gpu.md"
+  },
+  {
+    "question": "How do I configure or use installation gpu in vllm?",
+    "expected_source": "vllm/installation_gpu.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for installation gpu within vllm?",
+    "expected_source": "vllm/installation_gpu.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding installation gpu in vllm?",
+    "expected_source": "vllm/installation_gpu.md"
+  },
+  {
+    "question": "What does vLLM documentation say about installation gpu?",
+    "expected_source": "vllm/installation_gpu.md"
+  },
+  {
+    "question": "What are the core concepts of installation quickstart in vllm?",
+    "expected_source": "vllm/installation_quickstart.md"
+  },
+  {
+    "question": "How do I configure or use installation quickstart in vllm?",
+    "expected_source": "vllm/installation_quickstart.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for installation quickstart within vllm?",
+    "expected_source": "vllm/installation_quickstart.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding installation quickstart in vllm?",
+    "expected_source": "vllm/installation_quickstart.md"
+  },
+  {
+    "question": "What does vLLM documentation say about installation quickstart?",
+    "expected_source": "vllm/installation_quickstart.md"
+  },
+  {
+    "question": "What are the core concepts of offline inference in vllm?",
+    "expected_source": "vllm/offline_inference.md"
+  },
+  {
+    "question": "How do I configure or use offline inference in vllm?",
+    "expected_source": "vllm/offline_inference.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for offline inference within vllm?",
+    "expected_source": "vllm/offline_inference.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding offline inference in vllm?",
+    "expected_source": "vllm/offline_inference.md"
+  },
+  {
+    "question": "What does vLLM documentation say about offline inference?",
+    "expected_source": "vllm/offline_inference.md"
+  },
+  {
+    "question": "What are the core concepts of overview in vllm?",
+    "expected_source": "vllm/overview.md"
+  },
+  {
+    "question": "How do I configure or use overview in vllm?",
+    "expected_source": "vllm/overview.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for overview within vllm?",
+    "expected_source": "vllm/overview.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding overview in vllm?",
+    "expected_source": "vllm/overview.md"
+  },
+  {
+    "question": "What does vLLM documentation say about overview?",
+    "expected_source": "vllm/overview.md"
+  },
+  {
+    "question": "What are the core concepts of paged attention in vllm?",
+    "expected_source": "vllm/paged_attention.md"
+  },
+  {
+    "question": "How do I configure or use paged attention in vllm?",
+    "expected_source": "vllm/paged_attention.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for paged attention within vllm?",
+    "expected_source": "vllm/paged_attention.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding paged attention in vllm?",
+    "expected_source": "vllm/paged_attention.md"
+  },
+  {
+    "question": "What does vLLM documentation say about paged attention?",
+    "expected_source": "vllm/paged_attention.md"
+  },
+  {
+    "question": "What are the core concepts of parallelism scaling in vllm?",
+    "expected_source": "vllm/parallelism_scaling.md"
+  },
+  {
+    "question": "How do I configure or use parallelism scaling in vllm?",
+    "expected_source": "vllm/parallelism_scaling.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for parallelism scaling within vllm?",
+    "expected_source": "vllm/parallelism_scaling.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding parallelism scaling in vllm?",
+    "expected_source": "vllm/parallelism_scaling.md"
+  },
+  {
+    "question": "What does vLLM documentation say about parallelism scaling?",
+    "expected_source": "vllm/parallelism_scaling.md"
+  },
+  {
+    "question": "What are the core concepts of prefix caching in vllm?",
+    "expected_source": "vllm/prefix_caching.md"
+  },
+  {
+    "question": "How do I configure or use prefix caching in vllm?",
+    "expected_source": "vllm/prefix_caching.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for prefix caching within vllm?",
+    "expected_source": "vllm/prefix_caching.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding prefix caching in vllm?",
+    "expected_source": "vllm/prefix_caching.md"
+  },
+  {
+    "question": "What does vLLM documentation say about prefix caching?",
+    "expected_source": "vllm/prefix_caching.md"
+  },
+  {
+    "question": "What are the core concepts of quantization in vllm?",
+    "expected_source": "vllm/quantization.md"
+  },
+  {
+    "question": "How do I configure or use quantization in vllm?",
+    "expected_source": "vllm/quantization.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for quantization within vllm?",
+    "expected_source": "vllm/quantization.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding quantization in vllm?",
+    "expected_source": "vllm/quantization.md"
+  },
+  {
+    "question": "What does vLLM documentation say about quantization?",
+    "expected_source": "vllm/quantization.md"
+  },
+  {
+    "question": "What are the core concepts of sampling parameters in vllm?",
+    "expected_source": "vllm/sampling_parameters.md"
+  },
+  {
+    "question": "How do I configure or use sampling parameters in vllm?",
+    "expected_source": "vllm/sampling_parameters.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for sampling parameters within vllm?",
+    "expected_source": "vllm/sampling_parameters.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding sampling parameters in vllm?",
+    "expected_source": "vllm/sampling_parameters.md"
+  },
+  {
+    "question": "What does vLLM documentation say about sampling parameters?",
+    "expected_source": "vllm/sampling_parameters.md"
+  },
+  {
+    "question": "What are the core concepts of serving openai compatible server in vllm?",
+    "expected_source": "vllm/serving_openai_compatible_server.md"
+  },
+  {
+    "question": "How do I configure or use serving openai compatible server in vllm?",
+    "expected_source": "vllm/serving_openai_compatible_server.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for serving openai compatible server within vllm?",
+    "expected_source": "vllm/serving_openai_compatible_server.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding serving openai compatible server in vllm?",
+    "expected_source": "vllm/serving_openai_compatible_server.md"
+  },
+  {
+    "question": "What does vLLM documentation say about serving openai compatible server?",
+    "expected_source": "vllm/serving_openai_compatible_server.md"
+  },
+  {
+    "question": "What are the core concepts of speculative decoding in vllm?",
+    "expected_source": "vllm/speculative_decoding.md"
+  },
+  {
+    "question": "How do I configure or use speculative decoding in vllm?",
+    "expected_source": "vllm/speculative_decoding.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for speculative decoding within vllm?",
+    "expected_source": "vllm/speculative_decoding.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding speculative decoding in vllm?",
+    "expected_source": "vllm/speculative_decoding.md"
+  },
+  {
+    "question": "What does vLLM documentation say about speculative decoding?",
+    "expected_source": "vllm/speculative_decoding.md"
+  },
+  {
+    "question": "What are the core concepts of troubleshooting in vllm?",
+    "expected_source": "vllm/troubleshooting.md"
+  },
+  {
+    "question": "How do I configure or use troubleshooting in vllm?",
+    "expected_source": "vllm/troubleshooting.md"
+  },
+  {
+    "question": "Where can I find documentation and examples for troubleshooting within vllm?",
+    "expected_source": "vllm/troubleshooting.md"
+  },
+  {
+    "question": "Can you explain the best practices or details regarding troubleshooting in vllm?",
+    "expected_source": "vllm/troubleshooting.md"
+  },
+  {
+    "question": "What does vLLM documentation say about troubleshooting?",
+    "expected_source": "vllm/troubleshooting.md"
   }
 ]
