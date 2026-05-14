@@ -66,16 +66,17 @@ class IngestionPipeline:
         """
         Extracts domain and doc_type from the file path.
         Example: data/raw/official_docs/fastapi/deployment.md
+        - category: raw
         - doc_type: official_docs
         - domain: fastapi
         """
         try:
-            # Get path relative to data/raw
-            # This allows safe extraction of standard categories
+            # Pivot from 'data' to handle both raw and synthetic
             parts = file_path.parts
-            raw_index = parts.index("raw")
-            doc_type = parts[raw_index + 1] if len(parts) > raw_index + 1 else "unknown"
-            domain = parts[raw_index + 2] if len(parts) > raw_index + 2 else "unknown"
+            data_index = parts.index("data")
+            # parts[data_index + 1] would be "raw" or "synthetic"
+            doc_type = parts[data_index + 2] if len(parts) > data_index + 2 else "unknown"
+            domain = parts[data_index + 3] if len(parts) > data_index + 3 else "unknown"
         except ValueError:
             doc_type = "unknown"
             domain = "unknown"
@@ -216,15 +217,19 @@ class IngestionPipeline:
             await self.client.upsert(collection_name=collection_name, points=points)
             logger.info(f"Upserted batch {i // batch_size + 1} into {collection_name}")
 
-    async def run(self, raw_docs_root: Path):
+    async def run(self, data_roots: list[Path]):
         """Executes the full ingestion pipeline for the global knowledge base."""
-        logger.info(f"Starting ingestion from {raw_docs_root}")
+        logger.info(f"Starting ingestion from roots: {[str(r) for r in data_roots]}")
         collection_name = "enterprise_knowledge"
 
         # 1. Initialize global Qdrant collection
         await self.initialize_collection(collection_name)
 
-        corpora = await self.list_corpora(raw_docs_root)
+        corpora = []
+        for root in data_roots:
+            if root.exists():
+                corpora.extend(await self.list_corpora(root))
+
         logger.info(f"Found {len(corpora)} domains to ingest: {[c.name for c in corpora]}")
 
         for corpus_path in corpora:
