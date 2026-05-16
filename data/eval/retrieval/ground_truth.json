@@ -1,0 +1,1238 @@
+[
+    {
+        "question": "What are background tasks in FastAPI and when should they run?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "How do I import and use BackgroundTasks in a FastAPI path operation function?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "How do I create a task function for FastAPI background tasks?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "How do I add a task to BackgroundTasks using add_task in FastAPI?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "How does BackgroundTasks work with FastAPI dependency injection?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "When should I use Celery instead of FastAPI BackgroundTasks?",
+        "expected_source": "fastapi/background-tasks.md"
+    },
+    {
+        "question": "What is a request body in FastAPI?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "How do I declare a request body using a Pydantic BaseModel in FastAPI?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "How does FastAPI decide whether a model field is required or optional in a request body?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "What does FastAPI do automatically when a Pydantic model is used as a request body?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "How are request body models shown in FastAPI automatic API documentation?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "How can I use a Pydantic request body together with path parameters in FastAPI?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "How does FastAPI distinguish between body, path, and query parameters in the same path operation?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "Can FastAPI receive a body with a GET request and what are the caveats?",
+        "expected_source": "fastapi/body.md"
+    },
+    {
+        "question": "What does deployment mean for a FastAPI application?",
+        "expected_source": "fastapi/deployment.md"
+    },
+    {
+        "question": "How is deploying a FastAPI application different from running it during development?",
+        "expected_source": "fastapi/deployment.md"
+    },
+    {
+        "question": "What deployment strategies are mentioned for FastAPI applications?",
+        "expected_source": "fastapi/deployment.md"
+    },
+    {
+        "question": "What is FastAPI Cloud and how does it relate to FastAPI deployment?",
+        "expected_source": "fastapi/deployment.md"
+    },
+    {
+        "question": "What is FastAPI and what is it used for?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What are the key features of FastAPI?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What are the main dependencies FastAPI is built on?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "How do I install FastAPI with standard dependencies?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "How do I create a basic FastAPI app with a root endpoint and an item endpoint?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "How do I run a FastAPI application in development mode?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What does the fastapi dev command do?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "How do I access Swagger UI and ReDoc documentation for a FastAPI app?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "How do I add a PUT endpoint with a request body in a FastAPI example app?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What benefits does FastAPI provide from standard Python type declarations?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What optional dependencies are included when installing fastapi[standard]?",
+        "expected_source": "fastapi/getting_started.md"
+    },
+    {
+        "question": "What is middleware in FastAPI?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "How do I create custom HTTP middleware in FastAPI?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "What parameters does a FastAPI middleware function receive?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "How can middleware modify a response before returning it in FastAPI?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "How can I add an X-Process-Time header using FastAPI middleware?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "What is the execution order when multiple middlewares are added in FastAPI?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "How do dependencies with yield and background tasks relate to middleware execution order?",
+        "expected_source": "fastapi/middleware.md"
+    },
+    {
+        "question": "How do I declare path parameters in FastAPI?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How do I declare the type of a path parameter in FastAPI?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How does FastAPI convert path parameter values to Python types?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "What validation error does FastAPI return when a path parameter cannot be parsed as an integer?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How are FastAPI path parameters documented automatically?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "Why does path operation order matter in FastAPI?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How do I define predefined path parameter values using Enum in FastAPI?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How do I declare a FastAPI path parameter that contains a full file path?",
+        "expected_source": "fastapi/path-params.md"
+    },
+    {
+        "question": "How does FastAPI interpret function parameters that are not path parameters?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "What are query parameters in a FastAPI URL?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How do default values work for query parameters in FastAPI?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How do I make a query parameter optional in FastAPI?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How does FastAPI convert boolean query parameters?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "Can I declare multiple path and query parameters in any order in FastAPI?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How do I make a query parameter required in FastAPI?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How can I mix required, default, and optional query parameters in FastAPI?",
+        "expected_source": "fastapi/query-params.md"
+    },
+    {
+        "question": "How do I declare a response model using a return type annotation in FastAPI?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "What does FastAPI do with a declared response return type?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "How do I use the response_model parameter in a FastAPI path operation decorator?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "What happens if both a return type and response_model are declared in FastAPI?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "Why can returning the same input model expose sensitive data in FastAPI?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "How do I use an output model to filter passwords or private fields from FastAPI responses?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "How does model inheritance help with FastAPI response data filtering and type annotations?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "When should I set response_model=None in FastAPI?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "How do I exclude unset default values from a FastAPI response model?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "How do response_model_include and response_model_exclude work in FastAPI?",
+        "expected_source": "fastapi/response-model.md"
+    },
+    {
+        "question": "What security and authentication tools does FastAPI provide?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "What is OAuth2 and what kinds of authentication use cases does it cover?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "How is OAuth2 different from OAuth 1 according to the FastAPI security docs?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "What is OpenID Connect and how does it relate to OAuth2?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "What security schemes does OpenAPI define for APIs?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "What FastAPI module provides utilities for security schemes?",
+        "expected_source": "fastapi/security.md"
+    },
+    {
+        "question": "How do I test a FastAPI application using TestClient?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "What package should be installed to use FastAPI TestClient?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "How should pytest test functions be written when using FastAPI TestClient?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "How can I separate FastAPI application code and tests into different files?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "How do I pass path parameters, query parameters, JSON bodies, headers, and cookies in FastAPI tests?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "How do I run FastAPI tests with pytest?",
+        "expected_source": "fastapi/testing.md"
+    },
+    {
+        "question": "What is autoscaling in Kubernetes and how does it help workloads react to resource demand?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "What is the difference between horizontal scaling and vertical scaling in Kubernetes?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "How can Kubernetes workloads be scaled manually using horizontal and vertical scaling strategies?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "What is a HorizontalPodAutoscaler and what resource utilization does it observe?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "Why does VerticalPodAutoscaler require an add-on and Metrics Server in Kubernetes?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "How does the Cluster Proportional Autoscaler scale workloads based on cluster size?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "How can Kubernetes workloads be autoscaled based on events such as queue length?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "How can scheduled autoscaling be achieved in Kubernetes using KEDA Cron scaler?",
+        "expected_source": "kubernetes/autoscaling.md"
+    },
+    {
+        "question": "What is a CronJob in Kubernetes and what kinds of scheduled actions is it intended for?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "Why must a CronJob name be no longer than 52 characters?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "What does the Cron schedule expression 0 3 * * 1 mean in a Kubernetes CronJob?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "What is the purpose of the .spec.jobTemplate field in a CronJob?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "How does .spec.startingDeadlineSeconds affect delayed CronJob executions?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "What are the Allow, Forbid, and Replace concurrency policies for CronJobs?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "What happens when .spec.suspend is set to true on a CronJob?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "How do successfulJobsHistoryLimit and failedJobsHistoryLimit control CronJob history retention?",
+        "expected_source": "kubernetes/cron-jobs.md"
+    },
+    {
+        "question": "What types of application troubleshooting resources are covered by the Kubernetes troubleshooting applications document?",
+        "expected_source": "kubernetes/debug_application.md"
+    },
+    {
+        "question": "What kinds of Kubernetes resources are mentioned as common sources of application issues in the troubleshooting applications document?",
+        "expected_source": "kubernetes/debug_application.md"
+    },
+    {
+        "question": "What does the troubleshooting applications document say about container termination messages?",
+        "expected_source": "kubernetes/debug_application.md"
+    },
+    {
+        "question": "What does the troubleshooting applications document cover about debugging running containers?",
+        "expected_source": "kubernetes/debug_application.md"
+    },
+    {
+        "question": "What is a Deployment in Kubernetes and what resources does it provide declarative updates for?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "What are common use cases for Kubernetes Deployments?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "How does a Deployment create a ReplicaSet and Pods from the desired state?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "What information is shown by kubectl get deployments when checking a Deployment rollout?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "What is the pod-template-hash label and why should it not be changed?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "When does a Deployment rollout get triggered?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "How do maxUnavailable and maxSurge affect a Deployment rolling update?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "What happens when a Deployment is updated while another rollout is already in progress?",
+        "expected_source": "kubernetes/deployment.md"
+    },
+    {
+        "question": "What is Ingress in Kubernetes and what kinds of routes does it expose?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "Why does creating only an Ingress resource have no effect without an Ingress controller?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "What information is contained in an Ingress rule?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "What is defaultBackend in an Ingress and when is it used?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "What is a Resource backend in an Ingress and how is it different from a Service backend?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "What are the Exact, Prefix, and ImplementationSpecific path types in Ingress?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "How does Ingress support name based virtual hosting?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "How does Ingress handle TLS configuration?",
+        "expected_source": "kubernetes/ingress.md"
+    },
+    {
+        "question": "What is a Kubernetes Job and when is it considered complete?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "How does a Job retry Pods until a specified number successfully terminate?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "What fields are required when writing a Kubernetes Job spec?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "What restartPolicy values are allowed in a Job pod template?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "What are the three main types of parallel execution patterns for Kubernetes Jobs?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "How does .spec.parallelism control the number of Pods running for a Job?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "What is the difference between Indexed and NonIndexed completion modes for Jobs?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "How does .spec.backoffLimit control retries before a Job is considered failed?",
+        "expected_source": "kubernetes/job.md"
+    },
+    {
+        "question": "What are startup probes and how do they affect liveness and readiness probes?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "What are liveness probes used for in Kubernetes?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "What happens when a container repeatedly fails its liveness probe?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "What are readiness probes used for in Kubernetes?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "What happens when a readiness probe returns a failed state?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "How are readiness probes different from startup probes during a container lifecycle?",
+        "expected_source": "kubernetes/liveness-readiness-startup-probes.md"
+    },
+    {
+        "question": "What are PersistentVolumes and PersistentVolumeClaims in Kubernetes?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "What is the difference between static and dynamic PersistentVolume provisioning?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "How does Kubernetes bind a PersistentVolumeClaim to a PersistentVolume?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "How do Pods use PersistentVolumeClaims as volumes?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "What is Storage Object in Use Protection for PVs and PVCs?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "What are the Retain, Delete, and Recycle reclaim policies for PersistentVolumes?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "How can a PVC be pre-bound to a specific PersistentVolume?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "What conditions are required to expand a PersistentVolumeClaim?",
+        "expected_source": "kubernetes/persistent-volumes.md"
+    },
+    {
+        "question": "What is a Pod in Kubernetes and why is it considered the smallest deployable unit?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What resources do containers share inside the same Pod?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What are the two main ways Pods are used in Kubernetes clusters?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "Why are Pods usually created through workload resources instead of directly?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What does it mean that Pods are ephemeral and disposable entities?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "How do controllers replace Pods when a node fails?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What is a Pod template and how do workload resources use it?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What are init containers and ephemeral containers in a Pod?",
+        "expected_source": "kubernetes/pods.md"
+    },
+    {
+        "question": "What problem do ResourceQuotas solve in shared Kubernetes clusters?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "How does Kubernetes enforce ResourceQuota limits in a namespace?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "What happens when creating or updating a resource violates a ResourceQuota?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "Why must Pods specify CPU or memory requests or limits when quotas are enabled for those resources?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "What resource names are used for CPU and memory ResourceQuota limits and requests?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "How can ResourceQuota limit storage consumption and PersistentVolumeClaim counts?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "How can ResourceQuota limit the number of objects such as pods, secrets, jobs, and cronjobs?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "What are quota scopes and how do they limit where a ResourceQuota applies?",
+        "expected_source": "kubernetes/resource-quotas.md"
+    },
+    {
+        "question": "What is a Kubernetes Secret and what kind of data is it intended to hold?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "Why are Kubernetes Secrets safer than putting confidential data directly in Pod specs or container images?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What security precautions should be taken when using Kubernetes Secrets?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What are common uses for Secrets in Kubernetes?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "How can a Secret key beginning with a dot be mounted as a hidden file in a volume?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What are the built-in Kubernetes Secret types and what are they used for?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What is an Opaque Secret and when is it the default Secret type?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What is the recommended alternative to long-lived ServiceAccount token Secrets in Kubernetes v1.22 and later?",
+        "expected_source": "kubernetes/secret.md"
+    },
+    {
+        "question": "What is a Kubernetes Service and why is it useful for exposing Pods?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "How does a Service decouple frontend clients from changing backend Pods?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "How does a Service selector determine which Pods are targeted?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "How can a Service map an incoming port to a targetPort on Pods?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "How can a Service target Pods using named ports?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "How do Services without selectors work with manually created EndpointSlices?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "Why is the Endpoints API deprecated in favor of EndpointSlices?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "What are ClusterIP, NodePort, and LoadBalancer Service types used for?",
+        "expected_source": "kubernetes/service.md"
+    },
+    {
+        "question": "What are APIAuthentication resources used for in Qdrant?",
+        "expected_source": "qdrant/api-reference.md"
+    },
+    {
+        "question": "What fields are defined in APIAuthenticationSpec?",
+        "expected_source": "qdrant/api-reference.md"
+    },
+    {
+        "question": "What cluster phases can appear in QdrantClusterStatus?",
+        "expected_source": "qdrant/api-reference.md"
+    },
+    {
+        "question": "What GPU configuration options are available for a QdrantCluster?",
+        "expected_source": "qdrant/api-reference.md"
+    },
+    {
+        "question": "What does QdrantClusterScheduledSnapshotSpec define?",
+        "expected_source": "qdrant/api-reference.md"
+    },
+    {
+        "question": "What are collections in Qdrant?",
+        "expected_source": "qdrant/collections.md"
+    },
+    {
+        "question": "Which distance metrics does Qdrant support for collections?",
+        "expected_source": "qdrant/collections.md"
+    },
+    {
+        "question": "When should you use a single collection with payload-based partitioning instead of multiple collections?",
+        "expected_source": "qdrant/collections.md"
+    },
+    {
+        "question": "How can a collection be configured to store multiple vectors per record?",
+        "expected_source": "qdrant/collections.md"
+    },
+    {
+        "question": "How do you update vector parameters for collections without named vectors?",
+        "expected_source": "qdrant/collections.md"
+    },
+    {
+        "question": "How can you fix the 'Too many files open' OS error in Qdrant?",
+        "expected_source": "qdrant/common-errors.md"
+    },
+    {
+        "question": "Why does Qdrant require POSIX-compatible persistent file storage?",
+        "expected_source": "qdrant/common-errors.md"
+    },
+    {
+        "question": "How can incompatible file system problems be avoided when running Qdrant in Docker on Windows?",
+        "expected_source": "qdrant/common-errors.md"
+    },
+    {
+        "question": "What does the 'Can't open Collections meta Wal' error mean in a distributed Qdrant deployment?",
+        "expected_source": "qdrant/common-errors.md"
+    },
+    {
+        "question": "How can Python gRPC client errors with multiprocessing be prevented?",
+        "expected_source": "qdrant/common-errors.md"
+    },
+    {
+        "question": "What is the Query API used for in hybrid and multi-stage queries?",
+        "expected_source": "qdrant/hybrid-queries.md"
+    },
+    {
+        "question": "What does the prefetch parameter do in Qdrant query requests?",
+        "expected_source": "qdrant/hybrid-queries.md"
+    },
+    {
+        "question": "How does Reciprocal Rank Fusion combine results from multiple queries?",
+        "expected_source": "qdrant/hybrid-queries.md"
+    },
+    {
+        "question": "How can weights be assigned to different prefetches in weighted RRF?",
+        "expected_source": "qdrant/hybrid-queries.md"
+    },
+    {
+        "question": "What is Distribution-Based Score Fusion in Qdrant?",
+        "expected_source": "qdrant/hybrid-queries.md"
+    },
+    {
+        "question": "Why does Qdrant combine vector indexes with payload indexes?",
+        "expected_source": "qdrant/indexing.md"
+    },
+    {
+        "question": "What field types are available for payload indexes in Qdrant?",
+        "expected_source": "qdrant/indexing.md"
+    },
+    {
+        "question": "What is a parameterized integer index and when can it improve performance?",
+        "expected_source": "qdrant/indexing.md"
+    },
+    {
+        "question": "When should you use an on-disk payload index?",
+        "expected_source": "qdrant/indexing.md"
+    },
+    {
+        "question": "What tokenizers are available for Qdrant full-text indexes?",
+        "expected_source": "qdrant/indexing.md"
+    },
+    {
+        "question": "What is the retrieval process described in the Qdrant overview?",
+        "expected_source": "qdrant/overview.md"
+    },
+    {
+        "question": "How does Qdrant use dense and sparse vectors in retrieval?",
+        "expected_source": "qdrant/overview.md"
+    },
+    {
+        "question": "What client-server architecture and interfaces does Qdrant provide?",
+        "expected_source": "qdrant/overview.md"
+    },
+    {
+        "question": "What deployment models does Qdrant support?",
+        "expected_source": "qdrant/overview.md"
+    },
+    {
+        "question": "What memory considerations matter when scaling Qdrant collections?",
+        "expected_source": "qdrant/overview.md"
+    },
+    {
+        "question": "What is a point in Qdrant?",
+        "expected_source": "qdrant/points.md"
+    },
+    {
+        "question": "Which point ID formats does Qdrant support?",
+        "expected_source": "qdrant/points.md"
+    },
+    {
+        "question": "What vector types can be attached to Qdrant points?",
+        "expected_source": "qdrant/points.md"
+    },
+    {
+        "question": "How does idempotence work when uploading points to Qdrant?",
+        "expected_source": "qdrant/points.md"
+    },
+    {
+        "question": "What are the update_mode options for point upserts?",
+        "expected_source": "qdrant/points.md"
+    },
+    {
+        "question": "What is the maximum dense vector dimension supported by Qdrant?",
+        "expected_source": "qdrant/qdrant-fundamentals.md"
+    },
+    {
+        "question": "Why can the same similarity search query return slightly different results on different machines?",
+        "expected_source": "qdrant/qdrant-fundamentals.md"
+    },
+    {
+        "question": "Why might indexed vector counts not match total vector counts in a collection?",
+        "expected_source": "qdrant/qdrant-fundamentals.md"
+    },
+    {
+        "question": "Why might collection info show an approximate rather than exact number of points?",
+        "expected_source": "qdrant/qdrant-fundamentals.md"
+    },
+    {
+        "question": "Why might vectors in a collection not match the vectors that were uploaded?",
+        "expected_source": "qdrant/qdrant-fundamentals.md"
+    },
+    {
+        "question": "What is quantization in Qdrant used for?",
+        "expected_source": "qdrant/quantization.md"
+    },
+    {
+        "question": "How does scalar quantization reduce vector memory usage?",
+        "expected_source": "qdrant/quantization.md"
+    },
+    {
+        "question": "What are the benefits and limitations of binary quantization?",
+        "expected_source": "qdrant/quantization.md"
+    },
+    {
+        "question": "How do 1.5-bit and 2-bit binary quantization improve precision for smaller vectors?",
+        "expected_source": "qdrant/quantization.md"
+    },
+    {
+        "question": "How should you choose between scalar, binary, and product quantization?",
+        "expected_source": "qdrant/quantization.md"
+    },
+    {
+        "question": "Why is reranking useful in RAG systems using Qdrant?",
+        "expected_source": "qdrant/reranking-semantic-search.md"
+    },
+    {
+        "question": "How do precision and recall relate to reranking search results?",
+        "expected_source": "qdrant/reranking-semantic-search.md"
+    },
+    {
+        "question": "What are the main types of reranker models described in the guide?",
+        "expected_source": "qdrant/reranking-semantic-search.md"
+    },
+    {
+        "question": "What are the ingestion and retrieval stages in a reranking-based Qdrant search system?",
+        "expected_source": "qdrant/reranking-semantic-search.md"
+    },
+    {
+        "question": "How is Cohere reranking used after vector search in the Qdrant reranking example?",
+        "expected_source": "qdrant/reranking-semantic-search.md"
+    },
+    {
+        "question": "What is a Qdrant snapshot?",
+        "expected_source": "qdrant/snapshots.md"
+    },
+    {
+        "question": "Why must snapshots be created separately for each node in a distributed deployment?",
+        "expected_source": "qdrant/snapshots.md"
+    },
+    {
+        "question": "What data is included in a collection-level snapshot?",
+        "expected_source": "qdrant/snapshots.md"
+    },
+    {
+        "question": "What are the three ways to restore a collection snapshot?",
+        "expected_source": "qdrant/snapshots.md"
+    },
+    {
+        "question": "What snapshot recovery priorities are available and what do they mean?",
+        "expected_source": "qdrant/snapshots.md"
+    },
+    {
+        "question": "What are vectors in Qdrant?",
+        "expected_source": "qdrant/vectors.md"
+    },
+    {
+        "question": "What is the difference between dense vectors and sparse vectors?",
+        "expected_source": "qdrant/vectors.md"
+    },
+    {
+        "question": "What are multivectors and when are they useful?",
+        "expected_source": "qdrant/vectors.md"
+    },
+    {
+        "question": "How do named vectors allow multiple embeddings in the same point?",
+        "expected_source": "qdrant/vectors.md"
+    },
+    {
+        "question": "What vector datatypes does Qdrant support and why do they matter?",
+        "expected_source": "qdrant/vectors.md"
+    },
+    {
+        "question": "How do you initialize vLLM's LLM class for offline inference with the facebook/opt-125m model?",
+        "expected_source": "vllm/offline_inference.md"
+    },
+    {
+        "question": "What APIs are available after initializing an LLM instance for offline inference, and how do they differ by model type?",
+        "expected_source": "vllm/offline_inference.md"
+    },
+    {
+        "question": "What capabilities does the Ray Data LLM API add for large-scale offline inference with vLLM?",
+        "expected_source": "vllm/offline_inference.md"
+    },
+    {
+        "question": "How can Ray Data LLM preprocess rows into chat messages and sampling parameters for vLLM inference?",
+        "expected_source": "vllm/offline_inference.md"
+    },
+    {
+        "question": "What operating system and Python versions are required in the vLLM quickstart guide?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "How do you install vLLM on NVIDIA CUDA using uv and automatic PyTorch backend selection?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "How do you perform offline batched inference with LLM and SamplingParams in the quickstart guide?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "Why should chat or instruct models use a chat template when calling llm.generate?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "How do you start the OpenAI-compatible vLLM server with Qwen2.5-1.5B-Instruct?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "How can you enable API key checking for the vLLM OpenAI-compatible server?",
+        "expected_source": "vllm/installation_quickstart.md"
+    },
+    {
+        "question": "What OpenAI-compatible APIs does the vLLM server support?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "How do you launch vLLM serve with an API key and call it using the official OpenAI Python client?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "How can OpenAI client requests pass vLLM-specific parameters such as top_k?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "How do you disable the Hugging Face generation_config.json behavior when starting the vLLM server?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "What is required for a model to support the chat protocol in the vLLM OpenAI-compatible server?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "How does vLLM detect and handle chat template content formats such as string and OpenAI schema?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "How can offline API documentation be enabled for the FastAPI docs endpoint in air-gapped environments?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "What audio formats and required parameters are supported by the Transcriptions API?",
+        "expected_source": "vllm/serving_openai_compatible_server.md"
+    },
+    {
+        "question": "What does quantization trade off, and why is it useful for running large models?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "Which quantization formats are listed as supported by vLLM?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "Which quantization implementations are supported on Volta, Turing, Ampere, Ada, Hopper, AMD GPU, Intel GPU, and x86 CPU?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "How do you register a custom out-of-tree quantization method in vLLM?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "What abstract methods must a custom QuantizationConfig subclass implement?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "How do you implement custom quantized methods for linear and MoE layers?",
+        "expected_source": "vllm/quantization(1).md"
+    },
+    {
+        "question": "What is automatic prefix caching and why does it avoid redundant prompt computation?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "How does vLLM build a hash for each KV cache block in prefix caching?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "What prefix caching hash algorithms are available through --prefix-caching-hash-algo?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "How does prefix caching handle multi-modal image inputs with placeholder tokens?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "How does cache_salt isolate prefix cache reuse for security in shared environments?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "What data structures make up the KV cache manager for prefix caching in vLLM v1?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "What steps does the KV cache manager perform when allocating blocks for a new request?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "How does vLLM evict least recently used cached blocks in prefix caching?",
+        "expected_source": "vllm/prefix_caching.md"
+    },
+    {
+        "question": "When should you use a single GPU, tensor parallelism, or pipeline parallelism for distributed inference?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "How should tensor_parallel_size and pipeline_parallel_size be chosen for two nodes with eight GPUs per node?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "What do the GPU KV cache size and maximum concurrency log messages tell you?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "When should pipeline parallelism be used for uneven GPU splits or GPUs without NVLINK?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "How do you run vLLM inference or serving on four GPUs using tensor parallelism?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "How do you set up a Ray cluster with containers for multi-node vLLM serving?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "How do you run vLLM on a Ray cluster using tensor and pipeline parallel sizes?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "What container settings are needed to enable GPUDirect RDMA for vLLM?",
+        "expected_source": "vllm/parallelism_scaling.md"
+    },
+    {
+        "question": "What is speculative decoding used for in vLLM and under what workloads can it reduce inter-token latency?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "Which speculative decoding methods does vLLM support?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "How should EAGLE, MTP, draft models, n-gram, and suffix decoding be compared for low-QPS and high-QPS workloads?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "What theoretical and algorithmic losslessness guarantees does vLLM provide for speculative decoding?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "Why can outputs still vary with and without speculative decoding despite losslessness guarantees?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "What feature incompatibilities are documented for speculative decoding?",
+        "expected_source": "vllm/speculative_decoding.md"
+    },
+    {
+        "question": "What is the paged attention document's warning about its historical status?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "What are the main input pointers and template arguments of the paged attention kernel?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "What do sequence, context, vec, thread group, block, warp, thread block, and grid mean in the paged attention design?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "How are query vectors loaded into shared memory in the paged attention kernel?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "How are key vectors fetched and stored in register memory in paged attention?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "How does the paged attention kernel compute qk values and reduce across thread groups?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "How are qk_max and exp_sum reduced to compute softmax in paged attention?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "How does the paged attention kernel multiply value vectors with normalized logits?",
+        "expected_source": "vllm/paged_attention.md"
+    },
+    {
+        "question": "What debugging steps are recommended when vLLM hangs downloading or loading a model?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "How can --load-format dummy help isolate model downloading and loading bottlenecks?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "What should you do if generation quality changes after vLLM v0.8.0?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "Which environment variables enable more logging and tracing for vLLM troubleshooting?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "How can you use forked-pdb or VLLM_ENABLE_V1_MULTIPROCESSING to debug subprocess breakpoints?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "How do you override incorrect IP address detection or network interface selection in vLLM?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "How do you diagnose CUDA errors around self.graph.replay in vLLM?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "How should Python multiprocessing code be guarded to avoid RuntimeError when using vLLM?",
+        "expected_source": "vllm/troubleshooting.md"
+    },
+    {
+        "question": "What does the SamplingParams class control in vLLM text generation?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "What do n and best_of mean in SamplingParams?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "How do presence_penalty, frequency_penalty, and repetition_penalty affect generated tokens?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "How do temperature, top_p, top_k, and min_p affect token sampling?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "How do stop strings, stop_token_ids, bad_words, ignore_eos, max_tokens, and min_tokens control generation stopping behavior?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "What are logprobs and prompt_logprobs in SamplingParams?",
+        "expected_source": "vllm/sampling_parameters.md"
+    },
+    {
+        "question": "Where are engine arguments used for offline inference and online serving?",
+        "expected_source": "vllm/engine_args.md"
+    },
+    {
+        "question": "Why does the engine arguments documentation point developers to vllm.config classes?",
+        "expected_source": "vllm/engine_args.md"
+    },
+    {
+        "question": "What GPU variants does the vLLM GPU installation guide cover?",
+        "expected_source": "vllm/installation_gpu.md"
+    },
+    {
+        "question": "Does vLLM natively support Windows for GPU installation, and what alternatives are mentioned?",
+        "expected_source": "vllm/installation_gpu.md"
+    },
+    {
+        "question": "What setup paths are documented for GPU installation using Python and Docker?",
+        "expected_source": "vllm/installation_gpu.md"
+    },
+    {
+        "question": "What CPU variants does the vLLM CPU installation guide cover?",
+        "expected_source": "vllm/installation_cpu.md"
+    },
+    {
+        "question": "Which environment variables control CPU KV cache size, OpenMP thread binding, reserved CPU cores, visible NUMA nodes, and small-batch kernels?",
+        "expected_source": "vllm/installation_cpu.md"
+    },
+    {
+        "question": "How do you launch a vLLM service on CPU while reserving CPU cores for the serving framework?",
+        "expected_source": "vllm/installation_cpu.md"
+    },
+    {
+        "question": "How should VLLM_CPU_OMP_THREADS_BIND be chosen on hyper-threading or NUMA systems?",
+        "expected_source": "vllm/installation_cpu.md"
+    },
+    {
+        "question": "Can vLLM serve multiple models on a single OpenAI-compatible server port?",
+        "expected_source": "vllm/faq.md"
+    },
+    {
+        "question": "Which models are suggested for offline inference embeddings in the FAQ?",
+        "expected_source": "vllm/faq.md"
+    },
+    {
+        "question": "Why can the output of the same prompt vary across vLLM runs?",
+        "expected_source": "vllm/faq.md"
+    },
+    {
+        "question": "What mitigation strategies can reduce output variance across vLLM runs?",
+        "expected_source": "vllm/faq.md"
+    },
+    {
+        "question": "What is vLLM and where did it originate?",
+        "expected_source": "vllm/overview(1).md"
+    },
+    {
+        "question": "Where should users start if they want to run open-source models, build applications, or build vLLM itself?",
+        "expected_source": "vllm/overview(1).md"
+    },
+    {
+        "question": "What performance features make vLLM fast?",
+        "expected_source": "vllm/overview(1).md"
+    },
+    {
+        "question": "What flexibility and ease-of-use features does vLLM provide?",
+        "expected_source": "vllm/overview(1).md"
+    }
+]
