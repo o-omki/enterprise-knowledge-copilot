@@ -12,24 +12,24 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http import models
 
-from packages.rag.chunking import Chunk, chunk_text
+from packages.rag.chunking import Chunk, chunk_text_hierarchical
 
 logger = logging.getLogger(__name__)
 
 
 class IngestionConfig(BaseSettings):
-    # gemini-embedding-2 supports output_dimensionality. Recommended: 768, 1536, 3072.
     vector_size: int = 768
     qdrant_url: str = "http://localhost:6333"
     chunk_size: int = 1000
     chunk_overlap: int = 200
+    parent_chunk_size: int = 1500
+    child_chunk_size: int = 400
+    child_chunk_overlap: int = 100
 
-    # GCP Settings
     project_id: str = Field(alias="GCP_PROJECT_ID")
     location: str = Field(alias="GCP_LOCATION", default="global")
     embedding_model_name: str = Field(alias="GCP_EMBEDDING_MODEL", default="gemini-embedding-2")
 
-    # AI Studio setting (optional)
     gemini_api_key: str | None = Field(alias="GEMINI_API_KEY", default=None)
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
@@ -46,12 +46,10 @@ class IngestionPipeline:
         self.config = config or IngestionConfig()
         self.client = AsyncQdrantClient(url=self.config.qdrant_url)
 
-        # Initialize the new Google Gen AI SDK for Vertex AI
         self.genai_client = genai.Client(
             vertexai=True, project=self.config.project_id, location=self.config.location
         )
 
-        # Initialize FastEmbed for Sparse Vectors
         self.sparse_model = SparseTextEmbedding(model_name="Qdrant/bm25")
 
     async def list_corpora(self, official_docs_root: Path) -> list[Path]:
@@ -71,10 +69,8 @@ class IngestionPipeline:
         - domain: fastapi
         """
         try:
-            # Pivot from 'data' to handle both raw and synthetic
             parts = file_path.parts
             data_index = parts.index("data")
-            # parts[data_index + 1] would be "raw" or "synthetic"
             doc_type = parts[data_index + 2] if len(parts) > data_index + 2 else "unknown"
             domain = parts[data_index + 3] if len(parts) > data_index + 3 else "unknown"
         except ValueError:
@@ -107,11 +103,13 @@ class IngestionPipeline:
         """Chunks documents based on configuration."""
         all_chunks = []
         for doc in documents:
-            chunks = chunk_text(
+            # We will use hierarchical chunking for finer retrieval but larger context mapping
+            chunks = chunk_text_hierarchical(
                 doc.content,
                 source=str(doc.path),
-                chunk_size=self.config.chunk_size,
-                chunk_overlap=self.config.chunk_overlap,
+                parent_chunk_size=self.config.parent_chunk_size,
+                child_chunk_size=self.config.child_chunk_size,
+                child_chunk_overlap=self.config.child_chunk_overlap,
                 metadata=doc.metadata,
             )
             all_chunks.extend(chunks)
@@ -182,10 +180,8 @@ class IngestionPipeline:
             batch = chunks[i : i + batch_size]
             texts = [c.text for c in batch]
 
-            # Get embeddings
             embeddings = await self.get_embeddings(texts)
 
-            # Get Sparse Embeddings (BM25)
             sparse_embeddings = list(self.sparse_model.embed(texts))
 
             points = [
@@ -200,6 +196,7 @@ class IngestionPipeline:
                     },
                     payload={
                         "text": chunk.text,
+                        "parent_text": chunk.parent_text,
                         "source": chunk.source,
                         "filename": Path(chunk.source).name,
                         "chunk_index": chunk.index,
@@ -222,7 +219,6 @@ class IngestionPipeline:
         logger.info(f"Starting ingestion from roots: {[str(r) for r in data_roots]}")
         collection_name = "enterprise_knowledge"
 
-        # 1. Initialize global Qdrant collection
         await self.initialize_collection(collection_name)
 
         corpora = []
@@ -235,18 +231,15 @@ class IngestionPipeline:
         for corpus_path in corpora:
             logger.info(f"Processing domain: {corpus_path.name}")
 
-            # 2. Load documents
             docs = await self.load_markdown_files(corpus_path)
             if not docs:
                 logger.warning(f"No documents found in {corpus_path}")
                 continue
             logger.info(f"Loaded {len(docs)} documents from {corpus_path.name}.")
 
-            # 3. Chunk documents
             chunks = await self.process_documents(docs)
             logger.info(f"Generated {len(chunks)} chunks for {corpus_path.name}.")
 
-            # 4. Embed and Upsert
             await self.upsert_chunks(collection_name, chunks)
             logger.info(f"Completed ingestion for domain: {corpus_path.name}.")
 
@@ -256,6 +249,6 @@ if __name__ == "__main__":
     pipeline = IngestionPipeline()
     raw_dir = Path("data/raw/official_docs/fastapi")
     if raw_dir.exists():
-        asyncio.run(pipeline.run(raw_dir))
+        asyncio.run(pipeline.run([raw_dir]))
     else:
         logger.error(f"Directory {raw_dir} not found.")
