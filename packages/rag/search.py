@@ -12,10 +12,8 @@ logger = logging.getLogger(__name__)
 
 class SearchConfig(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
-    # gemini-embedding-2 supports output_dimensionality. Recommended: 768, 1536, 3072.
     vector_size: int = 768
 
-    # GCP Settings
     project_id: str = Field(alias="GCP_PROJECT_ID")
     location: str = Field(alias="GCP_LOCATION", default="global")
     embedding_model_name: str = Field(alias="GCP_EMBEDDING_MODEL", default="gemini-embedding-2")
@@ -95,7 +93,7 @@ class SearchService:
             )
             using = "sparse"
         elif method == "hybrid":
-            # For hybrid, we use Qdrant's Reciprocal Rank Fusion (RRF) via prefetch
+            # For hybrid, we use Qdrant's Reciprocal Rank Fusion via prefetch
             dense_vector = await self.get_query_embedding(query)
             sparse_res = list(self.sparse_model.embed([query]))[0]
             sparse_vector = models.SparseVector(
@@ -109,7 +107,6 @@ class SearchService:
         else:
             raise ValueError("Method must be 'dense', 'sparse', or 'hybrid'")
 
-        # Build the payload filter query depending on provided parameters
         must_conditions = []
         if domain:
             must_conditions.append(
@@ -130,7 +127,7 @@ class SearchService:
 
         import time
 
-        start_time = time.time()
+        start_time = time.perf_counter()
 
         results = await self.client.query_points(
             collection_name=collection_name,
@@ -142,15 +139,19 @@ class SearchService:
             query_filter=query_filter,
         )
 
-        latency_ms = round((time.time() - start_time) * 1000, 2)
+        latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
 
         return [
             SearchResult(
-                text=hit.payload.get("text", ""),
+                text=hit.payload.get("parent_text") or hit.payload.get("text", ""),
                 source=hit.payload.get("source", "unknown"),
                 score=hit.score,
-                diagnostics={"latency_ms": latency_ms, "method": method},
+                diagnostics={
+                    "latency_ms": latency_ms,
+                    "method": method,
+                    "is_parent": bool(hit.payload.get("parent_text")),
+                },
             )
             for hit in results.points
-            if hit.payload  # Ensure payload exists
+            if hit.payload
         ]
