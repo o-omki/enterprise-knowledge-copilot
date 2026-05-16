@@ -7,6 +7,7 @@ class Chunk:
     source: str
     index: int
     metadata: dict = field(default_factory=dict)
+    parent_text: str | None = None
 
 
 def chunk_text(
@@ -37,3 +38,41 @@ def chunk_text(
         start += step
         idx += 1
     return chunks
+
+
+def chunk_text_hierarchical(
+    text: str,
+    source: str,
+    parent_chunk_size: int = 1500,
+    child_chunk_size: int = 400,
+    child_chunk_overlap: int = 100,
+    metadata: dict = None,
+) -> list[Chunk]:
+    if metadata is None:
+        metadata = {}
+
+    child_chunks = chunk_text(
+        text=text,
+        source=source,
+        chunk_size=child_chunk_size,
+        chunk_overlap=child_chunk_overlap,
+        metadata=metadata,
+    )
+
+    child_step = child_chunk_size - child_chunk_overlap
+
+    for c_chunk in child_chunks:
+        child_start = c_chunk.index * child_step
+
+        total_padding = parent_chunk_size - child_chunk_size
+        left_padding = total_padding // 2
+
+        parent_start = max(0, child_start - left_padding)
+        parent_end = min(len(text), parent_start + parent_chunk_size)
+
+        if parent_end == len(text):
+            parent_start = max(0, parent_end - parent_chunk_size)
+
+        c_chunk.parent_text = text[parent_start:parent_end]
+
+    return child_chunks
