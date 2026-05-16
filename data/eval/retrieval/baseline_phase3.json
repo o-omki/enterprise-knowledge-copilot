@@ -1,0 +1,29 @@
+{
+  "description": "Pre-reranking retrieval baseline for Phase 3. Sourced from docs/adr/0011-hybrid-scoring-evaluation.md (Phase 2 final evaluation). Chunking strategy: Hierarchical (child_chunk_size=400, parent_chunk_size=1500). Embedding model: Google Gemini (dense), Qdrant/bm25 via FastEmbed (sparse). Fusion: Qdrant RRF.",
+  "phase": 2,
+  "recorded_at": "2026-05-15",
+  "dataset": "data/eval/retrieval/fastapi_ground_truth.json",
+  "chunking_strategy": "hierarchical",
+  "top_k": 5,
+  "methods": {
+    "dense": {
+      "recall_at_1": 0.83,
+      "recall_at_5": 0.97,
+      "mrr": 0.89
+    },
+    "sparse": {
+      "recall_at_1": 0.53,
+      "recall_at_5": 0.82,
+      "mrr": 0.64
+    },
+    "hybrid": {
+      "recall_at_1": 0.76,
+      "recall_at_5": 0.97,
+      "mrr": 0.86
+    }
+  },
+  "phase3_target": {
+    "note": "Phase 3 reranking goal: improve Recall@1 of hybrid (0.76) to match or exceed dense (0.83). Hybrid already achieves top Recall@5, so reranker should focus on promoting the best result to rank 1.",
+    "minimum_recall_at_1_hybrid_reranked": 0.83
+  }
+}
