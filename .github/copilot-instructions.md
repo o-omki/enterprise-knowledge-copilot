@@ -16,7 +16,7 @@ applyTo: '**'
 - [Product Requirements](../docs/product_requirements.md) — Functional & non-functional requirements
 - [Evaluation Framework](../docs/evaluation_framework.md) — Quality metrics and benchmarks
 - [Deployment Strategy](../docs/deployment.md) — Infrastructure and cloud targets
-- [Roadmap](../docs/roadmap.md) — 6-phase development plan (Phases 0–6)
+- [Roadmap](../docs/roadmap.md) — 12-phase development plan (Phases 0–11)
 
 ## Core Design Principles
 
@@ -60,77 +60,34 @@ applyTo: '**'
 
 ## Development Phases & Scope
 
-Work is organized into **6 phases** with strict scope gates. Each phase has clear entry/exit criteria.
+Work is organized into **12 phases** with strict scope gates. Each phase has clear entry/exit criteria defined in `docs/roadmap.md`. Below is an overview emphasizing the first critical phases:
 
 ### Phase 0: Foundation & Planning (Current)
-- ✅ Problem statement and product requirements defined
-- ✅ Architecture and system design documented
-- ✅ Data directory structure and raw documents scaffolded
-- ⏳ Evaluation framework and metrics specified
-- ⏳ ADRs for tech stack choices (K8s provider, frontend framework, message queue)
-
-**Deliverable:** Executable plan for Phase 1 with CI/CD skeleton, dev environment setup, and baseline collection of test data.
+- ✅ Problem statement, architecture, repo structure, and roadmap defined.
+**Deliverable:** Executable plan for Phase 1 with CI/CD skeleton.
 
 ### Phase 1: Baseline Retrieval System
-**Scope:** Single-document QA with exact retrieval
-
-- **Ingest:** Parse official docs (FastAPI, Qdrant, Kubernetes, vLLM) into chunks
-- **Index:** Build BM25 (sparse) and dense vector indexes
-- **Retrieve:** Simple query → top-k retrieval pipeline
-- **Answer:** Template-based QA ("The answer is found in: `<document>`")
-- **Eval:** Recall@k, nDCG, MRR on retrieval benchmarks; citation accuracy
-
+**Scope:** Ingest, index, simple retrieve, and answer using single LLM call with citations.
 **Gate:** Retrieval recall >85% on synthetic benchmark before Phase 2.
 
-### Phase 2: Hybrid Retrieval & Ranking
-**Scope:** Multi-document retrieval with ranking and relevance
+### Phase 2: Hybrid Retrieval and Retrieval Quality Improvements
+**Scope:** Combine sparse + dense retrieval, add metadata filtering, evaluate recall/MRR.
+**Gate:** Hybrid retrieval outperforms baseline metrics.
 
-- Implement BM25 + dense hybrid search scoring
-- Add cross-encoder reranking (top-100 → top-10)
-- Evaluate ranking quality; optimize hyperparameters
-- Build retrieval quality dashboard
+### Phase 3: Cross-Encoder Reranking
+**Scope:** Rerank candidate documents before generation.
+**Gate:** Reranking improves answer quality justifying token cost/latency.
 
-**Gate:** Ranking nDCG@10 >0.75 on benchmark before Phase 3.
+### Phase 4: Multi-Agent Query Planning
+**Scope:** Query decomposition, multi-hop retrieval parsing, agent routing.
+**Gate:** Planner handles multi-step queries; traces are logged/debuggable.
 
-### Phase 3: Multi-Hop Query Planning
-**Scope:** Agent-driven query decomposition and multi-step reasoning
+### Phase 5: Safety & Bias Mitigation
+**Scope:** PII redaction, prompt injection defense, refusal protocols, hallucination detection.
+**Gate:** Safety suite passes; PII redaction verified.
 
-- Query router: detect simple vs. complex queries
-- Query planner: decompose into sub-queries
-- Multi-agent orchestration for parallel retrieval + synthesis
-
-**Gate:** Agentic evaluation pass >80% before Phase 4.
-
-### Phase 4: Safety & Bias Mitigation
-**Scope:** PII detection, prompt injection, factuality, and refusal policies
-
-- PII redaction pipeline
-- Prompt injection detection
-- Hallucination detection and mitigation
-- Implement refusal policy for out-of-scope queries
-
-**Gate:** Safety test suite passes; zero undetected PII in 1K random samples.
-
-### Phase 5: Observability & Analytics
-**Scope:** Production-grade logging, tracing, metrics, and health checks
-
-- Structured logging and trace propagation
-- Real-time metrics (latency, throughput, error rates)
-- Query quality dashboard and analytics
-- Health checks and SLO monitoring
-
-**Gate:** Observability dashboards operational; SLOs documented and tracked.
-
-### Phase 6: Performance & Scale
-**Scope:** Optimize latency, throughput, and cost; prepare for multi-region deployment
-
-- **Performance targets:**
-  - Latency: P50 < 4s, P95 < 8s per query
-  - Cost target: < $0.10 per query (TBD)
-  - Throughput: TBD based on requirements
-- Load testing and bottleneck analysis
-- K8s autoscaling configuration
-- Multi-region deployment proof-of-concept
+### Phase 6-11: Scale, UI, Serving, Observability
+_Refer to `docs/roadmap.md` for full requirements covering the Evaluation Harness, UI Productization, vLLM Optimization, Telemetry, and Cloud Deployment._
 
 ---
 
