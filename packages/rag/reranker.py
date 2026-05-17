@@ -35,7 +35,7 @@ class RerankerConfig(BaseSettings):
     """
 
     model_name: str = Field(
-        default="cross-encoder/ms-marco-MiniLM-L-6-v2",
+        default="cross-encoder/ms-marco-MiniLM-L6-v2",
         alias="RERANKER_MODEL",
     )
     enabled: bool = Field(default=True, alias="RERANKER_ENABLED")
