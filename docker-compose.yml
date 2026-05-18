@@ -15,9 +15,21 @@ services:
     environment:
       - QDRANT_URL=http://qdrant:6333
       - POSTGRES_DSN=postgresql://postgres:postgres@postgres:5432/knowledge_copilot
+      - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
+      - OTEL_EXPORTER_OTLP_INSECURE=true
     depends_on:
       - qdrant
       - postgres
+      - jaeger
+
+  jaeger:
+    image: jaegertracing/all-in-one:latest
+    ports:
+      - "16686:16686" # Web UI
+      - "4317:4317"   # OTLP gRPC receiver
+      - "4318:4318"   # OTLP HTTP receiver
+    environment:
+      - COLLECTOR_OTLP_ENABLED=true
 
   qdrant:
     image: qdrant/qdrant:latest
