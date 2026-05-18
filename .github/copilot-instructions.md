@@ -62,7 +62,7 @@ applyTo: '**'
 
 Work is organized into **12 phases** with strict scope gates. Each phase has clear entry/exit criteria defined in `docs/roadmap.md`. Below is an overview emphasizing the first critical phases:
 
-### Phase 0: Foundation & Planning (Current)
+### Phase 0: Foundation & Planning
 - ✅ Problem statement, architecture, repo structure, and roadmap defined.
 **Deliverable:** Executable plan for Phase 1 with CI/CD skeleton.
 
