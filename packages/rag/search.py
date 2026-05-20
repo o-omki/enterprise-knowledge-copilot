@@ -74,6 +74,7 @@ class SearchService:
         domain: str | None = None,
         doc_type: str | None = None,
         method: str = "dense",
+        user_role: str | None = "public",
     ) -> list[SearchResult]:
         """Performs vector search in the global collection with optional payload filtering."""
         from qdrant_client.http import models
@@ -118,6 +119,12 @@ class SearchService:
                     key="doc_type", match=models.MatchValue(value=doc_type.lower())
                 )
             )
+
+        from packages.safety.rbac import get_rbac_filter
+
+        rbac_filter = get_rbac_filter(user_role)
+        if rbac_filter and rbac_filter.must:
+            must_conditions.extend(rbac_filter.must)
 
         query_filter = models.Filter(must=must_conditions) if must_conditions else None
 
