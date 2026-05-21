@@ -1,0 +1,38 @@
+[
+  {
+    "question": "How do I set up a background task in FastAPI and then run it inside a Kubernetes CronJob?",
+    "expected_sources": [
+      "fastapi/background-tasks.md",
+      "kubernetes/cron-jobs.md"
+    ]
+  },
+  {
+    "question": "Compare the deployment process of a FastAPI app with running Qdrant via Docker.",
+    "expected_sources": [
+      "fastapi/deployment.md",
+      "qdrant/overview.md"
+    ]
+  },
+  {
+    "question": "What is the difference between VLLM's paged attention and standard inference caching mechanics like prefix caching?",
+    "expected_sources": [
+      "vllm/paged_attention.md",
+      "vllm/prefix_caching.md"
+    ]
+  },
+  {
+    "question": "How does Qdrant's quantization compare to VLLM's quantization?",
+    "expected_sources": [
+      "qdrant/quantization.md",
+      "vllm/quantization.md"
+    ]
+  },
+  {
+    "question": "If I use vLLM offline inference, how do I configure sampling parameters versus running an OpenAI compatible server?",
+    "expected_sources": [
+      "vllm/offline_inference.md",
+      "vllm/serving_openai_compatible_server.md",
+      "vllm/sampling_parameters.md"
+    ]
+  }
+]

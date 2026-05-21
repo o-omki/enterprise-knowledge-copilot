@@ -1,0 +1,13 @@
+{
+  "description": "Phase 4 query planner vs single-pass evaluation",
+  "metrics": {
+    "single_pass": {
+      "full_recall": 0.2,
+      "avg_latency_ms": 3036.7
+    },
+    "planner_multi_pass": {
+      "full_recall": 0.6,
+      "avg_latency_ms": 7978.1
+    }
+  }
+}
