@@ -99,7 +99,7 @@ class RerankerService:
         )
 
         for result, score in zip(results, scores):
-            result.diagnostics["rerank_score"] = round(score, 4)
+            result.diagnostics["rerank_score"] = round(float(score), 4)
             result.diagnostics["rerank_latency_ms"] = latency_ms
 
         ranked = sorted(
