@@ -1,10 +1,9 @@
-import asyncio
 import logging
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
-from packages.agents import DecomposerAgent, QueryRouter, QueryType
+from packages.agents.orchestrator import QueryOrchestrator
 from packages.observability import setup_tracing
 from packages.rag.generation import AnswerResponse, GenerationService
 from packages.rag.reranker import RerankerService
@@ -21,8 +20,11 @@ setup_tracing(app)
 search_service = SearchService()
 generation_service = GenerationService()
 reranker_service = RerankerService()
-query_router = QueryRouter()
-decomposer = DecomposerAgent()
+orchestrator = QueryOrchestrator(
+    search_service=search_service,
+    generation_service=generation_service,
+    reranker_service=reranker_service,
+)
 
 
 class QueryResponse(BaseModel):
@@ -78,51 +80,14 @@ async def ask(
     """
     try:
         logger.info(f"Processing query: {q}")
-
-        # Step 1: Route the query
-        routing_decision = await query_router.route(query=q)
-        logger.info(
-            f"Routing decision: {routing_decision.query_type.value} | "
-            f"Reasoning: {routing_decision.reasoning}"
+        response = await orchestrator.answer_query(
+            query=q,
+            domain=domain,
+            doc_type=doc_type,
+            limit=limit,
+            method=method,
+            rerank=rerank,
         )
-
-        sub_queries = [q]
-        if routing_decision.query_type in [
-            QueryType.MULTI_HOP_SYNTHESIS,
-            QueryType.COMPARATIVE_QUERY,
-        ]:
-            decomp_result = await decomposer.decompose(query=q)
-            sub_queries = decomp_result.sub_queries
-            logger.info(f"Decomposed into {len(sub_queries)} sub-queries: {sub_queries}")
-
-        # Step 2: Parallel retrieval for all sub-queries
-        fetch_limit = limit * 2 if rerank else limit
-
-        async def fetch_and_rank(sq: str):
-            logger.info(f"Searching for sub-query: {sq}")
-            res = await search_service.search(
-                query=sq, limit=fetch_limit, domain=domain, doc_type=doc_type, method=method
-            )
-            if rerank:
-                res = await reranker_service.arerank(query=sq, results=res, top_k=limit)
-            return res
-
-        search_tasks = [fetch_and_rank(sq) for sq in sub_queries]
-        all_results_nested = await asyncio.gather(*search_tasks)
-
-        aggregated_results = []
-        seen_texts = set()
-        for res_list in all_results_nested:
-            for res in res_list:
-                res_text = getattr(res, "text", None) or res.model_dump().get("text")
-                if res_text and res_text not in seen_texts:
-                    seen_texts.add(res_text)
-                    aggregated_results.append(res)
-
-        capped_results = aggregated_results[: limit * 2]
-        logger.info(f"Aggregated {len(capped_results)} unique chunks to send to Generation.")
-
-        response = await generation_service.generate_answer(query=q, search_results=capped_results)
         return response
 
     except Exception as e:
