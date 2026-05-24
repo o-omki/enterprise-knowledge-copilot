@@ -1,8 +1,10 @@
 import logging
+import os
 
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 
+from apps.api.app.middleware.safety import SafetyGuardrailsMiddleware
 from packages.agents.orchestrator import QueryOrchestrator
 from packages.observability import setup_tracing
 from packages.rag.generation import AnswerResponse, GenerationService
@@ -14,8 +16,10 @@ logger = logging.getLogger(__name__)
 
 app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.3.0")
 
-# Set up tracing (auto-instruments FastAPI)
 setup_tracing(app)
+
+guardrails_url = os.getenv("GUARDRAILS_SERVICE_URL", "http://guardrails:8001")
+app.add_middleware(SafetyGuardrailsMiddleware, service_url=guardrails_url)
 
 search_service = SearchService()
 generation_service = GenerationService()
