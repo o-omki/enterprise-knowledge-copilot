@@ -37,6 +37,7 @@ services:
     env_file:
       - .env
     environment:
+      - NEMOGUARDRAILS_LLM_FRAMEWORK=langchain
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_EXPORTER_OTLP_INSECURE=true
     depends_on:
