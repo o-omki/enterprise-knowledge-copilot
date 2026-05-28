@@ -1,0 +1,29 @@
+import core
+import llm
+import guardrails
+
+flow check off topic intent
+  $is_off_topic = await check_off_topic_intent(user_input=$user_message)
+  if $is_off_topic
+    bot say "I am only authorized to assist with internal enterprise documentation queries."
+    abort
+
+flow trigger output validation
+  user said "validate output please"
+  $is_grounded = await self_check_facts(evidence=$evidence, response=$response)
+  if not $is_grounded
+    bot say "I'm sorry, but I cannot verify this information with internal sources. Please try rephrasing your query."
+    abort
+  bot say "grounded"
+
+flow input rails $input_text
+  await self check input
+  await jailbreak detection heuristics
+  await mask sensitive data on input
+  await check off topic intent
+
+flow output rails $output_text
+  await self check facts
+
+flow main
+  activate llm continuation

@@ -1,30 +1,17 @@
+colang_version: "2.x"
+
 models:
   - type: main
     engine: google_vertexai
-    model: gemini-3-flash
-  - type: embeddings
-    engine: google_vertexai
-    model: gemini-embedding-2
+    model: gemini-2.5-flash-lite
 
-# Integration with Private AI for PII masking
-pii:
-  backend: private_ai
-  server_endpoint: "https://api.private-ai.com/v3"
-  api_key: ${PRIVATE_AI_API_KEY}
-  mask_char: "*"
-  entity_types:
-    - NAME
-    - EMAIL_ADDRESS
-    - PHONE_NUMBER
-    - SSN
-    - CREDIT_CARD
-
-# Activated Rails Pipeline
 rails:
-  input:
-    flows:
-      - check jailbreak
-      - check off topic
-  output:
-    flows:
-      - self check facts
+  config:
+    sensitive_data_detection:
+      input:
+        entities:
+          - PERSON
+          - PHONE_NUMBER
+          - EMAIL_ADDRESS
+          - US_SSN
+      
