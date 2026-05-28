@@ -121,7 +121,18 @@ async def validate_input(request: InputValidationRequest):
                 ),
             )
 
-        res = await rails_app.generate_async(prompt=request.query)
+        res_obj = await rails_app.generate_async(
+            messages=[{"role": "user", "content": request.query}]
+        )
+
+        if res_obj and not isinstance(res_obj, str) and not isinstance(res_obj, dict):
+            # Internal object response fallback
+            try:
+                res = res_obj[0].get("content")
+            except Exception:
+                res = str(res_obj)
+        else:
+            res = res_obj.get("content", "") if isinstance(res_obj, dict) else str(res_obj)
 
         filtered_query = redact_local_pii(request.query)
 
@@ -165,29 +176,38 @@ async def validate_output(request: OutputValidationRequest):
         is_grounded = True
         refusal_message = None
 
-        if hasattr(rails_app, "runtime") and rails_app.runtime:
+        if hasattr(rails_app, "generate_async"):
             try:
-                result = await rails_app.runtime.execute_action(
-                    "self_check_facts",
-                    arguments={"evidence": evidence_str, "response": request.response},
+                # Trigger the Colang 2 custom output validation flow defined in main.co
+                # using generate_async and injecting $evidence and $response via context role
+                res_obj = await rails_app.generate_async(
+                    messages=[
+                        {
+                            "role": "context",
+                            "content": {"evidence": evidence_str, "response": request.response},
+                        },
+                        {"role": "user", "content": "validate output please"},
+                    ]
                 )
-                if result is False or result == "no":
+                res = res_obj.get("content", "") if isinstance(res_obj, dict) else str(res_obj)
+
+                # Check the refusal message returned by the custom flow
+                if "cannot verify this information" in res:
                     is_grounded = False
-                    refusal_message = (
-                        "I'm sorry, but I cannot verify this information with internal "
-                        "sources. Please try rephrasing your query."
-                    )
-            except Exception as action_err:
+                    refusal_message = res
+
+            except Exception as ev_err:
                 logger.warning(
-                    f"Failed to execute self_check_facts action directly: {action_err}, "
-                    "falling back to prompt generation"
+                    f"Failed to execute validate output flow: {ev_err}, "
+                    "falling back to default generation."
                 )
-                res = await rails_app.generate_async(
+                res_obj = await rails_app.generate_async(
                     prompt=(
                         f"Facts:\n{evidence_str}\n\nStatement:\n{request.response}\n\n"
                         "Is the statement fully grounded? (yes/no):"
                     )
                 )
+                res = res_obj.get("content", "") if isinstance(res_obj, dict) else str(res_obj)
                 if "no" in res.lower():
                     is_grounded = False
                     refusal_message = (
