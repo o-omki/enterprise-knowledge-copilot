@@ -28,7 +28,10 @@ class SafetyGuardrailsClient:
             async with httpx.AsyncClient(timeout=4.0) as client:
                 response = await client.post(url, json={"query": query})
                 if response.status_code == 200:
-                    return response.json()
+                    data = response.json()
+                    data["fallback_active"] = False
+                    data["is_pii_detected"] = data.get("filtered_query") != query
+                    return data
 
                 logger.error(
                     "Guardrails microservice returned status %d: %s",
@@ -85,7 +88,9 @@ class SafetyGuardrailsClient:
                     url, json={"query": query, "response": answer, "context": context}
                 )
                 if response.status_code == 200:
-                    return response.json()
+                    data = response.json()
+                    data["fallback_active"] = False
+                    return data
 
                 logger.error(
                     "Guardrails microservice returned status %d: %s",
