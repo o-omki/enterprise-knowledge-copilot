@@ -1,0 +1,841 @@
+[
+  {
+    "question": "How do I define a request body that includes both optional and required fields in FastAPI?",
+    "reference_answer": "To define a request body, you must first create a data model class that inherits from Pydantic's `BaseModel`. For required fields, simply declare the attribute with its standard Python type without a default value. To make a field optional, assign it a default value, typically using `None`.",
+    "expected_source": "fastapi/body.md",
+    "expected_citations": [
+      "Then you declare your data model as a class that inherits from BaseModel.",
+      "The same as when declaring query parameters, when a model attribute has a default value, it is not required. Otherwise, it is required.",
+      "Use `None` to make it just optional."
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "When defining an endpoint with multiple parameters, how does FastAPI distinguish between path, query, and request body parameters?",
+    "reference_answer": "FastAPI automatically categorizes function parameters based on their declaration and type. If a parameter matches a variable defined in the endpoint's path, it is treated as a path parameter. If the parameter is a singular type like an integer or string, it is interpreted as a query parameter, whereas parameters typed as Pydantic models are extracted from the request body.",
+    "expected_source": "fastapi/body.md",
+    "expected_citations": [
+      "If the parameter is also declared in the **path**, it will be used as a path parameter.",
+      "If the parameter is of a **singular type** (like `int`, `float`, `str`, `bool`, etc) it will be interpreted as a **query** parameter.",
+      "If the parameter is declared to be of the type of a **Pydantic model**, it will be interpreted as a request **body**."
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "Why is it discouraged to send a request body with a GET request in FastAPI?",
+    "reference_answer": "Sending a body with a GET request has undefined behavior according to HTTP specifications. Although FastAPI technically supports it for extreme use cases, interactive documentation tools like Swagger UI will not display the body documentation for GET requests. Furthermore, intermediate proxies might fail to support GET requests that contain a body.",
+    "expected_source": "fastapi/body.md",
+    "expected_citations": [
+      "Sending a body with a `GET` request has an undefined behavior in the specifications, nevertheless, it is supported by FastAPI, only for very complex/extreme use cases.",
+      "As it is discouraged, the interactive docs with Swagger UI won't show the documentation for the body when using `GET`, and proxies in the middle might not support it."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How do I configure a background task to run after an endpoint returns a response in FastAPI?",
+    "reference_answer": "To configure a background task, first import `BackgroundTasks` and add it as a parameter to your path operation function. Next, define a standard function (either `async def` or `def`) that will perform the background work. Finally, inside your path operation, call the `.add_task()` method on the background tasks object, passing your task function along with any required positional or keyword arguments.",
+    "expected_source": "fastapi/background-tasks.md",
+    "expected_citations": [
+      "First, import `BackgroundTasks` and define a parameter in your *path operation function* with a type declaration of `BackgroundTasks`:",
+      "It can be an `async def` or normal `def` function, **FastAPI** will know how to handle it correctly.",
+      "Inside of your *path operation function*, pass your task function to the *background tasks* object with the method `.add_task()`:"
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "What is the difference between using FastAPI's built-in BackgroundTasks and a tool like Celery, and when should I choose one over the other?",
+    "reference_answer": "FastAPI's `BackgroundTasks` is ideal for small background operations, like sending emails, or when you need to access variables and objects from the same FastAPI application process. In contrast, Celery is better suited for heavy background computation that can be distributed across multiple processes or servers. However, Celery requires a more complex configuration, including a message or job queue manager like RabbitMQ or Redis.",
+    "expected_source": "fastapi/background-tasks.md",
+    "expected_citations": [
+      "If you need to perform heavy background computation and you don't necessarily need it to be run by the same process (for example, you don't need to share memory, variables, etc), you might benefit from using other bigger tools like Celery.",
+      "They tend to require more complex configurations, a message/job queue manager, like RabbitMQ or Redis, but they allow you to run background tasks in multiple processes, and especially, in multiple servers.",
+      "But if you need to access variables and objects from the same **FastAPI** app, or you need to perform small background tasks (like sending an email notification), you can simply just use `BackgroundTasks`."
+    ],
+    "question_type": "comparative",
+    "domain": "fastapi"
+  },
+  {
+    "question": "Can I inject background tasks into sub-dependencies, and how does FastAPI handle multiple tasks added at different dependency levels?",
+    "reference_answer": "Yes, you can declare a parameter of type `BackgroundTasks` at multiple levels, including path operation functions, dependencies, and sub-dependencies. FastAPI automatically knows how to reuse the same background tasks object across these different levels. It will merge all the defined background tasks together and run them in the background after the response is sent.",
+    "expected_source": "fastapi/background-tasks.md",
+    "expected_citations": [
+      "Using `BackgroundTasks` also works with the dependency injection system, you can declare a parameter of type `BackgroundTasks` at multiple levels: in a *path operation function*, in a dependency (dependable), in a sub-dependency, etc.",
+      "**FastAPI** knows what to do in each case and how to reuse the same object, so that all the background tasks are merged together and are run in the background afterwards:"
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How do I create a middleware function in FastAPI to modify a response before returning it?",
+    "reference_answer": "To create a middleware in FastAPI, use the `@app.middleware(\"http\")` decorator on top of your function. The function must accept the `request` and a `call_next` function as parameters. You can use `call_next` to pass the request to the path operation, receive the generated response, and then modify that response before returning it.",
+    "expected_source": "fastapi/middleware.md",
+    "expected_citations": [
+      "To create a middleware you use the decorator `@app.middleware(\"http\")` on top of a function.",
+      "A function `call_next` that will receive the `request` as a parameter.",
+      "You can then further modify the `response` before returning it."
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "In what order are multiple middlewares and background tasks executed during a request lifecycle?",
+    "reference_answer": "When you add multiple middlewares, they form a stack where the last middleware added is the outermost. On the incoming request, the outermost middleware runs first, and on the outgoing response, it runs last. Any background tasks associated with the request will run after all the middleware has finished executing.",
+    "expected_source": "fastapi/middleware.md",
+    "expected_citations": [
+      "The last middleware added is the outermost, and the first is the innermost.",
+      "On the request path, the outermost middleware runs first. On the response path, it runs last.",
+      "If there were any background tasks (covered in the Background Tasks section, you will see it later), they will run after all the middleware."
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "What must be configured if I want a client in a browser to be able to see custom proprietary headers added by a middleware?",
+    "reference_answer": "If you add custom headers (typically using the `X-` prefix) and want them visible to a browser client, you must update your CORS configurations. Specifically, you need to add them using the `expose_headers` parameter as documented in Starlette's CORS documentation.",
+    "expected_source": "fastapi/middleware.md",
+    "expected_citations": [
+      "Keep in mind that custom proprietary headers can be added using the `X-` prefix.",
+      "But if you have custom headers that you want a client in a browser to be able to see, you need to add them to your CORS configurations (CORS (Cross-Origin Resource Sharing)) using the parameter `expose_headers` documented in Starlette's CORS docs."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How do I pass a Pydantic model in a test request body using TestClient?",
+    "reference_answer": "The TestClient expects data that can be converted to JSON, rather than raw Pydantic models. To send a Pydantic model's data during testing, you should first convert it using the `jsonable_encoder`. Once encoded, you can pass the resulting data to the client.",
+    "expected_source": "fastapi/testing.md",
+    "expected_citations": [
+      "Note that the `TestClient` receives data that can be converted to JSON, not Pydantic models.",
+      "If you have a Pydantic model in your test and you want to send its data to the application during testing, you can use the `jsonable_encoder` described in JSON Compatible Encoder."
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "Why are FastAPI test functions defined with `def` instead of `async def`?",
+    "reference_answer": "FastAPI test functions are defined as normal `def` functions because the calls made to the TestClient are standard synchronous calls that do not require `await`. This design choice simplifies the testing process. It allows developers to use `pytest` directly without needing complex configurations for asynchronous execution.",
+    "expected_source": "fastapi/testing.md",
+    "expected_citations": [
+      "Notice that the testing functions are normal `def`, not `async def`.",
+      "And the calls to the client are also normal calls, not using `await`.",
+      "This allows you to use `pytest` directly without complications."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "fastapi"
+  },
+  {
+    "question": "What packages do I need to install to write and run tests for a FastAPI application?",
+    "reference_answer": "To write and run tests for a FastAPI application, you need to install two primary packages. First, you must install `httpx` in order to use the `TestClient` for making requests. Second, you need to install `pytest`, which serves as the test runner that automatically detects, executes, and reports on your test files.",
+    "expected_source": "fastapi/testing.md",
+    "expected_citations": [
+      "To use `TestClient`, first install `httpx`.",
+      "After that, you just need to install `pytest`.",
+      "It will detect the files and tests automatically, execute them, and report the results back to you."
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How do I define a query parameter as required in a FastAPI endpoint?",
+    "reference_answer": "To make a query parameter required in FastAPI, you simply declare the parameter in your function signature without providing any default value. If a client attempts to access the endpoint without including this required parameter in the URL, FastAPI will automatically return an error indicating that the field is missing.",
+    "expected_source": "fastapi/query-params.md",
+    "expected_citations": [
+      "But when you want to make a query parameter required, you can just not declare any default value:",
+      "...without adding the required parameter `needy`, you will see an error like:"
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "What string values can I pass in a URL to represent a `True` boolean query parameter?",
+    "reference_answer": "When you declare a query parameter with a `bool` type, FastAPI automatically converts specific string representations from the URL into a Python boolean. You can pass values such as `1`, `True`, `true`, `on`, or `yes`, including any case variations like uppercase or first letter capitalized. If you pass these values, the parameter will be `True`, otherwise it will be evaluated as `False`.",
+    "expected_source": "fastapi/query-params.md",
+    "expected_citations": [
+      "You can also declare `bool` types, and they will be converted:",
+      "or any other case variation (uppercase, first letter in uppercase, etc), your function will see the parameter `short` with a `bool` value of `True`. Otherwise as `False`."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How does FastAPI know whether a function argument is meant to be a path parameter or a query parameter?",
+    "reference_answer": "FastAPI automatically interprets any function parameters that are not explicitly declared as part of the path parameters as query parameters. When you declare multiple path and query parameters together, FastAPI detects them by name to distinguish between the two. You do not need to declare them in any specific order in your function signature.",
+    "expected_source": "fastapi/query-params.md",
+    "expected_citations": [
+      "When you declare other function parameters that are not part of the path parameters, they are automatically interpreted as \"query\" parameters.",
+      "You can declare multiple path parameters and query parameters at the same time, **FastAPI** knows which is which.",
+      "And you don't have to declare them in any specific order. They will be detected by name:"
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How can I configure a path parameter to accept a full file path that includes slashes?",
+    "reference_answer": "To allow a path parameter to contain a full path with slashes, you can use the `:path` convertor provided by Starlette. You declare the path parameter in your route URL using the syntax `{file_path:path}`. This indicates that the parameter should match any path, allowing it to capture values that include slashes, such as `home/johndoe/myfile.txt`.",
+    "expected_source": "fastapi/path-params.md",
+    "expected_citations": [
+      "Using an option directly from Starlette you can declare a *path parameter* containing a *path* using a URL like:\n\n```\n/files/{file_path:path}\n```",
+      "In this case, the name of the parameter is `file_path`, and the last part, `:path`, tells it that the parameter should match any *path*."
+    ],
+    "question_type": "procedural",
+    "domain": "fastapi"
+  },
+  {
+    "question": "What are the benefits of adding standard Python type annotations to path parameters?",
+    "reference_answer": "Adding Python type annotations to path parameters provides several key benefits, including automatic data conversion (parsing) from HTTP request strings into the specified Python data types. It also enables automatic data validation, which returns clear errors when the input is invalid. Furthermore, type annotations power editor support like autocompletion and generate automatic, interactive API documentation.",
+    "expected_source": "fastapi/path-params.md",
+    "expected_citations": [
+      "So, with that type declaration, **FastAPI** gives you automatic request \"parsing\".",
+      "So, with the same Python type declaration, **FastAPI** gives you data validation.",
+      "Again, just with that same Python type declaration, **FastAPI** gives you automatic, interactive documentation (integrating Swagger UI)."
+    ],
+    "question_type": "multi_hop",
+    "domain": "fastapi"
+  },
+  {
+    "question": "Why must a fixed path operation be declared before a variable path operation that shares a similar structure?",
+    "reference_answer": "Fixed path operations must be declared first because path operations are evaluated in the exact order they appear in the code. If a variable path is declared before a fixed path, the variable path will intercept the request. For example, `/users/{user_id}` would incorrectly match a request intended for `/users/me` by treating \"me\" as the `user_id` parameter.",
+    "expected_source": "fastapi/path-params.md",
+    "expected_citations": [
+      "Because *path operations* are evaluated in order, you need to make sure that the path for `/users/me` is declared before the one for `/users/{user_id}`:",
+      "Otherwise, the path for `/users/{user_id}` would match also for `/users/me`, \"thinking\" that it's receiving a parameter `user_id` with a value of `\"me\"`."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "fastapi"
+  },
+  {
+    "question": "How can I configure a Kubernetes Service to route traffic to an external database running outside of the cluster?",
+    "reference_answer": "To route traffic to an external database, you can define a Service without specifying a pod selector. Because the Service lacks a selector, Kubernetes will not automatically create the corresponding EndpointSlice objects. You must manually create an EndpointSlice object that maps the Service to the network address and port of your external database, linking them by setting the `kubernetes.io/service-name` label.",
+    "expected_source": "kubernetes/service.md",
+    "expected_citations": [
+      "In any of these scenarios you can define a Service _without_ specifying a selector to match Pods.",
+      "Because this Service has no selector, the corresponding EndpointSlice objects are not created automatically.",
+      "You can map the Service to the network address and port where it's running, by adding an EndpointSlice object manually."
+    ],
+    "question_type": "procedural",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What IP addresses are restricted and cannot be used as endpoint IPs when manually creating an EndpointSlice?",
+    "reference_answer": "When manually creating an EndpointSlice, you must not use loopback addresses (such as 127.0.0.0/8 for IPv4) or link-local addresses. Additionally, you cannot use the cluster IPs of other Kubernetes Services as endpoint IP addresses. This is because kube-proxy does not support routing to virtual IPs as a destination.",
+    "expected_source": "kubernetes/service.md",
+    "expected_citations": [
+      "The endpoint IPs _must not_ be: loopback (127.0.0.0/8 for IPv4, ::1/128 for IPv6), or link-local (169.254.0.0/16 and 224.0.0.0/24 for IPv4, fe80::/64 for IPv6).",
+      "The endpoint IP addresses cannot be the cluster IPs of other Kubernetes Services, because kube-proxy doesn't support virtual IPs as a destination."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "How does referencing a named port in a Service's targetPort attribute help with deploying updates to backend software?",
+    "reference_answer": "Referencing a named port in the `targetPort` attribute allows a Service to route traffic to Pods even if they use different numerical ports for the same protocol. This decoupling provides significant flexibility when deploying and evolving services. For instance, it allows you to change the actual port numbers exposed by the Pods in a new version of your backend software without causing disruptions for existing clients.",
+    "expected_source": "kubernetes/service.md",
+    "expected_citations": [
+      "Port definitions in Pods have names, and you can reference these names in the `targetPort` attribute of a Service.",
+      "This works even if there is a mixture of Pods in the Service using a single configured name, with the same network protocol available via different port numbers.",
+      "For example, you can change the port numbers that Pods expose in the next version of your backend software, without breaking clients."
+    ],
+    "question_type": "multi_hop",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "How can I configure a CronJob to skip a run if it misses its scheduled time by more than an hour, and ensure that only one instance of the job runs at a time?",
+    "reference_answer": "To skip a run that is delayed by more than an hour, you should set the `.spec.startingDeadlineSeconds` field to 3600 (60 minutes). To ensure only one instance of the job runs at a time, set the `.spec.concurrencyPolicy` field to `Forbid`. This combination ensures that delayed jobs have a strict cutoff and concurrent executions are prevented.",
+    "expected_source": "kubernetes/cron-jobs.md",
+    "expected_citations": [
+      "The `.spec.startingDeadlineSeconds` field is optional. This field defines a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.",
+      "`Forbid`: The CronJob does not allow concurrent runs; if it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob skips the new Job run."
+    ],
+    "question_type": "multi_hop",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the officially supported method for specifying a time zone for a Kubernetes CronJob?",
+    "reference_answer": "The officially supported method for specifying a time zone is to set the `.spec.timeZone` field to the name of a valid time zone, such as \"Etc/UTC\". You should not use `CRON_TZ` or `TZ` variables inside the `.spec.schedule` field, as this is not officially supported and will cause a validation error upon creation or update. If no time zone is specified, the kube-controller-manager will interpret the schedule relative to its own local time zone.",
+    "expected_source": "kubernetes/cron-jobs.md",
+    "expected_citations": [
+      "You can specify a time zone for a CronJob by setting `.spec.timeZone` to the name of a valid time zone.",
+      "Specifying a timezone using `CRON_TZ` or `TZ` variables inside `.spec.schedule` is **not officially supported** (and never has been).",
+      "For CronJobs with no time zone specified, the kube-controller-manager interprets schedules relative to its local time zone."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the difference between the `Forbid` and `Replace` concurrency policies in a CronJob?",
+    "reference_answer": "Both policies handle situations where it is time for a new Job run but the previous Job run has not yet finished. The `Forbid` policy skips the new Job run entirely, allowing the existing Job to continue running. In contrast, the `Replace` policy stops the currently running Job and replaces it with the new Job run.",
+    "expected_source": "kubernetes/cron-jobs.md",
+    "expected_citations": [
+      "`Forbid`: The CronJob does not allow concurrent runs; if it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob skips the new Job run.",
+      "`Replace`: If it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob replaces the currently running Job run with a new Job run"
+    ],
+    "question_type": "comparative",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "How should I scale my application to run multiple instances instead of creating individual Pods directly?",
+    "reference_answer": "To scale your application horizontally, you should use workload resources like Deployments or Jobs rather than creating individual Pods directly. These workload resources use controllers to manage replicated Pods as a group, handling both scaling and automatic healing if a Node fails. Each Pod will then run a single instance of your application to provide more overall resources.",
+    "expected_source": "kubernetes/pods.md",
+    "expected_citations": [
+      "Usually you don't need to create Pods directly, even singleton Pods. Instead, create them using workload resources such as Deployment or Job.",
+      "If you want to scale your application horizontally (to provide more overall resources by running more instances), you should use multiple Pods, one for each instance.",
+      "Replicated Pods are usually created and managed as a group by a workload resource and its controller."
+    ],
+    "question_type": "procedural",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "Which specific fields are allowed to be modified on a running Pod?",
+    "reference_answer": "Most metadata on a running Pod is immutable, but Kubernetes does allow in-place updates to a few specific fields. You can modify the container images (`spec.containers[*].image` and `spec.initContainers[*].image`), `spec.activeDeadlineSeconds`, `spec.terminationGracePeriodSeconds`, and `spec.schedulingGates`. Additionally, you can update `spec.tolerations`, but you are only permitted to add new entries to it.",
+    "expected_source": "kubernetes/pods.md",
+    "expected_citations": [
+      "Most of the metadata about a Pod is immutable. For example, you cannot change the `namespace`, `name`, `uid`, or `creationTimestamp` fields.",
+      "Pod updates may not change fields other than `spec.containers[*].image`, `spec.initContainers[*].image`, `spec.activeDeadlineSeconds`, `spec.terminationGracePeriodSeconds`, `spec.tolerations` or `spec.schedulingGates`.",
+      "For `spec.tolerations`, you can only add new entries."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the difference between restarting a container in a Pod and restarting the Pod itself?",
+    "reference_answer": "Restarting a container within a Pod is not the same as restarting the Pod itself, because a Pod is an environment for running containers rather than a single process. A Pod is a relatively ephemeral entity that persists on its scheduled node until it finishes execution, is deleted, gets evicted, or the node fails. Therefore, a Pod itself is not \"restarted\"; it simply persists until it is permanently removed or replaced.",
+    "expected_source": "kubernetes/pods.md",
+    "expected_citations": [
+      "Restarting a container in a Pod should not be confused with restarting a Pod.",
+      "A Pod is not a process, but an environment for running container(s). A Pod persists until it is deleted.",
+      "The Pod remains on that node until the Pod finishes execution, the Pod object is deleted, the Pod is *evicted* for lack of resources, or the node fails."
+    ],
+    "question_type": "comparative",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What steps should be taken to secure Kubernetes Secrets given that they are stored unencrypted by default?",
+    "reference_answer": "By default, Kubernetes Secrets are stored unencrypted in the API server's underlying etcd data store. To safely use them, administrators should enable Encryption at Rest and configure RBAC rules for least-privilege access. Additionally, access should be restricted to specific containers, and external Secret store providers can be utilized for enhanced security.",
+    "expected_source": "kubernetes/secret.md",
+    "expected_citations": [
+      "Kubernetes Secrets are, by default, stored unencrypted in the API server's underlying data store (etcd).",
+      "Enable Encryption at Rest for Secrets.",
+      "Enable or configure RBAC rules with least-privilege access to Secrets."
+    ],
+    "question_type": "procedural",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the difference between using a ServiceAccount token Secret and the TokenRequest API for providing credentials to Pods?",
+    "reference_answer": "A ServiceAccount token Secret is a legacy mechanism that provides long-lived, non-expiring credentials to Pods. In contrast, the TokenRequest API is the recommended approach for Kubernetes v1.22 and later because it provides short-lived, automatically rotating tokens. Tokens obtained via the TokenRequest API and mounted in a projected volume are automatically invalidated when the Pod is deleted.",
+    "expected_source": "kubernetes/secret.md",
+    "expected_citations": [
+      "This is a legacy mechanism that provides long-lived ServiceAccount credentials to Pods.",
+      "In Kubernetes v1.22 and later, the recommended approach is to obtain a short-lived, automatically rotating ServiceAccount token by using the TokenRequest API instead.",
+      "The token is automatically invalidated when the Pod that it's mounted in is deleted."
+    ],
+    "question_type": "comparative",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What alternative mechanisms can be used instead of Kubernetes Secrets to protect confidential data?",
+    "reference_answer": "Instead of using Secrets, you can use ServiceAccount tokens to authenticate cloud-native components running within the same cluster. Other alternatives include using third-party tools to manage sensitive data, implementing a custom signer for X.509 certificates using CertificateSigningRequests, or utilizing a device plugin to expose node-local encryption hardware. These options can also be combined, such as using an operator to fetch short-lived session tokens from an external service.",
+    "expected_source": "kubernetes/secret.md",
+    "expected_citations": [
+      "If your cloud-native component needs to authenticate to another application that you know is running within the same Kubernetes cluster, you can use a ServiceAccount and its tokens to identify your client.",
+      "For authentication, you can implement a custom signer for X.509 certificates, and use CertificateSigningRequests to let that custom signer issue certificates to Pods that need them.",
+      "You can use a device plugin to expose node-local encryption hardware to a specific Pod."
+    ],
+    "question_type": "multi_hop",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the difference between a liveness probe and a readiness probe in Kubernetes?",
+    "reference_answer": "A liveness probe determines if a container needs to be restarted, such as when an application is deadlocked and cannot make progress. In contrast, a readiness probe determines if a container is ready to accept network traffic. If a liveness probe fails, the kubelet restarts the container, whereas if a readiness probe fails, Kubernetes simply removes the pod from all matching service endpoints.",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+    "expected_citations": [
+      "Liveness probes determine when to restart a container.",
+      "Readiness probes determine when a container is ready to accept traffic.",
+      "If the readiness probe returns a failed state, Kubernetes removes the pod from all matching service endpoints."
+    ],
+    "question_type": "comparative",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "How can I prevent a liveness probe from failing while my application is still performing its initial startup tasks?",
+    "reference_answer": "To prevent a liveness probe from failing during application initialization, you can configure a startup probe. When a startup probe is defined, Kubernetes will not execute liveness or readiness probes until the startup probe succeeds. Alternatively, you can define the initialDelaySeconds property on the liveness probe to wait before it begins executing.",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+    "expected_citations": [
+      "If a startup probe is configured, Kubernetes does not execute liveness or readiness probes until the startup probe succeeds, allowing the application time to finish its initialization.",
+      "If you want to wait before executing a liveness probe, you can either define initialDelaySeconds or use a startup probe."
+    ],
+    "question_type": "multi_hop",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What happens to a pod if its readiness probe fails?",
+    "reference_answer": "If a readiness probe fails, Kubernetes will stop sending traffic to the affected container. Specifically, it achieves this by removing the pod from all matching service endpoints. The probe will continue to run throughout the container's lifecycle to detect when it recovers from temporary faults or overloads.",
+    "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+    "expected_citations": [
+      "Based on probe results, Kubernetes can restart unhealthy containers or stop sending traffic to containers that are not ready.",
+      "If the readiness probe returns a failed state, Kubernetes removes the pod from all matching service endpoints.",
+      "Readiness probes run on the container during its whole lifecycle."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What is the difference between horizontal and vertical pod autoscaling in Kubernetes, and do they both come installed by default?",
+    "reference_answer": "Horizontal scaling adjusts the number of replicas managed by a workload, whereas vertical scaling adjusts the CPU and memory resources available to those replicas. The HorizontalPodAutoscaler (HPA) is built into Kubernetes by default as an API resource and controller. In contrast, the VerticalPodAutoscaler (VPA) is an add-on that must be deployed separately by a cluster administrator before it can be used.",
+    "expected_source": "kubernetes/autoscaling.md",
+    "expected_citations": [
+      "When you scale a workload, you can either increase or decrease the number of replicas managed by the workload, or adjust the resources available to the replicas in-place. The first approach is referred to as horizontal scaling, while the second is referred to as vertical scaling.",
+      "Unlike the HPA, the VPA doesn't come with Kubernetes by default, but is a an add-on that you or a cluster administrator may need to deploy before you can use it."
+    ],
+    "question_type": "comparative",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "How can I automatically scale my workloads based on a specific time schedule or the number of messages in a queue?",
+    "reference_answer": "You can scale workloads based on events, such as the number of messages in a queue, by using the Kubernetes Event Driven Autoscaler (KEDA). KEDA provides various adapters for different event sources to handle this event-driven scaling. To scale based on a specific time schedule, you can use KEDA in conjunction with its `Cron` scaler, which allows you to define schedules and time zones for scaling your workloads in or out.",
+    "expected_source": "kubernetes/autoscaling.md",
+    "expected_citations": [
+      "KEDA is a CNCF-graduated project enabling you to scale your workloads based on the number of events to be processed, for example the amount of messages in a queue.",
+      "Similar to event driven autoscaling, such behavior can be achieved using KEDA in conjunction with its `Cron` scaler.",
+      "The `Cron` scaler allows you to define schedules (and time zones) for scaling your workloads in or out."
+    ],
+    "question_type": "multi_hop",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "What prerequisites are required before I can use the VerticalPodAutoscaler (VPA) to automatically scale workload resources?",
+    "reference_answer": "Before using the VerticalPodAutoscaler, you must deploy it as an add-on, since it is not included in Kubernetes by default. Additionally, you must install the Metrics Server in your cluster for the VPA to function properly. Once these components are installed, you can create CustomResourceDefinitions (CRDs) to define how and when your workload resources should scale.",
+    "expected_source": "kubernetes/autoscaling.md",
+    "expected_citations": [
+      "Unlike the HPA, the VPA doesn't come with Kubernetes by default, but is a an add-on that you or a cluster administrator may need to deploy before you can use it.",
+      "You will need to have the Metrics Server installed to your cluster for the VPA to work.",
+      "Once installed, it allows you to create CustomResourceDefinitions (CRDs) for your workloads which define how and when to scale the resources of the managed replicas."
+    ],
+    "question_type": "procedural",
+    "domain": "kubernetes"
+  },
+  {
+    "question": "When configuring GPU indexing, what is the difference between using the `deviceFilter` and `devices` fields?",
+    "reference_answer": "The `deviceFilter` field allows you to select GPUs by matching substrings against the hardware device names in a case-insensitive manner. In contrast, the `devices` field allows you to explicitly select specific GPUs by their index in the list of found devices. If both fields are used together, the indexes specified in `devices` are applied only after the `deviceFilter` has filtered the available hardware.",
+    "expected_source": "qdrant/api-reference.md",
+    "expected_citations": [
+      "DeviceFilter for GPU devices by hardware name. Case-insensitive. List of substrings to match against the gpu device name.",
+      "Devices is a List of explicit GPU devices to use. If host has multiple GPUs, this option allows to select specific devices by their index in the list of found devices.",
+      "If `deviceFilter` is set, indexes are applied after filtering."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What is the default TLS configuration behavior for the different ingress providers supported by Qdrant?",
+    "reference_answer": "The default TLS configuration depends on the specific ingress provider being used. For both KubernetesIngress and NginxIngress, TLS is disabled (False) by default. However, for QdrantCloudTraefik, the default behavior depends on the `config.tls` setting configured in the operator.",
+    "expected_source": "qdrant/api-reference.md",
+    "expected_citations": [
+      "TLS specifies whether to enable tls for the ingress.",
+      "The default depends on the ingress provider:",
+      "- KubernetesIngress: False\n- NginxIngress: False\n- QdrantCloudTraefik: Depending on the config.tls setting of the operator."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How should I configure the `APIAuthenticationSpec` to authenticate against specific Qdrant clusters?",
+    "reference_answer": "To configure authentication, you must provide a 128-character SHA512 hash of your API key in the `sha512` field. Additionally, you need to specify the clusters this key is authorized for by providing a list of cluster IDs in the `clusterIDs` field.",
+    "expected_source": "qdrant/api-reference.md",
+    "expected_citations": [
+      "APIAuthenticationSpec describes the configuration for authenticating against Qdrant clusters.",
+      "`sha512` string SHA512 hash of an API key. MaxLength: 128 MinLength: 128",
+      "`clusterIDs` string array List of cluster IDs for which the API key is valid"
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How can I optimize the initial loading of vectors into a collection to save computational resources?",
+    "reference_answer": "To optimize the initial loading of vectors, you can dynamically update the collection parameters to disable indexing during the upload process. Once the upload is complete, you can immediately re-enable indexing. This approach prevents wasting computational resources on continuously rebuilding the index while data is still being ingested.",
+    "expected_source": "qdrant/collections.md",
+    "expected_citations": [
+      "Dynamic parameter updates may be helpful, for example, for more efficient initial loading of vectors.",
+      "For example, you can disable indexing during the upload process, and enable it immediately after the upload is finished.",
+      "As a result, you will not waste extra computation resources on rebuilding the index."
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What are the configuration differences between dense and sparse vectors within a collection?",
+    "reference_answer": "When configuring a collection, sparse vectors must always be named, whereas dense vectors do not strictly require a name unless multiple are used in a single point. Furthermore, sparse and dense vectors must have distinct names within the same collection. Lastly, the distance function for sparse vectors is always set to `Dot` and does not need to be explicitly specified, unlike dense vectors.",
+    "expected_source": "qdrant/collections.md",
+    "expected_citations": [
+      "Unlike dense vectors, sparse vectors must be named.",
+      "And additionally, sparse vectors and dense vectors must have different names within a collection.",
+      "The distance function for sparse vectors is always `Dot` and does not need to be specified."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How does the system implement Cosine similarity to ensure search efficiency?",
+    "reference_answer": "To ensure search efficiency, Cosine similarity is implemented under the hood as a dot-product operation over normalized vectors. The system handles this by automatically normalizing the vectors as they are uploaded.",
+    "expected_source": "qdrant/collections.md",
+    "expected_citations": [
+      "For search efficiency, Cosine similarity is implemented as dot-product over normalized vectors.",
+      "Vectors are automatically normalized during upload"
+    ],
+    "question_type": "factual_lookup",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How does Qdrant combine results from different queries when using Distribution-Based Score Fusion (DBSF)?",
+    "reference_answer": "When using Distribution-Based Score Fusion (DBSF), Qdrant normalizes the scores of the points in each query before combining them. It uses the mean plus or minus the third standard deviation as the limits for this normalization. After normalizing, it sums the scores of the same point across the different queries to produce the final result.",
+    "expected_source": "qdrant/hybrid-queries.md",
+    "expected_citations": [
+      "DBSF normalizes the scores of the points in each query, using the mean +/- the 3rd standard deviation as limits, and then sums the scores of the same point across different queries.",
+      "dbsf is stateless and calculates the normalization limits only based on the results of each query, not on all the scores that it has seen."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How can I assign different levels of importance to multiple queries when performing a hybrid search with Reciprocal Rank Fusion?",
+    "reference_answer": "To assign different levels of importance to multiple queries, you can use the weighted RRF feature by configuring relative weights for each of your prefetches. You provide these weights as an array of numbers, where each weight corresponds to a prefetch in the order they are defined. For instance, assigning a higher weight to a semantic search model compared to a keyword matcher ensures the stronger model has a greater influence on the final ranked results.",
+    "expected_source": "qdrant/hybrid-queries.md",
+    "expected_citations": [
+      "The `rrf` query allows you to configure relative weights for each of the prefetches.",
+      "Weights should be provided as an array of numbers, where each weight is applied to the corresponding prefetch in the order they are defined.",
+      "The number of weights must match the number of prefetches."
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What is the difference between how Reciprocal Rank Fusion (RRF) and Distribution-Based Score Fusion (DBSF) calculate the final score of a document?",
+    "reference_answer": "Reciprocal Rank Fusion (RRF) calculates a document's score based on its rank or position within each query's result set, boosting documents that appear closer to the top. In contrast, Distribution-Based Score Fusion (DBSF) calculates the final score by normalizing the actual scores of the points in each query using the mean and standard deviation, and then summing those normalized scores. While RRF relies on the ordered ranking of results, DBSF relies on the statistical distribution of the scores themselves.",
+    "expected_source": "qdrant/hybrid-queries.md",
+    "expected_citations": [
+      "RRF considers the positions of results within each query and boosts those that appear closer to the top in multiple sets of results. The score of a document is calculated using its rank in each result set",
+      "DBSF normalizes the scores of the points in each query, using the mean +/- the 3rd standard deviation as limits, and then sums the scores of the same point across different queries."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How do sparse and dense vector searches differ in terms of precision and recall?",
+    "reference_answer": "Sparse vector searches typically provide high precision because they excel at finding exact keyword matches, but they often suffer in recall when relevant documents lack those specific keywords. Conversely, dense vector searches are excellent for recall as they capture the broader semantic meaning of a query. However, this broader understanding can result in lower precision by returning loosely related results.",
+    "expected_source": "qdrant/reranking-semantic-search.md",
+    "expected_citations": [
+      "Sparse vector searches usually give you high precision because they\u2019re great at finding exact matches. But, here's the catch\u2014your recall can suffer when relevant documents don\u2019t contain those exact keywords.",
+      "On the flip side, dense vector searches are fantastic for recall since they grasp the broader, semantic meaning of your query.",
+      "However, this can lead to lower precision, where you might see results that are only loosely related."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How should I configure a Qdrant collection to store embeddings for a search system using Cohere's reranking?",
+    "reference_answer": "To configure the Qdrant collection, you need to create a named group of points where all vectors share the same size and distance metric. Specifically, you should set the vector size to 1024 to match the dense embeddings. Additionally, configure the distance metric to use the dot product (Distance.DOT), which is ideal for capturing similarity between normalized vectors.",
+    "expected_source": "qdrant/reranking-semantic-search.md",
+    "expected_citations": [
+      "All the vectors in a collection need to have the same size and be compared using one distance metric.",
+      "client.create_collection(\n    collection_name=\"basic-search-rerank\",\n    vectors_config=VectorParams(size=1024, distance=Distance.DOT),\n)",
+      "Here, the vector size is set to 1024 to match our dense embeddings, and we\u2019re using dot product as the distance metric\u2014perfect for capturing the similarity between vectors, especially when they\u2019re normalized."
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What are the primary types of reranker models available, and how do cross-encoder models specifically evaluate data?",
+    "reference_answer": "The primary types of reranker models include Cross Encoder Models, Multi-Vector Rerankers (like ColBERT), and Large Language Models (LLMs). Cross-encoder models evaluate data by using a classification system to assess pairs of data, such as sentences or documents. They generate a similarity score between 0 and 1 to indicate how closely a document matches the query, but they require both the query and document simultaneously to function.",
+    "expected_source": "qdrant/reranking-semantic-search.md",
+    "expected_citations": [
+      "Rerankers come in different types, each with its own strengths. Let\u2019s break them down: 1. Cross Encoder Models... 2. Multi-Vector Rerankers (e.g., ColBERT)... 3. Large Language Models (LLMs) as Rerankers",
+      "These boost reranking by using a classification system to evaluate pairs of data\u2014like sentences or documents.",
+      "They spit out a similarity score from 0 to 1, showing how closely the document matches your query. The catch? Cross-encoders need both query and document, so they can\u2019t handle standalone documents or queries by themselves."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How do sparse vectors differ from dense vectors in terms of structure and storage in Qdrant?",
+    "reference_answer": "While dense vectors are a simple list of floating-point numbers with a fixed length, sparse vectors do not have a fixed length because they are dynamically allocated during insertion. To define a sparse vector, you must provide a list of its non-zero elements and their corresponding indexes. Furthermore, sparse vectors are kept in a special storage and indexed separately, requiring a different configuration than dense vectors.",
+    "expected_source": "qdrant/vectors.md",
+    "expected_citations": [
+      "Sparse vectors in Qdrant don't have a fixed length, as it is dynamically allocated during vector insertion.",
+      "In order to define a sparse vector, you need to provide a list of non-zero elements and their indexes.",
+      "Sparse vectors in Qdrant are kept in special storage and indexed in a separate index, so their configuration is different from dense vectors."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How can I reduce the memory consumption of my vectors without significantly impacting search quality?",
+    "reference_answer": "You can reduce memory consumption by changing the datatype of your vectors to Float16, which requires half the memory of the default Float32 datatype. This change has virtually no impact on the quality of vector search. To implement this optimization, you need to specify the Float16 datatype for vectors in your collection configuration.",
+    "expected_source": "qdrant/vectors.md",
+    "expected_citations": [
+      "The main advantage of Float16 is that it requires half the memory of Float32, while having virtually no impact on the quality of vector search.",
+      "To use Float16, you need to specify the datatype for vectors in the collection configuration:"
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "Is it possible to store different types of embeddings for a single data point, and can Qdrant generate these embeddings automatically?",
+    "reference_answer": "Yes, Qdrant allows you to store multiple vectors of different sizes and types in the same data point by creating separate named vector spaces within a collection. Furthermore, instead of providing these vectors explicitly, Qdrant can automatically generate them from text or images using a process called inference. You can use this inference capability during both data ingestion and querying by specifying the desired machine learning model.",
+    "expected_source": "qdrant/vectors.md",
+    "expected_citations": [
+      "In Qdrant, you can store multiple vectors of different sizes and [types](#vector-types) in the same data [point](/documentation/concepts/points/).",
+      "Instead of providing vectors explicitly when ingesting or querying data, Qdrant can also generate vectors using a process called [inference](/documentation/inference/).",
+      "You can use inference in the API wherever you can use regular vectors."
+    ],
+    "question_type": "multi_hop",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What is the difference between a vector index and a payload index in Qdrant?",
+    "reference_answer": "In Qdrant, a vector index is designed to accelerate vector search operations, while a payload index is used to speed up filtering conditions. Combining both is essential because relying solely on a vector index is insufficient for effective vector search when filters are applied. Additionally, the payload index accurately estimates filter cardinality, which assists the query planning process in selecting the most efficient search strategy.",
+    "expected_source": "qdrant/indexing.md",
+    "expected_citations": [
+      "In simpler terms, a vector index speeds up vector search, and payload indexes speed up filtering.",
+      "It is essential to have this because for vector search to work effectively with filters, having a vector index only is not enough.",
+      "The index is also used to accurately estimate the filter cardinality, which helps the query planning choose a search strategy."
+    ],
+    "question_type": "comparative",
+    "domain": "qdrant"
+  },
+  {
+    "question": "How can I configure an integer index to only support range filters and disable direct lookup?",
+    "reference_answer": "To configure an integer index that only supports range filters, you need to create a parameterized index. You can achieve this by setting the `range` flag to `true` and the `lookup` flag to `false` in your index configuration. This parameterized setup can significantly enhance performance in collections containing millions of points compared to using the regular integer index.",
+    "expected_source": "qdrant/indexing.md",
+    "expected_citations": [
+      "The regular `integer` index assumes both `lookup` and `range` are `true`. In contrast, to configure a parameterized index, you would set only one of these filters to `true`:",
+      "For example, the following code sets up a parameterized integer index which supports only range filters:",
+      "The parameterized index can enhance performance in collections with millions of points."
+    ],
+    "question_type": "procedural",
+    "domain": "qdrant"
+  },
+  {
+    "question": "Why might a developer choose to store a payload index on disk instead of in memory?",
+    "reference_answer": "By default, Qdrant stores payload-related structures in memory to ensure the vector index can quickly access payload values and maintain low latency during searches. However, a developer might choose to store payload indexes on disk if the indexes are exceptionally large or if they are rarely used. It is important to note that enabling an on-disk payload index requires additional disk I/O operations, which can negatively impact the latency of cold requests.",
+    "expected_source": "qdrant/indexing.md",
+    "expected_citations": [
+      "By default all payload-related structures are stored in memory. In this way, the vector index can quickly access payload values during search.",
+      "There are, however, cases when payload indexes are too large or rarely used. In those cases, it is possible to store payload indexes on disk.",
+      "On-disk payload index might affect cold requests latency, as it requires additional disk I/O operations."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "qdrant"
+  },
+  {
+    "question": "What operating system and Python versions are required to run vLLM?",
+    "reference_answer": "vLLM requires a Linux operating system to run natively. Additionally, you must use a Python version between 3.10 and 3.13.",
+    "expected_source": "vllm/installation_gpu.md",
+    "expected_citations": [
+      "- OS: Linux",
+      "- Python: 3.10 -- 3.13"
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "How can I run vLLM on a Windows machine?",
+    "reference_answer": "Because vLLM does not support Windows natively, you must use a workaround to run it. You can either use the Windows Subsystem for Linux (WSL) with a compatible Linux distribution, or utilize a community-maintained fork like the SystemPanic vllm-windows repository.",
+    "expected_source": "vllm/installation_gpu.md",
+    "expected_citations": [
+      "vLLM does not support Windows natively.",
+      "To run vLLM on Windows, you can use the Windows Subsystem for Linux (WSL) with a compatible Linux distribution, or use some community-maintained forks, e.g. https://github.com/SystemPanic/vllm-windows."
+    ],
+    "question_type": "procedural",
+    "domain": "vllm"
+  },
+  {
+    "question": "What are the different installation methods available for supported GPU architectures like NVIDIA, AMD, and Intel?",
+    "reference_answer": "For supported GPU architectures (NVIDIA CUDA, AMD ROCm, and Intel XPU), vLLM offers installation through either Python or Docker. If setting up via Python, you can install using pre-built wheels or build the wheel from source. If using Docker, you have the option to pull pre-built images or build the image from source.",
+    "expected_source": "vllm/installation_gpu.md",
+    "expected_citations": [
+      "vLLM is a Python library that supports the following GPU variants... NVIDIA CUDA... AMD ROCm... Intel XPU",
+      "## Set up using Python",
+      "### Pre-built wheels {#pre-built-wheels}",
+      "## Set up using Docker",
+      "### Pre-built images"
+    ],
+    "question_type": "multi_hop",
+    "domain": "vllm"
+  },
+  {
+    "question": "How do the presence, frequency, and repetition penalties differ in how they encourage or discourage new tokens?",
+    "reference_answer": "The presence and frequency penalties both use values greater than 0 to encourage new tokens and values less than 0 to encourage repeating tokens. However, the presence penalty is based simply on whether tokens have appeared so far, while the frequency penalty is based on their actual frequency in the generated text. In contrast, the repetition penalty uses values greater than 1 to encourage new tokens and values less than 1 to encourage repetition, factoring in both the prompt and the generated text.",
+    "expected_source": "vllm/sampling_parameters.md",
+    "expected_citations": [
+      "presence_penalty \u2013 Float that penalizes new tokens based on whether they appear in the generated text so far. Values > 0 encourage the model to use new tokens, while values < 0 encourage the model to repeat tokens.",
+      "frequency_penalty \u2013 Float that penalizes new tokens based on their frequency in the generated text so far. Values > 0 encourage the model to use new tokens, while values < 0 encourage the model to repeat tokens.",
+      "repetition_penalty \u2013 Float that penalizes new tokens based on whether they appear in the prompt and the generated text so far. Values > 1 encourage the model to use new tokens, while values < 1 encourage the model to repeat tokens."
+    ],
+    "question_type": "comparative",
+    "domain": "vllm"
+  },
+  {
+    "question": "How can I configure the sampling parameters to generate multiple candidate sequences and only return the top ones?",
+    "reference_answer": "You can achieve this by configuring the n and best_of parameters. Set best_of to the total number of output sequences you want the model to generate from the prompt. Then, set n to the number of top sequences you actually want returned, ensuring that best_of is greater than or equal to n.",
+    "expected_source": "vllm/sampling_parameters.md",
+    "expected_citations": [
+      "n \u2013 Number of output sequences to return for the given prompt.",
+      "best_of \u2013 Number of output sequences that are generated from the prompt. From these best_of sequences, the top n sequences are returned.",
+      "best_of must be greater than or equal to n."
+    ],
+    "question_type": "procedural",
+    "domain": "vllm"
+  },
+  {
+    "question": "Why are LogitsProcessor objects excluded when creating a deep copy of the sampling parameters using the clone method?",
+    "reference_answer": "LogitsProcessor objects are excluded during a deep copy because they can contain an arbitrary and nontrivial amount of data. This prevents the clone method from copying potentially massive or complex data structures unnecessarily.",
+    "expected_source": "vllm/sampling_parameters.md",
+    "expected_citations": [
+      "Deep copy excluding LogitsProcessor objects.",
+      "LogitsProcessor objects are excluded because they may contain an arbitrary, nontrivial amount of data."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "How can I implement and register a custom quantization method in vLLM without modifying the core codebase?",
+    "reference_answer": "To implement a custom quantization method, you must create a class that inherits from QuantizationConfig and decorate it with @register_quantization_config. This subclass requires the implementation of several abstract methods, such as get_name(), get_supported_act_dtypes(), and get_quant_method(). Once registered, the custom method can be utilized by passing its name to the quantization parameter when initializing the LLM.",
+    "expected_source": "vllm/quantization.md",
+    "expected_citations": [
+      "vLLM supports registering custom, out-of-tree quantization methods using the `@register_quantization_config` decorator.",
+      "To register a custom quantization method, create a class that inherits from `QuantizationConfig` and decorate it with `@register_quantization_config`.",
+      "Once registered, you can use your custom quantization method with vLLM:"
+    ],
+    "question_type": "procedural",
+    "domain": "vllm"
+  },
+  {
+    "question": "When building a custom quantization plugin in vLLM, what is the difference between implementing a method for linear layers versus Mixture of Experts (MoE) layers?",
+    "reference_answer": "When implementing a custom quantization method for linear layers, developers must return a QuantizeMethodBase subclass from the get_quant_method function. Conversely, for Mixture of Experts (MoE) models, developers need to return a FusedMoEMethodBase subclass. If a developer wishes to skip quantization for MoE layers entirely, they can utilize the UnquantizedFusedMoEMethod class.",
+    "expected_source": "vllm/quantization.md",
+    "expected_citations": [
+      "For linear layers, return a `QuantizeMethodBase` subclass from `get_quant_method`.",
+      "For Mixture of Experts (MoE) models, return a `FusedMoEMethodBase` subclass from `get_quant_method`.",
+      "You can use `UnquantizedFusedMoEMethod` to skip MoE quantization:"
+    ],
+    "question_type": "comparative",
+    "domain": "vllm"
+  },
+  {
+    "question": "What library is recommended for optimizing models for deployment with vLLM, and what quantization formats does it support?",
+    "reference_answer": "vLLM recommends using the LLM Compressor library to optimize models for deployment. This library supports several quantization formats, including FP8, INT8, and INT4.",
+    "expected_source": "vllm/quantization.md",
+    "expected_citations": [
+      "To get started with quantization, see [LLM Compressor](llm_compressor.md), a library for optimizing models for deployment with vLLM that supports FP8, INT8, INT4, and other quantization formats."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "What is the difference between model-based speculative decoding methods and simpler methods like n-gram in vLLM?",
+    "reference_answer": "Model-based speculative decoding methods, such as EAGLE, MTP, and draft models, provide the highest reduction in latency. In contrast, simpler methods like n-gram and suffix decoding offer more modest speed improvements. However, these simpler methods have the advantage of being lightweight and not increasing the workload during peak traffic periods.",
+    "expected_source": "vllm/speculative_decoding.md",
+    "expected_citations": [
+      "Model-based methods such as EAGLE, MTP, draft models, PARD and MLP provide the best latency reduction, while simpler methods such as n-gram and suffix decoding provide modest speedups without increasing workload during peak traffic.",
+      "N-gram | Low to medium gain | Medium gain | Lightweight and easy to enable."
+    ],
+    "question_type": "comparative",
+    "domain": "vllm"
+  },
+  {
+    "question": "Does vLLM's speculative decoding guarantee that the generated output will be exactly the same across different runs?",
+    "reference_answer": "No, vLLM does not guarantee stable token log probabilities, which can lead to different outputs for the same request across multiple runs. While speculative decoding is theoretically and algorithmically lossless, variations can still occur due to floating-point precision differences in hardware. Additionally, changes in batch size can cause numerical instability or non-deterministic behavior that affects output probabilities.",
+    "expected_source": "vllm/speculative_decoding.md",
+    "expected_citations": [
+      "vLLM does not currently guarantee stable token log probabilities (logprobs). This can result in different outputs for the same request across runs.",
+      "Differences in hardware numerical precision may lead to slight discrepancies in the output distribution.",
+      "Changes in batch size may cause variations in logprobs and output probabilities, potentially due to non-deterministic behavior in batched operations or numerical instability."
+    ],
+    "question_type": "multi_hop",
+    "domain": "vllm"
+  },
+  {
+    "question": "What are the known feature incompatibilities and version constraints for using speculative decoding in vLLM?",
+    "reference_answer": "In vLLM versions 0.15.0 and older, speculative decoding cannot be composed with pipeline parallelism. Additionally, using speculative decoding with a separate draft model is not supported in vLLM versions 0.10.0 and older.",
+    "expected_source": "vllm/speculative_decoding.md",
+    "expected_citations": [
+      "Pipeline parallelism is not composible with speculative decoding as of `vllm<=0.15.0`",
+      "Speculative decoding with a draft models is not supported in `vllm<=0.10.0`"
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "How should I configure my Kubernetes pod spec to enable GPUDirect RDMA for vLLM?",
+    "reference_answer": "To enable GPUDirect RDMA in Kubernetes, you need to configure the container's security context and shared memory. Specifically, add the `IPC_LOCK` capability to the security context to lock memory pages and prevent them from swapping to disk. Additionally, you must mount `/dev/shm` in the pod spec to provide shared memory for interprocess communication.",
+    "expected_source": "vllm/parallelism_scaling.md",
+    "expected_citations": [
+      "`IPC_LOCK` security context: add the `IPC_LOCK` capability to the container's security context to lock memory pages and prevent swapping to disk.",
+      "Shared memory with `/dev/shm`: mount `/dev/shm` in the pod spec to provide shared memory for interprocess communication (IPC)."
+    ],
+    "question_type": "procedural",
+    "domain": "vllm"
+  },
+  {
+    "question": "What are the default distributed execution backends for single-node versus multi-node inference in vLLM?",
+    "reference_answer": "For single-node inference, vLLM uses native Python `multiprocessing` as the default distributed runtime. In contrast, multi-node inference defaults to using the Ray distributed computing framework. You can override these defaults by configuring the `distributed_executor_backend` setting in the LLM class or API server.",
+    "expected_source": "vllm/parallelism_scaling.md",
+    "expected_citations": [
+      "The default distributed runtimes are Ray for multi-node inference and native Python `multiprocessing` for single-node inference.",
+      "You can override the defaults by setting `distributed_executor_backend` in the `LLM` class or `--distributed-executor-backend` in the API server."
+    ],
+    "question_type": "comparative",
+    "domain": "vllm"
+  },
+  {
+    "question": "When provisioning resources for a model in vLLM, what does the 'Maximum concurrency' log message indicate?",
+    "reference_answer": "The 'Maximum concurrency' log message provides an estimate of how many requests the system can serve concurrently if each request requires a specific number of tokens. This token number is based on the model configuration's maximum sequence length. If the estimated concurrency is lower than your required throughput, you will need to add more GPUs or nodes to the cluster.",
+    "expected_source": "vllm/parallelism_scaling.md",
+    "expected_citations": [
+      "The `Maximum concurrency` line provides an estimate of how many requests can be served concurrently if each request requires the specified number of tokens (40,960 in the example above).",
+      "The tokens-per-request number is taken from the model configuration's maximum sequence length, `ModelConfig.max_model_len`.",
+      "If these numbers are lower than your throughput requirements, add more GPUs or nodes to your cluster."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "What hardware platforms and accelerators are supported for running vLLM?",
+    "reference_answer": "vLLM supports a wide variety of hardware platforms for inference. It can run on NVIDIA GPUs, AMD CPUs and GPUs, Intel CPUs and GPUs, PowerPC CPUs, Arm CPUs, and TPUs. Additionally, it supports diverse hardware plugins including Intel Gaudi, IBM Spyre, and Huawei Ascend.",
+    "expected_source": "vllm/overview.md",
+    "expected_citations": [
+      "Support for NVIDIA GPUs, AMD CPUs and GPUs, Intel CPUs and GPUs, PowerPC CPUs, Arm CPUs, and TPU.",
+      "Additionally, support for diverse hardware plugins such as Intel Gaudi, IBM Spyre and Huawei Ascend."
+    ],
+    "question_type": "factual_lookup",
+    "domain": "vllm"
+  },
+  {
+    "question": "As a new user, where should I start if I want to run open-source models versus building my own applications with vLLM?",
+    "reference_answer": "If your goal is to run open-source models, you should begin with the Quickstart Guide. However, if you are looking to build applications using vLLM, it is recommended to start with the User Guide instead.",
+    "expected_source": "vllm/overview.md",
+    "expected_citations": [
+      "Run open-source models on vLLM, we recommend starting with the Quickstart Guide",
+      "Build applications with vLLM, we recommend starting with the User Guide"
+    ],
+    "question_type": "procedural",
+    "domain": "vllm"
+  },
+  {
+    "question": "How do I get started with vLLM?",
+    "reference_answer": "The best place to get started depends on your specific goals as a user. You should use the Quickstart Guide if you want to run open-source models, or the User Guide if you are looking to build applications. If you intend to contribute to building vLLM itself, you should start with the Developer Guide.",
+    "expected_source": "vllm/overview.md",
+    "expected_citations": [
+      "Where to get started with vLLM depends on the type of user.",
+      "Run open-source models on vLLM, we recommend starting with the Quickstart Guide",
+      "Build applications with vLLM, we recommend starting with the User Guide",
+      "Build vLLM, we recommend starting with Developer Guide"
+    ],
+    "question_type": "ambiguous",
+    "domain": "vllm"
+  }
+]
