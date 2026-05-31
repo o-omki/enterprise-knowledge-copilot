@@ -5,9 +5,6 @@ seed: 42
 top_k: 5
 candidate_multiplier: 2
 methods:
-  - dense
-  - sparse
-  - hybrid
   - hybrid+rerank
 
 datasets:
