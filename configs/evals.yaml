@@ -16,7 +16,7 @@ datasets:
 judge:
   model: gemini-3-flash-preview
   temperature: 0.0
-  max_output_tokens: 2048
+  max_output_tokens: 8192
 
 reports:
   output_dir: data/eval/reports
