@@ -28,6 +28,7 @@ class Citation(BaseModel):
 class AnswerResponse(BaseModel):
     answer: str
     citations: list[Citation]
+    context_passages: list[str] = Field(default_factory=list)
 
 
 class GenerationService:
@@ -72,31 +73,48 @@ class GenerationService:
 
         context_str = "\n".join(context_parts)
 
-        prompt = f"""
-            You are an expert enterprise knowledge assistant.
+        system_instruction = """\
+You are an enterprise knowledge assistant. You answer questions based \
+STRICTLY on the provided source documents.
 
-            Answer the user's question using ONLY the provided context.
-            If the answer is not present in the context, say you do not know.
+HARD RULES — violating any of these is a critical failure:
+1. ONLY use information that is explicitly stated in the Context below.
+2. NEVER add facts, explanations, examples, or details from your own knowledge, \
+even if you know them to be correct.
+3. EVERY factual sentence in your answer MUST end with an inline citation [N] \
+referencing the source it came from. Multiple sources may be cited as [1][3].
+4. If the Context does not contain enough information to answer the question, \
+respond EXACTLY with: "I don't have enough information in the knowledge base \
+to answer this question."
+5. Stay close to the source wording. Do not heavily paraphrase or embellish.
+6. Do NOT start your answer with "Based on the provided context" or similar \
+meta-commentary. Answer the question directly.
 
-            When information from a source is used, include inline citations
-            using the source number in brackets.
+CITATION FORMAT:
+- Use [N] at the end of each sentence, where N is the Source number.
+- Example: "FastAPI supports background tasks for long-running operations [1]. \
+You can declare them as function parameters [2]."
+"""
 
-            Example:
-            'FastAPI supports background tasks [1].'
+        user_prompt = f"""\
+Context:
+{context_str}
 
-            Context:
-            {context_str}
+Question:
+{query}
 
-            Question:
-            {query}
-
-            Answer:
-            """.strip()
+Answer:
+"""
 
         try:
             response = await self.genai_client.aio.models.generate_content(
                 model=self.config.generation_model_name,
-                contents=prompt,
+                contents=user_prompt,
+                config={
+                    "system_instruction": system_instruction,
+                    "temperature": 0.2,
+                    "max_output_tokens": 2048,
+                },
             )
 
         except Exception as e:
@@ -105,4 +123,16 @@ class GenerationService:
             raise RuntimeError(f"Generation failed: {e}") from e
 
         else:
-            return AnswerResponse(answer=response.text, citations=citations_meta)
+            try:
+                answer_text = (
+                    response.text
+                    or "I cannot answer this question due to safety policy restrictions."
+                )
+            except Exception:
+                answer_text = "I cannot answer this question due to safety policy restrictions."
+
+            return AnswerResponse(
+                answer=answer_text,
+                citations=citations_meta,
+                context_passages=[r.text for r in search_results],
+            )
