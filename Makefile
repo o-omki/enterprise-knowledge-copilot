@@ -36,10 +36,37 @@ ingest-docs:
 	@echo "Document ingestion complete."
 
 
-run-evals: eval-retrieval
+eval-all:
+	@echo "Running ALL evaluations..."
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run-all
 	@echo "All evaluations complete."
 
 eval-retrieval:
-	@echo "Running retrieval evaluation..."
-	PYTHONPATH=. $(PYTHON) benchmarks/retrieval/eval_retrieval.py
-	@echo "Retrieval evaluation complete."
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner retrieval
+
+eval-reranking:
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner reranking
+
+eval-generation:
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner generation
+
+eval-safety:
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner safety
+
+eval-latency:
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner latency
+
+eval-regression:
+	@echo "Running regression check against baseline..."
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli compare
+
+eval-freeze-baseline:
+	@echo "Freezing current results as new baseline..."
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli freeze-baseline
+
+generate-eval-dataset:
+	@echo "Generating golden QA evaluation dataset..."
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli generate-dataset
+
+# Legacy aliases (deprecated — use eval-* targets above)
+run-evals: eval-all
