@@ -151,29 +151,34 @@ Support harder user questions through structured planning.
 ### Notes
 Do not build five fancy agents at once. Start with a simple planner + retriever + synthesizer pattern.
 
----
-
 ## Phase 5: Safety and Guardrails
 
 ### Objective
-Reduce unsafe or ungrounded behavior.
+Establish a production-grade, enterprise-aligned safety layer using NVIDIA NeMo Guardrails, Vertex AI (Gemini), and Private AI to mitigate prompt injection, redact PII, enforce conversational boundaries, and detect ungrounded answers/hallucinations.
 
-### Tasks
-- implement prompt injection checks
-- add source trust rules
-- add PII masking/redaction layer
-- add unsupported-claim detection heuristics
-- define refusal/fallback behavior
-- create adversarial test cases
+For a comprehensive blueprint, directory structure, task breakdown, and exit SLA metrics, refer to the [Phase 5 Safety & Guardrails Implementation Plan](file:///home/omki/.gemini/antigravity/brain/64ab4120-512f-4fff-9f32-0115e723a103/phase5_safety_guardrails_plan.md).
+
+### Core Tasks
+- **Microservice Infrastructure**: Deploy NeMo Guardrails as an independent microservice container connected to Vertex AI (Gemini-3-flash).
+- **PII Masking & DLP**: Integrate the Private AI engine to mask sensitive patterns in inputs/outputs, backed by zero-latency local regex pre-filters.
+- **Input Guardrails**: Formulate Colang 2.0 flows and self-checking prompts to defend against jailbreaks, prompt injection, and off-topic requests.
+- **Output Guardrails**: Implement entailment-based grounding checks (`self_check_facts`) to ensure answers are strictly backed by retrieved RAG evidence.
+- **Refusal UX**: Set up safety gateway middleware in the FastAPI API layer with polite error schemas and offline graceful degradation fallbacks.
+- **Adversarial Evaluation**: Compile a static attack dataset and construct an automated red-teaming harness driven by generative agents to test safety policies and produce scorecards.
 
 ### Deliverables
-- safety middleware
-- adversarial benchmark set
-- safety report
+- Independent safety-guardrails microservice Uvicorn server and Docker configuration.
+- Local safety package client SDK (`packages/safety`) and API gateway interceptors.
+- Static and generative dynamic adversarial benchmark evaluation suites (`data/eval/safety`).
+- Detailed safety baseline report scorecard showing deflection metrics, false-positive refusal rates, and latency overheads.
 
 ### Exit Criteria
-- system demonstrates reasonable mitigation on common attack patterns
-- fallback behaviors are documented
+- **100%** jailbreak deflection rate on standard static datasets and **>98%** on dynamic red-teaming.
+- **0%** sensitive PII leakage under test validation.
+- **>95%** ungrounded fact/hallucination deflection accuracy.
+- **<2%** false-positive refusal rate on clean queries.
+- **<800ms** P95 latency overhead introduced by the guardrails pipeline.
+- Successful implementation of fail-safe degradation on microservice outage.
 
 ---
 
