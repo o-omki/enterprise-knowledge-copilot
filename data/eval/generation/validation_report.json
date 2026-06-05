@@ -1,0 +1,2742 @@
+{
+  "stats": {
+    "total_pairs": 72,
+    "valid_pairs": 72,
+    "invalid_pairs": 0,
+    "validity_percentage": 100.0,
+    "question_validity_percentage": 100.0,
+    "answer_validity_percentage": 100.0,
+    "total_citations_checked": 191,
+    "python_citation_matches": 175,
+    "python_citation_match_percentage": 91.62
+  },
+  "results": [
+    {
+      "question": "How do I define a request body that includes both optional and required fields in FastAPI?",
+      "reference_answer": "To define a request body, you must first create a data model class that inherits from Pydantic's `BaseModel`. For required fields, simply declare the attribute with its standard Python type without a default value. To make a field optional, assign it a default value, typically using `None`.",
+      "expected_source": "fastapi/body.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses a core concept explained in the document (how to define optional and required fields in a request body using Pydantic models).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is fully correct, clear, and directly grounded in the text. It accurately explains how to inherit from BaseModel, how required fields are defined (no default value), and how optional fields are defined (using a default value like None).",
+      "citations_validation": [
+        {
+          "citation": "Then you declare your data model as a class that inherits from BaseModel.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (with minor formatting difference of backticks around BaseModel) and supports the answer's explanation of how to create the data model."
+        },
+        {
+          "citation": "The same as when declaring query parameters, when a model attribute has a default value, it is not required. Otherwise, it is required.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the text and supports the explanation of how required vs. optional fields are determined by the presence of a default value."
+        },
+        {
+          "citation": "Use `None` to make it just optional.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the text and supports the explanation of using None to make a field optional."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "When defining an endpoint with multiple parameters, how does FastAPI distinguish between path, query, and request body parameters?",
+      "reference_answer": "FastAPI automatically categorizes function parameters based on their declaration and type. If a parameter matches a variable defined in the endpoint's path, it is treated as a path parameter. If the parameter is a singular type like an integer or string, it is interpreted as a query parameter, whereas parameters typed as Pydantic models are extracted from the request body.",
+      "expected_source": "fastapi/body.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and directly answers the question. It is 100% grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "If the parameter is also declared in the **path**, it will be used as a path parameter.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the source text and supports the explanation of how FastAPI identifies path parameters."
+        },
+        {
+          "citation": "If the parameter is of a **singular type** (like `int`, `float`, `str`, `bool`, etc) it will be interpreted as a **query** parameter.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the source text and supports the explanation of how FastAPI identifies query parameters."
+        },
+        {
+          "citation": "If the parameter is declared to be of the type of a **Pydantic model**, it will be interpreted as a request **body**.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the source text and supports the explanation of how FastAPI identifies request body parameters."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Why is it discouraged to send a request body with a GET request in FastAPI?",
+      "reference_answer": "Sending a body with a GET request has undefined behavior according to HTTP specifications. Although FastAPI technically supports it for extreme use cases, interactive documentation tools like Swagger UI will not display the body documentation for GET requests. Furthermore, intermediate proxies might fail to support GET requests that contain a body.",
+      "expected_source": "fastapi/body.md",
+      "question_type": "factual_lookup",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Sending a body with a `GET` request has an undefined behavior in the specifications, nevertheless, it is supported by FastAPI, only for very complex/extreme use cases.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the source document and directly explains why sending a body with a GET request has undefined behavior in the specifications."
+        },
+        {
+          "citation": "As it is discouraged, the interactive docs with Swagger UI won't show the documentation for the body when using `GET`, and proxies in the middle might not support it.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the source document and explains the consequences/reasons why it is discouraged (lack of Swagger UI documentation and potential proxy issues)."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do I configure a background task to run after an endpoint returns a response in FastAPI?",
+      "reference_answer": "To configure a background task, first import `BackgroundTasks` and add it as a parameter to your path operation function. Next, define a standard function (either `async def` or `def`) that will perform the background work. Finally, inside your path operation, call the `.add_task()` method on the background tasks object, passing your task function along with any required positional or keyword arguments.",
+      "expected_source": "fastapi/background-tasks.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document. It accurately describes the steps to configure a background task in FastAPI.",
+      "citations_validation": [
+        {
+          "citation": "First, import `BackgroundTasks` and define a parameter in your *path operation function* with a type declaration of `BackgroundTasks`:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the first step of the answer (importing and declaring the parameter)."
+        },
+        {
+          "citation": "It can be an `async def` or normal `def` function, **FastAPI** will know how to handle it correctly.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the second step of the answer (defining the task function as async def or normal def)."
+        },
+        {
+          "citation": "Inside of your *path operation function*, pass your task function to the *background tasks* object with the method `.add_task()`:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the final step of the answer (calling .add_task() inside the path operation function)."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between using FastAPI's built-in BackgroundTasks and a tool like Celery, and when should I choose one over the other?",
+      "reference_answer": "FastAPI's `BackgroundTasks` is ideal for small background operations, like sending emails, or when you need to access variables and objects from the same FastAPI application process. In contrast, Celery is better suited for heavy background computation that can be distributed across multiple processes or servers. However, Celery requires a more complex configuration, including a message or job queue manager like RabbitMQ or Redis.",
+      "expected_source": "fastapi/background-tasks.md",
+      "question_type": "comparative",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'Caveat' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, directly addresses the question, and is completely grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "If you need to perform heavy background computation and you don't necessarily need it to be run by the same process (for example, you don't need to share memory, variables, etc), you might benefit from using other bigger tools like Celery.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of when to use Celery (heavy computation, no shared memory)."
+        },
+        {
+          "citation": "They tend to require more complex configurations, a message/job queue manager, like RabbitMQ or Redis, but they allow you to run background tasks in multiple processes, and especially, in multiple servers.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of Celery's requirements (complex configuration, message queue) and capabilities (multiple processes/servers)."
+        },
+        {
+          "citation": "But if you need to access variables and objects from the same **FastAPI** app, or you need to perform small background tasks (like sending an email notification), you can simply just use `BackgroundTasks`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of when to use FastAPI's built-in BackgroundTasks (small tasks, accessing app variables/objects)."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Can I inject background tasks into sub-dependencies, and how does FastAPI handle multiple tasks added at different dependency levels?",
+      "reference_answer": "Yes, you can declare a parameter of type `BackgroundTasks` at multiple levels, including path operation functions, dependencies, and sub-dependencies. FastAPI automatically knows how to reuse the same background tasks object across these different levels. It will merge all the defined background tasks together and run them in the background after the response is sent.",
+      "expected_source": "fastapi/background-tasks.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It directly answers both parts of the question without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Using `BackgroundTasks` also works with the dependency injection system, you can declare a parameter of type `BackgroundTasks` at multiple levels: in a *path operation function*, in a dependency (dependable), in a sub-dependency, etc.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the first part of the answer regarding injecting background tasks into sub-dependencies."
+        },
+        {
+          "citation": "**FastAPI** knows what to do in each case and how to reuse the same object, so that all the background tasks are merged together and are run in the background afterwards:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the second part of the answer regarding how FastAPI handles and merges multiple tasks across different levels."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do I create a middleware function in FastAPI to modify a response before returning it?",
+      "reference_answer": "To create a middleware in FastAPI, use the `@app.middleware(\"http\")` decorator on top of your function. The function must accept the `request` and a `call_next` function as parameters. You can use `call_next` to pass the request to the path operation, receive the generated response, and then modify that response before returning it.",
+      "expected_source": "fastapi/middleware.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It accurately describes how to create a middleware using the decorator and parameters described in the text.",
+      "citations_validation": [
+        {
+          "citation": "To create a middleware you use the decorator `@app.middleware(\"http\")` on top of a function.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the text and supports the part of the answer explaining how to define the middleware using the decorator."
+        },
+        {
+          "citation": "A function `call_next` that will receive the `request` as a parameter.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the text and supports the part of the answer explaining the parameters the middleware function must accept."
+        },
+        {
+          "citation": "You can then further modify the `response` before returning it.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the text and supports the part of the answer explaining how to modify the response before returning it."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "In what order are multiple middlewares and background tasks executed during a request lifecycle?",
+      "reference_answer": "When you add multiple middlewares, they form a stack where the last middleware added is the outermost. On the incoming request, the outermost middleware runs first, and on the outgoing response, it runs last. Any background tasks associated with the request will run after all the middleware has finished executing.",
+      "expected_source": "fastapi/middleware.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately describes the execution order of multiple middlewares and background tasks.",
+      "citations_validation": [
+        {
+          "citation": "The last middleware added is the outermost, and the first is the innermost.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how the middleware stack is structured."
+        },
+        {
+          "citation": "On the request path, the outermost middleware runs first. On the response path, it runs last.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of the execution order of middlewares during the request and response phases."
+        },
+        {
+          "citation": "If there were any background tasks (covered in the Background Tasks section, you will see it later), they will run after all the middleware.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (with minor markdown link formatting differences) and supports the explanation of when background tasks are executed relative to the middleware."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What must be configured if I want a client in a browser to be able to see custom proprietary headers added by a middleware?",
+      "reference_answer": "If you add custom headers (typically using the `X-` prefix) and want them visible to a browser client, you must update your CORS configurations. Specifically, you need to add them using the `expose_headers` parameter as documented in Starlette's CORS documentation.",
+      "expected_source": "fastapi/middleware.md",
+      "question_type": "factual_lookup",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses a specific scenario described in the document regarding custom headers and browser visibility.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document, specifically referencing the CORS configuration and the `expose_headers` parameter.",
+      "citations_validation": [
+        {
+          "citation": "Keep in mind that custom proprietary headers can be added using the `X-` prefix.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the source document (with minor markdown link differences) and supports the context of adding custom proprietary headers."
+        },
+        {
+          "citation": "But if you have custom headers that you want a client in a browser to be able to see, you need to add them to your CORS configurations (CORS (Cross-Origin Resource Sharing)) using the parameter `expose_headers` documented in Starlette's CORS docs.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document and fully supports the answer by explaining the exact configuration needed (CORS and `expose_headers`)."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do I pass a Pydantic model in a test request body using TestClient?",
+      "reference_answer": "The TestClient expects data that can be converted to JSON, rather than raw Pydantic models. To send a Pydantic model's data during testing, you should first convert it using the `jsonable_encoder`. Once encoded, you can pass the resulting data to the client.",
+      "expected_source": "fastapi/testing.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and completely grounded in the source document. It accurately explains that TestClient does not accept raw Pydantic models directly and recommends using the `jsonable_encoder` to convert the data.",
+      "citations_validation": [
+        {
+          "citation": "Note that the `TestClient` receives data that can be converted to JSON, not Pydantic models.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the answer by explaining that TestClient does not accept raw Pydantic models."
+        },
+        {
+          "citation": "If you have a Pydantic model in your test and you want to send its data to the application during testing, you can use the `jsonable_encoder` described in JSON Compatible Encoder.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (with minor markdown link formatting differences) and supports the answer by providing the solution of using `jsonable_encoder`."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Why are FastAPI test functions defined with `def` instead of `async def`?",
+      "reference_answer": "FastAPI test functions are defined as normal `def` functions because the calls made to the TestClient are standard synchronous calls that do not require `await`. This design choice simplifies the testing process. It allows developers to use `pytest` directly without needing complex configurations for asynchronous execution.",
+      "expected_source": "fastapi/testing.md",
+      "question_type": "factual_lookup",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses a specific design choice explained in the document regarding the use of synchronous test functions.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, clear, and fully grounded in the provided text. It correctly explains that the test functions are defined with 'def' because the client calls are synchronous (not using 'await'), which allows using pytest directly without complications.",
+      "citations_validation": [
+        {
+          "citation": "Notice that the testing functions are normal `def`, not `async def`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of how testing functions are defined."
+        },
+        {
+          "citation": "And the calls to the client are also normal calls, not using `await`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and explains why 'def' is used instead of 'async def' (because the client calls do not use 'await')."
+        },
+        {
+          "citation": "This allows you to use `pytest` directly without complications.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the part of the answer explaining that this design choice simplifies testing with pytest."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What packages do I need to install to write and run tests for a FastAPI application?",
+      "reference_answer": "To write and run tests for a FastAPI application, you need to install two primary packages. First, you must install `httpx` in order to use the `TestClient` for making requests. Second, you need to install `pytest`, which serves as the test runner that automatically detects, executes, and reports on your test files.",
+      "expected_source": "fastapi/testing.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is fully grounded in the text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "To use `TestClient`, first install `httpx`.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (with a markdown link) and supports the answer's claim that `httpx` must be installed to use `TestClient`."
+        },
+        {
+          "citation": "After that, you just need to install `pytest`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the answer's claim that `pytest` needs to be installed."
+        },
+        {
+          "citation": "It will detect the files and tests automatically, execute them, and report the results back to you.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of what `pytest` does when run."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do I define a query parameter as required in a FastAPI endpoint?",
+      "reference_answer": "To make a query parameter required in FastAPI, you simply declare the parameter in your function signature without providing any default value. If a client attempts to access the endpoint without including this required parameter in the URL, FastAPI will automatically return an error indicating that the field is missing.",
+      "expected_source": "fastapi/query-params.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and fully grounded in the source document. It accurately explains how to make a query parameter required (by not declaring a default value) and what happens if it is omitted (FastAPI returns an error).",
+      "citations_validation": [
+        {
+          "citation": "But when you want to make a query parameter required, you can just not declare any default value:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and directly supports the explanation of how to define a required query parameter."
+        },
+        {
+          "citation": "...without adding the required parameter `needy`, you will see an error like:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the statement that FastAPI will return an error if the required parameter is missing."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What string values can I pass in a URL to represent a `True` boolean query parameter?",
+      "reference_answer": "When you declare a query parameter with a `bool` type, FastAPI automatically converts specific string representations from the URL into a Python boolean. You can pass values such as `1`, `True`, `true`, `on`, or `yes`, including any case variations like uppercase or first letter capitalized. If you pass these values, the parameter will be `True`, otherwise it will be evaluated as `False`.",
+      "expected_source": "fastapi/query-params.md",
+      "question_type": "factual_lookup",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately lists the string values that convert to a True boolean and explains the case-insensitivity and fallback behavior.",
+      "citations_validation": [
+        {
+          "citation": "You can also declare `bool` types, and they will be converted:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and introduces the concept of declaring and converting boolean query parameters."
+        },
+        {
+          "citation": "or any other case variation (uppercase, first letter in uppercase, etc), your function will see the parameter `short` with a `bool` value of `True`. Otherwise as `False`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and directly supports the answer's explanation of case variations and the fallback to False."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How does FastAPI know whether a function argument is meant to be a path parameter or a query parameter?",
+      "reference_answer": "FastAPI automatically interprets any function parameters that are not explicitly declared as part of the path parameters as query parameters. When you declare multiple path and query parameters together, FastAPI detects them by name to distinguish between the two. You do not need to declare them in any specific order in your function signature.",
+      "expected_source": "fastapi/query-params.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately explains how FastAPI distinguishes between path and query parameters based on the text.",
+      "citations_validation": [
+        {
+          "citation": "When you declare other function parameters that are not part of the path parameters, they are automatically interpreted as \"query\" parameters.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the first sentence of the answer explaining how non-path parameters are interpreted as query parameters."
+        },
+        {
+          "citation": "You can declare multiple path parameters and query parameters at the same time, **FastAPI** knows which is which.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation that FastAPI can distinguish between multiple path and query parameters."
+        },
+        {
+          "citation": "And you don't have to declare them in any specific order. They will be detected by name:",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the part of the answer stating that parameters are detected by name and do not need to be declared in any specific order."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I configure a path parameter to accept a full file path that includes slashes?",
+      "reference_answer": "To allow a path parameter to contain a full path with slashes, you can use the `:path` convertor provided by Starlette. You declare the path parameter in your route URL using the syntax `{file_path:path}`. This indicates that the parameter should match any path, allowing it to capture values that include slashes, such as `home/johndoe/myfile.txt`.",
+      "expected_source": "fastapi/path-params.md",
+      "question_type": "procedural",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses a specific feature explained in the document (how to handle path parameters containing paths).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is fully grounded in the document, accurately explaining the use of Starlette's `:path` convertor and providing the correct syntax as described in the text.",
+      "citations_validation": [
+        {
+          "citation": "Using an option directly from Starlette you can declare a *path parameter* containing a *path* using a URL like:\n\n```\n/files/{file_path:path}\n```",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source document and directly supports the answer by showing the exact syntax used to declare a path parameter containing a path."
+        },
+        {
+          "citation": "In this case, the name of the parameter is `file_path`, and the last part, `:path`, tells it that the parameter should match any *path*.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source document and explains the function of the `:path` convertor, supporting the explanation in the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the benefits of adding standard Python type annotations to path parameters?",
+      "reference_answer": "Adding Python type annotations to path parameters provides several key benefits, including automatic data conversion (parsing) from HTTP request strings into the specified Python data types. It also enables automatic data validation, which returns clear errors when the input is invalid. Furthermore, type annotations power editor support like autocompletion and generate automatic, interactive API documentation.",
+      "expected_source": "fastapi/path-params.md",
+      "question_type": "multi_hop",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately summarizes the benefits of type annotations (data conversion, validation, editor support, and documentation) as described in the text.",
+      "citations_validation": [
+        {
+          "citation": "So, with that type declaration, **FastAPI** gives you automatic request \"parsing\".",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text under the 'Data conversion' section (with minor HTML formatting for dfn) and directly supports the answer's claim about automatic data conversion/parsing."
+        },
+        {
+          "citation": "So, with the same Python type declaration, **FastAPI** gives you data validation.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the 'Data validation' section and supports the answer's claim about automatic data validation."
+        },
+        {
+          "citation": "Again, just with that same Python type declaration, **FastAPI** gives you automatic, interactive documentation (integrating Swagger UI).",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the 'Documentation' section and supports the answer's claim about automatic, interactive API documentation."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Why must a fixed path operation be declared before a variable path operation that shares a similar structure?",
+      "reference_answer": "Fixed path operations must be declared first because path operations are evaluated in the exact order they appear in the code. If a variable path is declared before a fixed path, the variable path will intercept the request. For example, `/users/{user_id}` would incorrectly match a request intended for `/users/me` by treating \"me\" as the `user_id` parameter.",
+      "expected_source": "fastapi/path-params.md",
+      "question_type": "factual_lookup",
+      "domain": "fastapi",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and directly addresses a concept explained in the 'Order matters' section of the document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, detailed, and fully grounded in the text. It correctly explains that path operations are evaluated in order and provides the exact example from the text to illustrate why order matters.",
+      "citations_validation": [
+        {
+          "citation": "Because *path operations* are evaluated in order, you need to make sure that the path for `/users/me` is declared before the one for `/users/{user_id}`:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the explanation of why order matters when declaring path operations."
+        },
+        {
+          "citation": "Otherwise, the path for `/users/{user_id}` would match also for `/users/me`, \"thinking\" that it's receiving a parameter `user_id` with a value of `\"me\"`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and explains the exact consequence of declaring the variable path before the fixed path."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I configure a Kubernetes Service to route traffic to an external database running outside of the cluster?",
+      "reference_answer": "To route traffic to an external database, you can define a Service without specifying a pod selector. Because the Service lacks a selector, Kubernetes will not automatically create the corresponding EndpointSlice objects. You must manually create an EndpointSlice object that maps the Service to the network address and port of your external database, linking them by setting the `kubernetes.io/service-name` label.",
+      "expected_source": "kubernetes/service.md",
+      "question_type": "procedural",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'Services without selectors' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It accurately explains how to define a Service without a selector and manually create an EndpointSlice with the correct label to map to an external database.",
+      "citations_validation": [
+        {
+          "citation": "In any of these scenarios you can define a Service _without_ specifying a selector to match Pods.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's instruction to define a Service without a selector."
+        },
+        {
+          "citation": "Because this Service has no selector, the corresponding EndpointSlice objects are not created automatically.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the explanation of why EndpointSlices are not automatically created."
+        },
+        {
+          "citation": "You can map the Service to the network address and port where it's running, by adding an EndpointSlice object manually.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the instruction to manually create an EndpointSlice to map the Service to the external database's address and port."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What IP addresses are restricted and cannot be used as endpoint IPs when manually creating an EndpointSlice?",
+      "reference_answer": "When manually creating an EndpointSlice, you must not use loopback addresses (such as 127.0.0.0/8 for IPv4) or link-local addresses. Additionally, you cannot use the cluster IPs of other Kubernetes Services as endpoint IP addresses. This is because kube-proxy does not support routing to virtual IPs as a destination.",
+      "expected_source": "kubernetes/service.md",
+      "question_type": "factual_lookup",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and directly addresses a specific constraint mentioned in the document regarding manual EndpointSlice creation.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly answers the question, and is fully grounded in the provided text without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "The endpoint IPs _must not_ be: loopback (127.0.0.0/8 for IPv4, ::1/128 for IPv6), or link-local (169.254.0.0/16 and 224.0.0.0/24 for IPv4, fe80::/64 for IPv6).",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document under the 'Custom EndpointSlices' section and lists the restricted loopback and link-local IP addresses."
+        },
+        {
+          "citation": "The endpoint IP addresses cannot be the cluster IPs of other Kubernetes Services, because kube-proxy doesn't support virtual IPs as a destination.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document (with template tags stripped) and explains the restriction regarding cluster IPs of other Services."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How does referencing a named port in a Service's targetPort attribute help with deploying updates to backend software?",
+      "reference_answer": "Referencing a named port in the `targetPort` attribute allows a Service to route traffic to Pods even if they use different numerical ports for the same protocol. This decoupling provides significant flexibility when deploying and evolving services. For instance, it allows you to change the actual port numbers exposed by the Pods in a new version of your backend software without causing disruptions for existing clients.",
+      "expected_source": "kubernetes/service.md",
+      "question_type": "multi_hop",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and directly answers the question. It is completely grounded in the 'Port definitions' section of the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Port definitions in Pods have names, and you can reference these names in the `targetPort` attribute of a Service.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer by explaining how named ports are referenced in a Service."
+        },
+        {
+          "citation": "This works even if there is a mixture of Pods in the Service using a single configured name, with the same network protocol available via different port numbers.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer by explaining how the mapping handles mixed port numbers."
+        },
+        {
+          "citation": "For example, you can change the port numbers that Pods expose in the next version of your backend software, without breaking clients.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the answer's explanation of how this feature helps with deploying updates without breaking clients."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I configure a CronJob to skip a run if it misses its scheduled time by more than an hour, and ensure that only one instance of the job runs at a time?",
+      "reference_answer": "To skip a run that is delayed by more than an hour, you should set the `.spec.startingDeadlineSeconds` field to 3600 (60 minutes). To ensure only one instance of the job runs at a time, set the `.spec.concurrencyPolicy` field to `Forbid`. This combination ensures that delayed jobs have a strict cutoff and concurrent executions are prevented.",
+      "expected_source": "kubernetes/cron-jobs.md",
+      "question_type": "multi_hop",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses configuration options (starting deadline and concurrency policy) described in the document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is fully grounded in the document. It correctly calculates 1 hour as 3600 seconds for `.spec.startingDeadlineSeconds` and identifies `Forbid` as the correct `.spec.concurrencyPolicy` to prevent concurrent runs.",
+      "citations_validation": [
+        {
+          "citation": "The `.spec.startingDeadlineSeconds` field is optional. This field defines a deadline (in whole seconds) for starting the Job, if that Job misses its scheduled time for any reason.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document and supports the answer's explanation of how to configure the deadline for delayed jobs."
+        },
+        {
+          "citation": "`Forbid`: The CronJob does not allow concurrent runs; if it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob skips the new Job run.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document and supports the answer's explanation of how to prevent concurrent executions using the 'Forbid' policy."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the officially supported method for specifying a time zone for a Kubernetes CronJob?",
+      "reference_answer": "The officially supported method for specifying a time zone is to set the `.spec.timeZone` field to the name of a valid time zone, such as \"Etc/UTC\". You should not use `CRON_TZ` or `TZ` variables inside the `.spec.schedule` field, as this is not officially supported and will cause a validation error upon creation or update. If no time zone is specified, the kube-controller-manager will interpret the schedule relative to its own local time zone.",
+      "expected_source": "kubernetes/cron-jobs.md",
+      "question_type": "factual_lookup",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It directly answers the question by explaining the supported method (.spec.timeZone), the unsupported method (CRON_TZ/TZ), and the default behavior.",
+      "citations_validation": [
+        {
+          "citation": "You can specify a time zone for a CronJob by setting `.spec.timeZone` to the name of a valid time zone.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically identical to the text in the document under the 'Time zones' section and directly supports the main part of the answer."
+        },
+        {
+          "citation": "Specifying a timezone using `CRON_TZ` or `TZ` variables inside `.spec.schedule` is **not officially supported** (and never has been).",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match to the text in the 'Unsupported TimeZone specification' section and supports the part of the answer explaining what is not supported."
+        },
+        {
+          "citation": "For CronJobs with no time zone specified, the kube-controller-manager interprets schedules relative to its local time zone.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically identical to the text in the 'Time zones' section (ignoring the glossary tooltip markup) and supports the part of the answer explaining the default behavior."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between the `Forbid` and `Replace` concurrency policies in a CronJob?",
+      "reference_answer": "Both policies handle situations where it is time for a new Job run but the previous Job run has not yet finished. The `Forbid` policy skips the new Job run entirely, allowing the existing Job to continue running. In contrast, the `Replace` policy stops the currently running Job and replaces it with the new Job run.",
+      "expected_source": "kubernetes/cron-jobs.md",
+      "question_type": "comparative",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is fully grounded in the provided text without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "`Forbid`: The CronJob does not allow concurrent runs; if it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob skips the new Job run.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document and directly supports the explanation of the 'Forbid' policy in the answer."
+        },
+        {
+          "citation": "`Replace`: If it is time for a new Job run and the previous Job run hasn't finished yet, the CronJob replaces the currently running Job run with a new Job run",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document and directly supports the explanation of the 'Replace' policy in the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How should I scale my application to run multiple instances instead of creating individual Pods directly?",
+      "reference_answer": "To scale your application horizontally, you should use workload resources like Deployments or Jobs rather than creating individual Pods directly. These workload resources use controllers to manage replicated Pods as a group, handling both scaling and automatic healing if a Node fails. Each Pod will then run a single instance of your application to provide more overall resources.",
+      "expected_source": "kubernetes/pods.md",
+      "question_type": "procedural",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It accurately explains how to scale applications using workload resources and controllers instead of creating individual Pods directly.",
+      "citations_validation": [
+        {
+          "citation": "Usually you don't need to create Pods directly, even singleton Pods. Instead, create them using workload resources such as Deployment or Job.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document under the 'Workload resources for managing pods' section and supports the recommendation to use workload resources instead of creating Pods directly."
+        },
+        {
+          "citation": "If you want to scale your application horizontally (to provide more overall resources by running more instances), you should use multiple Pods, one for each instance.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document under the 'Workload resources for managing pods' section and supports the explanation of how horizontal scaling works with Pods."
+        },
+        {
+          "citation": "Replicated Pods are usually created and managed as a group by a workload resource and its controller.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the document under the 'Workload resources for managing pods' section and supports the explanation of how workload resources and controllers manage replicated Pods."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Which specific fields are allowed to be modified on a running Pod?",
+      "reference_answer": "Most metadata on a running Pod is immutable, but Kubernetes does allow in-place updates to a few specific fields. You can modify the container images (`spec.containers[*].image` and `spec.initContainers[*].image`), `spec.activeDeadlineSeconds`, `spec.terminationGracePeriodSeconds`, and `spec.schedulingGates`. Additionally, you can update `spec.tolerations`, but you are only permitted to add new entries to it.",
+      "expected_source": "kubernetes/pods.md",
+      "question_type": "factual_lookup",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document. It accurately lists the mutable fields and the specific constraints associated with them.",
+      "citations_validation": [
+        {
+          "citation": "Most of the metadata about a Pod is immutable. For example, you cannot change the `namespace`, `name`, `uid`, or `creationTimestamp` fields.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's statement that most metadata on a running Pod is immutable."
+        },
+        {
+          "citation": "Pod updates may not change fields other than `spec.containers[*].image`, `spec.initContainers[*].image`, `spec.activeDeadlineSeconds`, `spec.terminationGracePeriodSeconds`, `spec.tolerations` or `spec.schedulingGates`.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the list of mutable fields provided in the answer."
+        },
+        {
+          "citation": "For `spec.tolerations`, you can only add new entries.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's detail regarding the restriction on updating `spec.tolerations`."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between restarting a container in a Pod and restarting the Pod itself?",
+      "reference_answer": "Restarting a container within a Pod is not the same as restarting the Pod itself, because a Pod is an environment for running containers rather than a single process. A Pod is a relatively ephemeral entity that persists on its scheduled node until it finishes execution, is deleted, gets evicted, or the node fails. Therefore, a Pod itself is not \"restarted\"; it simply persists until it is permanently removed or replaced.",
+      "expected_source": "kubernetes/pods.md",
+      "question_type": "comparative",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, directly answers the question, and is completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Restarting a container in a Pod should not be confused with restarting a Pod.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This exact sentence is present in the source document under the 'Working with Pods' section and directly supports the answer's explanation of the difference."
+        },
+        {
+          "citation": "A Pod is not a process, but an environment for running container(s). A Pod persists until it is deleted.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This exact text is present in the source document as a note under the 'Working with Pods' section and explains why restarting a container is different from restarting a Pod."
+        },
+        {
+          "citation": "The Pod remains on that node until the Pod finishes execution, the Pod object is deleted, the Pod is *evicted* for lack of resources, or the node fails.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This exact sentence is present in the source document under the 'Working with Pods' section and supports the explanation of the Pod's lifecycle and persistence."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What steps should be taken to secure Kubernetes Secrets given that they are stored unencrypted by default?",
+      "reference_answer": "By default, Kubernetes Secrets are stored unencrypted in the API server's underlying etcd data store. To safely use them, administrators should enable Encryption at Rest and configure RBAC rules for least-privilege access. Additionally, access should be restricted to specific containers, and external Secret store providers can be utilized for enhanced security.",
+      "expected_source": "kubernetes/secret.md",
+      "question_type": "procedural",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, directly answers the question, and is fully grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Kubernetes Secrets are, by default, stored unencrypted in the API server's underlying data store (etcd).",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the premise of the question and answer regarding why security steps are needed."
+        },
+        {
+          "citation": "Enable Encryption at Rest for Secrets.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source document as step 1 of the recommended security measures and directly supports the answer."
+        },
+        {
+          "citation": "Enable or configure RBAC rules with least-privilege access to Secrets.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source document as step 2 of the recommended security measures and directly supports the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between using a ServiceAccount token Secret and the TokenRequest API for providing credentials to Pods?",
+      "reference_answer": "A ServiceAccount token Secret is a legacy mechanism that provides long-lived, non-expiring credentials to Pods. In contrast, the TokenRequest API is the recommended approach for Kubernetes v1.22 and later because it provides short-lived, automatically rotating tokens. Tokens obtained via the TokenRequest API and mounted in a projected volume are automatically invalidated when the Pod is deleted.",
+      "expected_source": "kubernetes/secret.md",
+      "question_type": "comparative",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document. It accurately contrasts the legacy ServiceAccount token Secret with the modern TokenRequest API using facts directly stated in the text.",
+      "citations_validation": [
+        {
+          "citation": "This is a legacy mechanism that provides long-lived ServiceAccount credentials to Pods.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present verbatim in the text and supports the explanation of the ServiceAccount token Secret as a legacy, long-lived credential mechanism."
+        },
+        {
+          "citation": "In Kubernetes v1.22 and later, the recommended approach is to obtain a short-lived, automatically rotating ServiceAccount token by using the TokenRequest API instead.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present verbatim in the text and supports the explanation of the TokenRequest API as the recommended, modern approach providing short-lived, rotating tokens."
+        },
+        {
+          "citation": "The token is automatically invalidated when the Pod that it's mounted in is deleted.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present verbatim in the text and supports the explanation of how TokenRequest tokens are automatically invalidated upon Pod deletion."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What alternative mechanisms can be used instead of Kubernetes Secrets to protect confidential data?",
+      "reference_answer": "Instead of using Secrets, you can use ServiceAccount tokens to authenticate cloud-native components running within the same cluster. Other alternatives include using third-party tools to manage sensitive data, implementing a custom signer for X.509 certificates using CertificateSigningRequests, or utilizing a device plugin to expose node-local encryption hardware. These options can also be combined, such as using an operator to fetch short-lived session tokens from an external service.",
+      "expected_source": "kubernetes/secret.md",
+      "question_type": "multi_hop",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document under the 'Alternatives to Secrets' section.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is highly accurate, directly addresses the question, and is completely grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "If your cloud-native component needs to authenticate to another application that you know is running within the same Kubernetes cluster, you can use a ServiceAccount and its tokens to identify your client.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's mention of ServiceAccount tokens as an alternative."
+        },
+        {
+          "citation": "For authentication, you can implement a custom signer for X.509 certificates, and use CertificateSigningRequests to let that custom signer issue certificates to Pods that need them.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's mention of custom signers and CertificateSigningRequests."
+        },
+        {
+          "citation": "You can use a device plugin to expose node-local encryption hardware to a specific Pod.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's mention of using device plugins to expose node-local encryption hardware."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between a liveness probe and a readiness probe in Kubernetes?",
+      "reference_answer": "A liveness probe determines if a container needs to be restarted, such as when an application is deadlocked and cannot make progress. In contrast, a readiness probe determines if a container is ready to accept network traffic. If a liveness probe fails, the kubelet restarts the container, whereas if a readiness probe fails, Kubernetes simply removes the pod from all matching service endpoints.",
+      "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+      "question_type": "comparative",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, concise, and fully grounded in the source text without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "Liveness probes determine when to restart a container.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of liveness probes."
+        },
+        {
+          "citation": "Readiness probes determine when a container is ready to accept traffic.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of readiness probes."
+        },
+        {
+          "citation": "If the readiness probe returns a failed state, Kubernetes removes the pod from all matching service endpoints.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of what happens when a readiness probe fails."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I prevent a liveness probe from failing while my application is still performing its initial startup tasks?",
+      "reference_answer": "To prevent a liveness probe from failing during application initialization, you can configure a startup probe. When a startup probe is defined, Kubernetes will not execute liveness or readiness probes until the startup probe succeeds. Alternatively, you can define the initialDelaySeconds property on the liveness probe to wait before it begins executing.",
+      "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+      "question_type": "multi_hop",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is fully grounded in the source text.",
+      "citations_validation": [
+        {
+          "citation": "If a startup probe is configured, Kubernetes does not execute liveness or readiness probes until the startup probe succeeds, allowing the application time to finish its initialization.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how startup probes delay liveness probes."
+        },
+        {
+          "citation": "If you want to wait before executing a liveness probe, you can either define initialDelaySeconds or use a startup probe.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the two options provided in the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What happens to a pod if its readiness probe fails?",
+      "reference_answer": "If a readiness probe fails, Kubernetes will stop sending traffic to the affected container. Specifically, it achieves this by removing the pod from all matching service endpoints. The probe will continue to run throughout the container's lifecycle to detect when it recovers from temporary faults or overloads.",
+      "expected_source": "kubernetes/liveness-readiness-startup-probes.md",
+      "question_type": "factual_lookup",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source text. It accurately describes what happens when a readiness probe fails (removing the pod from service endpoints to stop traffic) and notes that the probe continues to run.",
+      "citations_validation": [
+        {
+          "citation": "Based on probe results, Kubernetes can restart unhealthy containers or stop sending traffic to containers that are not ready.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly from the overview section of the document and supports the statement that Kubernetes stops sending traffic to containers that are not ready."
+        },
+        {
+          "citation": "If the readiness probe returns a failed state, Kubernetes removes the pod from all matching service endpoints.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly from the 'Readiness probe' section and supports the specific mechanism of removing the pod from matching service endpoints when the probe fails."
+        },
+        {
+          "citation": "Readiness probes run on the container during its whole lifecycle.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly from the 'Readiness probe' section and supports the statement that the probe continues to run throughout the container's lifecycle."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between horizontal and vertical pod autoscaling in Kubernetes, and do they both come installed by default?",
+      "reference_answer": "Horizontal scaling adjusts the number of replicas managed by a workload, whereas vertical scaling adjusts the CPU and memory resources available to those replicas. The HorizontalPodAutoscaler (HPA) is built into Kubernetes by default as an API resource and controller. In contrast, the VerticalPodAutoscaler (VPA) is an add-on that must be deployed separately by a cluster administrator before it can be used.",
+      "expected_source": "kubernetes/autoscaling.md",
+      "question_type": "comparative",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is completely grounded in the source document without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "When you scale a workload, you can either increase or decrease the number of replicas managed by the workload, or adjust the resources available to the replicas in-place. The first approach is referred to as horizontal scaling, while the second is referred to as vertical scaling.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source text and directly supports the explanation of the difference between horizontal and vertical scaling."
+        },
+        {
+          "citation": "Unlike the HPA, the VPA doesn't come with Kubernetes by default, but is a an add-on that you or a cluster administrator may need to deploy before you can use it.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source text and directly supports the statement that HPA is built-in by default while VPA is an add-on."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I automatically scale my workloads based on a specific time schedule or the number of messages in a queue?",
+      "reference_answer": "You can scale workloads based on events, such as the number of messages in a queue, by using the Kubernetes Event Driven Autoscaler (KEDA). KEDA provides various adapters for different event sources to handle this event-driven scaling. To scale based on a specific time schedule, you can use KEDA in conjunction with its `Cron` scaler, which allows you to define schedules and time zones for scaling your workloads in or out.",
+      "expected_source": "kubernetes/autoscaling.md",
+      "question_type": "multi_hop",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses specific features (event-driven and schedule-based autoscaling) described in the document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, detailed, and fully grounded in the source text. It correctly identifies KEDA for event-driven scaling (messages in a queue) and KEDA's Cron scaler for schedule-based scaling.",
+      "citations_validation": [
+        {
+          "citation": "KEDA is a CNCF-graduated project enabling you to scale your workloads based on the number of events to be processed, for example the amount of messages in a queue.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the text and supports the part of the answer explaining how to scale based on messages in a queue."
+        },
+        {
+          "citation": "Similar to event driven autoscaling, such behavior can be achieved using KEDA in conjunction with its `Cron` scaler.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the text and supports the part of the answer explaining how to scale based on schedules using KEDA's Cron scaler."
+        },
+        {
+          "citation": "The `Cron` scaler allows you to define schedules (and time zones) for scaling your workloads in or out.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the text and supports the explanation of how the Cron scaler works to define schedules."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What prerequisites are required before I can use the VerticalPodAutoscaler (VPA) to automatically scale workload resources?",
+      "reference_answer": "Before using the VerticalPodAutoscaler, you must deploy it as an add-on, since it is not included in Kubernetes by default. Additionally, you must install the Metrics Server in your cluster for the VPA to function properly. Once these components are installed, you can create CustomResourceDefinitions (CRDs) to define how and when your workload resources should scale.",
+      "expected_source": "kubernetes/autoscaling.md",
+      "question_type": "procedural",
+      "domain": "kubernetes",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately identifies the prerequisites (deploying the VPA add-on and installing the Metrics Server) and explains what can be done once they are installed.",
+      "citations_validation": [
+        {
+          "citation": "Unlike the HPA, the VPA doesn't come with Kubernetes by default, but is a an add-on that you or a cluster administrator may need to deploy before you can use it.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source text and supports the answer's statement that the VPA must be deployed as an add-on because it is not included by default."
+        },
+        {
+          "citation": "You will need to have the Metrics Server installed to your cluster for the VPA to work.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source text (with the markdown link stripped) and supports the answer's statement that the Metrics Server must be installed for the VPA to function."
+        },
+        {
+          "citation": "Once installed, it allows you to create CustomResourceDefinitions (CRDs) for your workloads which define how and when to scale the resources of the managed replicas.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source text (with the glossary shortcodes stripped) and supports the answer's explanation of what can be done once the components are installed."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "When configuring GPU indexing, what is the difference between using the `deviceFilter` and `devices` fields?",
+      "reference_answer": "The `deviceFilter` field allows you to select GPUs by matching substrings against the hardware device names in a case-insensitive manner. In contrast, the `devices` field allows you to explicitly select specific GPUs by their index in the list of found devices. If both fields are used together, the indexes specified in `devices` are applied only after the `deviceFilter` has filtered the available hardware.",
+      "expected_source": "qdrant/api-reference.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided API reference document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the descriptions of the `deviceFilter` and `devices` fields under the `GPU` resource type in the document.",
+      "citations_validation": [
+        {
+          "citation": "DeviceFilter for GPU devices by hardware name. Case-insensitive. List of substrings to match against the gpu device name.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the description of the `deviceFilter` field and supports the explanation of how `deviceFilter` works."
+        },
+        {
+          "citation": "Devices is a List of explicit GPU devices to use. If host has multiple GPUs, this option allows to select specific devices by their index in the list of found devices.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the description of the `devices` field and supports the explanation of how `devices` works."
+        },
+        {
+          "citation": "If `deviceFilter` is set, indexes are applied after filtering.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the description of the `devices` field and supports the explanation of how the two fields interact when used together."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the default TLS configuration behavior for the different ingress providers supported by Qdrant?",
+      "reference_answer": "The default TLS configuration depends on the specific ingress provider being used. For both KubernetesIngress and NginxIngress, TLS is disabled (False) by default. However, for QdrantCloudTraefik, the default behavior depends on the `config.tls` setting configured in the operator.",
+      "expected_source": "qdrant/api-reference.md",
+      "question_type": "factual_lookup",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided API reference document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is completely grounded in the description of the `tls` field under the `Ingress` resource type.",
+      "citations_validation": [
+        {
+          "citation": "TLS specifies whether to enable tls for the ingress.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the description of the `tls` field under the `Ingress` resource type and supports the answer."
+        },
+        {
+          "citation": "The default depends on the ingress provider:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the description of the `tls` field under the `Ingress` resource type and supports the answer."
+        },
+        {
+          "citation": "- KubernetesIngress: False\n- NginxIngress: False\n- QdrantCloudTraefik: Depending on the config.tls setting of the operator.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the description of the `tls` field under the `Ingress` resource type (with HTML line breaks in the source) and directly supports the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How should I configure the `APIAuthenticationSpec` to authenticate against specific Qdrant clusters?",
+      "reference_answer": "To configure authentication, you must provide a 128-character SHA512 hash of your API key in the `sha512` field. Additionally, you need to specify the clusters this key is authorized for by providing a list of cluster IDs in the `clusterIDs` field.",
+      "expected_source": "qdrant/api-reference.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly asks about the configuration of a specific API resource type (`APIAuthenticationSpec`) defined in the document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is fully grounded in the document. It correctly identifies the `sha512` field (and its 128-character length constraint based on MinLength/MaxLength validation) and the `clusterIDs` field, explaining their purposes accurately.",
+      "citations_validation": [
+        {
+          "citation": "APIAuthenticationSpec describes the configuration for authenticating against Qdrant clusters.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is exactly present in the document as the description of the `APIAuthenticationSpec` struct and supports the context of the answer."
+        },
+        {
+          "citation": "`sha512` string SHA512 hash of an API key. MaxLength: 128 MinLength: 128",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the fields table of `APIAuthenticationSpec` and supports the answer's statement about providing a 128-character SHA512 hash."
+        },
+        {
+          "citation": "`clusterIDs` string array List of cluster IDs for which the API key is valid",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the fields table of `APIAuthenticationSpec` and supports the answer's statement about specifying the list of cluster IDs."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I optimize the initial loading of vectors into a collection to save computational resources?",
+      "reference_answer": "To optimize the initial loading of vectors, you can dynamically update the collection parameters to disable indexing during the upload process. Once the upload is complete, you can immediately re-enable indexing. This approach prevents wasting computational resources on continuously rebuilding the index while data is still being ingested.",
+      "expected_source": "qdrant/collections.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It accurately describes the process of disabling indexing during upload and re-enabling it afterward to save computational resources.",
+      "citations_validation": [
+        {
+          "citation": "Dynamic parameter updates may be helpful, for example, for more efficient initial loading of vectors.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Update collection parameters' section and supports the answer's premise of using dynamic updates for efficient loading."
+        },
+        {
+          "citation": "For example, you can disable indexing during the upload process, and enable it immediately after the upload is finished.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and explains the exact mechanism of disabling and re-enabling indexing."
+        },
+        {
+          "citation": "As a result, you will not waste extra computation resources on rebuilding the index.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and explains the benefit of saving computational resources, which directly answers the question."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the configuration differences between dense and sparse vectors within a collection?",
+      "reference_answer": "When configuring a collection, sparse vectors must always be named, whereas dense vectors do not strictly require a name unless multiple are used in a single point. Furthermore, sparse and dense vectors must have distinct names within the same collection. Lastly, the distance function for sparse vectors is always set to `Dot` and does not need to be explicitly specified, unlike dense vectors.",
+      "expected_source": "qdrant/collections.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document, specifically the section on 'Collection with sparse vectors'.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document. It accurately highlights the naming requirements and distance function differences between dense and sparse vectors as described in the text.",
+      "citations_validation": [
+        {
+          "citation": "Unlike dense vectors, sparse vectors must be named.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the 'Collection with sparse vectors' section and directly supports the statement that sparse vectors must always be named."
+        },
+        {
+          "citation": "And additionally, sparse vectors and dense vectors must have different names within a collection.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the document and directly supports the statement that sparse and dense vectors must have distinct names within the same collection."
+        },
+        {
+          "citation": "The distance function for sparse vectors is always `Dot` and does not need to be specified.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the document and directly supports the statement that the distance function for sparse vectors is always Dot and does not need to be specified."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How does the system implement Cosine similarity to ensure search efficiency?",
+      "reference_answer": "To ensure search efficiency, Cosine similarity is implemented under the hood as a dot-product operation over normalized vectors. The system handles this by automatically normalizing the vectors as they are uploaded.",
+      "expected_source": "qdrant/collections.md",
+      "question_type": "factual_lookup",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, directly answers the question, and is fully grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "For search efficiency, Cosine similarity is implemented as dot-product over normalized vectors.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document and supports the explanation of how Cosine similarity is implemented for search efficiency."
+        },
+        {
+          "citation": "Vectors are automatically normalized during upload",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document and supports the explanation of how the system handles vector normalization."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How does Qdrant combine results from different queries when using Distribution-Based Score Fusion (DBSF)?",
+      "reference_answer": "When using Distribution-Based Score Fusion (DBSF), Qdrant normalizes the scores of the points in each query before combining them. It uses the mean plus or minus the third standard deviation as the limits for this normalization. After normalizing, it sums the scores of the same point across the different queries to produce the final result.",
+      "expected_source": "qdrant/hybrid-queries.md",
+      "question_type": "factual_lookup",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately describes how DBSF normalizes and sums scores.",
+      "citations_validation": [
+        {
+          "citation": "DBSF normalizes the scores of the points in each query, using the mean +/- the 3rd standard deviation as limits, and then sums the scores of the same point across different queries.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and provides the exact mechanism of DBSF described in the reference answer."
+        },
+        {
+          "citation": "dbsf is stateless and calculates the normalization limits only based on the results of each query, not on all the scores that it has seen.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the answer by providing additional context on how the normalization limits are calculated."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I assign different levels of importance to multiple queries when performing a hybrid search with Reciprocal Rank Fusion?",
+      "reference_answer": "To assign different levels of importance to multiple queries, you can use the weighted RRF feature by configuring relative weights for each of your prefetches. You provide these weights as an array of numbers, where each weight corresponds to a prefetch in the order they are defined. For instance, assigning a higher weight to a semantic search model compared to a keyword matcher ensures the stronger model has a greater influence on the final ranked results.",
+      "expected_source": "qdrant/hybrid-queries.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'Weighted RRF' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the document. It accurately explains how to configure relative weights for prefetches using an array of numbers to assign different levels of importance.",
+      "citations_validation": [
+        {
+          "citation": "The `rrf` query allows you to configure relative weights for each of the prefetches.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the text and directly supports the explanation of how to assign different levels of importance to queries."
+        },
+        {
+          "citation": "Weights should be provided as an array of numbers, where each weight is applied to the corresponding prefetch in the order they are defined.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the text and supports the answer's explanation of how the weights are provided and mapped to the prefetches."
+        },
+        {
+          "citation": "The number of weights must match the number of prefetches.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the text and supports the answer by detailing the constraint on how weights must be configured."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between how Reciprocal Rank Fusion (RRF) and Distribution-Based Score Fusion (DBSF) calculate the final score of a document?",
+      "reference_answer": "Reciprocal Rank Fusion (RRF) calculates a document's score based on its rank or position within each query's result set, boosting documents that appear closer to the top. In contrast, Distribution-Based Score Fusion (DBSF) calculates the final score by normalizing the actual scores of the points in each query using the mean and standard deviation, and then summing those normalized scores. While RRF relies on the ordered ranking of results, DBSF relies on the statistical distribution of the scores themselves.",
+      "expected_source": "qdrant/hybrid-queries.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and directly addresses a core concept explained in the document (the difference between RRF and DBSF fusion methods).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, detailed, and fully grounded in the provided text. It correctly contrasts the rank-based approach of RRF with the score-normalization approach of DBSF without introducing external information.",
+      "citations_validation": [
+        {
+          "citation": "RRF considers the positions of results within each query and boosts those that appear closer to the top in multiple sets of results. The score of a document is calculated using its rank in each result set",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the text and directly supports the explanation of how RRF calculates scores based on rank."
+        },
+        {
+          "citation": "DBSF normalizes the scores of the points in each query, using the mean +/- the 3rd standard deviation as limits, and then sums the scores of the same point across different queries.",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the text and directly supports the explanation of how DBSF normalizes and sums scores."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do sparse and dense vector searches differ in terms of precision and recall?",
+      "reference_answer": "Sparse vector searches typically provide high precision because they excel at finding exact keyword matches, but they often suffer in recall when relevant documents lack those specific keywords. Conversely, dense vector searches are excellent for recall as they capture the broader semantic meaning of a query. However, this broader understanding can result in lower precision by returning loosely related results.",
+      "expected_source": "qdrant/reranking-semantic-search.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is highly accurate, directly addresses the question, and is completely grounded in the 'Background' section of the source document without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "Sparse vector searches usually give you high precision because they\u2019re great at finding exact matches. But, here's the catch\u2014your recall can suffer when relevant documents don\u2019t contain those exact keywords.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source text and directly supports the explanation of sparse vector searches' precision and recall characteristics."
+        },
+        {
+          "citation": "On the flip side, dense vector searches are fantastic for recall since they grasp the broader, semantic meaning of your query.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source text and directly supports the explanation of dense vector searches' recall capabilities."
+        },
+        {
+          "citation": "However, this can lead to lower precision, where you might see results that are only loosely related.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source text and directly supports the explanation of dense vector searches' precision limitations."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How should I configure a Qdrant collection to store embeddings for a search system using Cohere's reranking?",
+      "reference_answer": "To configure the Qdrant collection, you need to create a named group of points where all vectors share the same size and distance metric. Specifically, you should set the vector size to 1024 to match the dense embeddings. Additionally, configure the distance metric to use the dot product (Distance.DOT), which is ideal for capturing similarity between normalized vectors.",
+      "expected_source": "qdrant/reranking-semantic-search.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document. It specifically asks about configuring a Qdrant collection based on the implementation details in the text.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document. It accurately describes the collection requirements, the vector size of 1024, and the use of the dot product distance metric as specified in the text.",
+      "citations_validation": [
+        {
+          "citation": "All the vectors in a collection need to have the same size and be compared using one distance metric.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the answer's explanation of the general requirements for configuring a Qdrant collection."
+        },
+        {
+          "citation": "client.create_collection(\n    collection_name=\"basic-search-rerank\",\n    vectors_config=VectorParams(size=1024, distance=Distance.DOT),\n)",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This code block is present in the text and shows the exact configuration parameters (size=1024, distance=Distance.DOT) used to create the collection."
+        },
+        {
+          "citation": "Here, the vector size is set to 1024 to match our dense embeddings, and we\u2019re using dot product as the distance metric\u2014perfect for capturing the similarity between vectors, especially when they\u2019re normalized.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and explains why the vector size is set to 1024 and why the dot product is used as the distance metric."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the primary types of reranker models available, and how do cross-encoder models specifically evaluate data?",
+      "reference_answer": "The primary types of reranker models include Cross Encoder Models, Multi-Vector Rerankers (like ColBERT), and Large Language Models (LLMs). Cross-encoder models evaluate data by using a classification system to assess pairs of data, such as sentences or documents. They generate a similarity score between 0 and 1 to indicate how closely a document matches the query, but they require both the query and document simultaneously to function.",
+      "expected_source": "qdrant/reranking-semantic-search.md",
+      "question_type": "factual_lookup",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Rerankers come in different types, each with its own strengths. Let\u2019s break them down: 1. Cross Encoder Models... 2. Multi-Vector Rerankers (e.g., ColBERT)... 3. Large Language Models (LLMs) as Rerankers",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the document and directly supports the part of the answer listing the primary types of reranker models."
+        },
+        {
+          "citation": "These boost reranking by using a classification system to evaluate pairs of data\u2014like sentences or documents.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the document and supports the explanation of how cross-encoder models evaluate data using a classification system."
+        },
+        {
+          "citation": "They spit out a similarity score from 0 to 1, showing how closely the document matches your query. The catch? Cross-encoders need both query and document, so they can\u2019t handle standalone documents or queries by themselves.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the document and supports the explanation of the similarity score output and the requirement of having both query and document simultaneously."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do sparse vectors differ from dense vectors in terms of structure and storage in Qdrant?",
+      "reference_answer": "While dense vectors are a simple list of floating-point numbers with a fixed length, sparse vectors do not have a fixed length because they are dynamically allocated during insertion. To define a sparse vector, you must provide a list of its non-zero elements and their corresponding indexes. Furthermore, sparse vectors are kept in a special storage and indexed separately, requiring a different configuration than dense vectors.",
+      "expected_source": "qdrant/vectors.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Sparse vectors in Qdrant don't have a fixed length, as it is dynamically allocated during vector insertion.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the answer's explanation of the structural differences regarding vector length."
+        },
+        {
+          "citation": "In order to define a sparse vector, you need to provide a list of non-zero elements and their indexes.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's explanation of how sparse vectors are defined structurally."
+        },
+        {
+          "citation": "Sparse vectors in Qdrant are kept in special storage and indexed in a separate index, so their configuration is different from dense vectors.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's explanation of the storage and configuration differences."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I reduce the memory consumption of my vectors without significantly impacting search quality?",
+      "reference_answer": "You can reduce memory consumption by changing the datatype of your vectors to Float16, which requires half the memory of the default Float32 datatype. This change has virtually no impact on the quality of vector search. To implement this optimization, you need to specify the Float16 datatype for vectors in your collection configuration.",
+      "expected_source": "qdrant/vectors.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and fully grounded in the source document. It accurately explains how Float16 reduces memory consumption with virtually no impact on search quality and how to configure it.",
+      "citations_validation": [
+        {
+          "citation": "The main advantage of Float16 is that it requires half the memory of Float32, while having virtually no impact on the quality of vector search.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and directly supports the answer's claim about memory reduction and search quality."
+        },
+        {
+          "citation": "To use Float16, you need to specify the datatype for vectors in the collection configuration:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the source document and supports the answer's explanation of how to implement the Float16 datatype."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Is it possible to store different types of embeddings for a single data point, and can Qdrant generate these embeddings automatically?",
+      "reference_answer": "Yes, Qdrant allows you to store multiple vectors of different sizes and types in the same data point by creating separate named vector spaces within a collection. Furthermore, instead of providing these vectors explicitly, Qdrant can automatically generate them from text or images using a process called inference. You can use this inference capability during both data ingestion and querying by specifying the desired machine learning model.",
+      "expected_source": "qdrant/vectors.md",
+      "question_type": "multi_hop",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, self-contained, and directly addresses features described in the document (Named Vectors and Inference).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is fully grounded in the text, accurately explaining how named vectors allow storing multiple embeddings per point and how inference can automatically generate them during ingestion and querying.",
+      "citations_validation": [
+        {
+          "citation": "In Qdrant, you can store multiple vectors of different sizes and [types](#vector-types) in the same data [point](/documentation/concepts/points/).",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the 'Named Vectors' section and supports the answer's claim that multiple vectors of different sizes and types can be stored in a single data point."
+        },
+        {
+          "citation": "Instead of providing vectors explicitly when ingesting or querying data, Qdrant can also generate vectors using a process called [inference](/documentation/inference/).",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the 'Inference' section and supports the answer's claim that Qdrant can automatically generate embeddings."
+        },
+        {
+          "citation": "You can use inference in the API wherever you can use regular vectors.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the 'Inference' section and supports the answer's claim that inference can be used during both data ingestion and querying."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between a vector index and a payload index in Qdrant?",
+      "reference_answer": "In Qdrant, a vector index is designed to accelerate vector search operations, while a payload index is used to speed up filtering conditions. Combining both is essential because relying solely on a vector index is insufficient for effective vector search when filters are applied. Additionally, the payload index accurately estimates filter cardinality, which assists the query planning process in selecting the most efficient search strategy.",
+      "expected_source": "qdrant/indexing.md",
+      "question_type": "comparative",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and directly addresses a core concept explained in the document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is highly accurate, directly answers the question, and is fully grounded in the text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "In simpler terms, a vector index speeds up vector search, and payload indexes speed up filtering.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is verbatim in the text and supports the explanation of the primary difference between the two indexes."
+        },
+        {
+          "citation": "It is essential to have this because for vector search to work effectively with filters, having a vector index only is not enough.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is verbatim in the text and supports the explanation of why combining both indexes is necessary."
+        },
+        {
+          "citation": "The index is also used to accurately estimate the filter cardinality, which helps the query planning choose a search strategy.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (with markdown links stripped in the citation) and supports the explanation of the payload index's role in query planning."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I configure an integer index to only support range filters and disable direct lookup?",
+      "reference_answer": "To configure an integer index that only supports range filters, you need to create a parameterized index. You can achieve this by setting the `range` flag to `true` and the `lookup` flag to `false` in your index configuration. This parameterized setup can significantly enhance performance in collections containing millions of points compared to using the regular integer index.",
+      "expected_source": "qdrant/indexing.md",
+      "question_type": "procedural",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'Parameterized index' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and fully grounded in the document. It accurately explains how to configure the parameterized integer index by setting 'range' to true and 'lookup' to false, and mentions the performance benefits for collections with millions of points as stated in the text.",
+      "citations_validation": [
+        {
+          "citation": "The regular `integer` index assumes both `lookup` and `range` are `true`. In contrast, to configure a parameterized index, you would set only one of these filters to `true`:",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how to configure a parameterized index by setting only one of the flags to true."
+        },
+        {
+          "citation": "For example, the following code sets up a parameterized integer index which supports only range filters:",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and directly supports the concept of setting up an integer index that only supports range filters."
+        },
+        {
+          "citation": "The parameterized index can enhance performance in collections with millions of points.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the performance claim made in the reference answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Why might a developer choose to store a payload index on disk instead of in memory?",
+      "reference_answer": "By default, Qdrant stores payload-related structures in memory to ensure the vector index can quickly access payload values and maintain low latency during searches. However, a developer might choose to store payload indexes on disk if the indexes are exceptionally large or if they are rarely used. It is important to note that enabling an on-disk payload index requires additional disk I/O operations, which can negatively impact the latency of cold requests.",
+      "expected_source": "qdrant/indexing.md",
+      "question_type": "factual_lookup",
+      "domain": "qdrant",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'On-disk payload index' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and directly addresses the question. It is 100% grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "By default all payload-related structures are stored in memory. In this way, the vector index can quickly access payload values during search.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the 'On-disk payload index' section and explains the default behavior (in-memory storage) and its purpose (quick access/low latency)."
+        },
+        {
+          "citation": "There are, however, cases when payload indexes are too large or rarely used. In those cases, it is possible to store payload indexes on disk.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present word-for-word in the 'On-disk payload index' section and directly answers why a developer would choose to store the index on disk (too large or rarely used)."
+        },
+        {
+          "citation": "On-disk payload index might affect cold requests latency, as it requires additional disk I/O operations.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the source document inside an alert aside tag and supports the answer's note about the impact on cold request latency."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What operating system and Python versions are required to run vLLM?",
+      "reference_answer": "vLLM requires a Linux operating system to run natively. Additionally, you must use a Python version between 3.10 and 3.13.",
+      "expected_source": "vllm/installation_gpu.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is fully grounded in the provided document without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "- OS: Linux",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the document under the 'Requirements' section and supports the statement that Linux is the required operating system."
+        },
+        {
+          "citation": "- Python: 3.10 -- 3.13",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the document under the 'Requirements' section and supports the statement that Python versions 3.10 to 3.13 are required."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I run vLLM on a Windows machine?",
+      "reference_answer": "Because vLLM does not support Windows natively, you must use a workaround to run it. You can either use the Windows Subsystem for Linux (WSL) with a compatible Linux distribution, or utilize a community-maintained fork like the SystemPanic vllm-windows repository.",
+      "expected_source": "vllm/installation_gpu.md",
+      "question_type": "procedural",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is correct, directly answers the question, and is completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "vLLM does not support Windows natively.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document and supports the explanation of why a workaround is needed."
+        },
+        {
+          "citation": "To run vLLM on Windows, you can use the Windows Subsystem for Linux (WSL) with a compatible Linux distribution, or use some community-maintained forks, e.g. https://github.com/SystemPanic/vllm-windows.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the source document and provides the exact methods/workarounds mentioned in the reference answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the different installation methods available for supported GPU architectures like NVIDIA, AMD, and Intel?",
+      "reference_answer": "For supported GPU architectures (NVIDIA CUDA, AMD ROCm, and Intel XPU), vLLM offers installation through either Python or Docker. If setting up via Python, you can install using pre-built wheels or build the wheel from source. If using Docker, you have the option to pull pre-built images or build the image from source.",
+      "expected_source": "vllm/installation_gpu.md",
+      "question_type": "multi_hop",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using the structure and headings of the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly addresses the question, and is fully grounded in the document's headings and structure (Python setup with pre-built wheels or building from source, and Docker setup with pre-built images or building from source).",
+      "citations_validation": [
+        {
+          "citation": "vLLM is a Python library that supports the following GPU variants... NVIDIA CUDA... AMD ROCm... Intel XPU",
+          "exact_match": false,
+          "normalized_match": false,
+          "python_contained": false,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically present in the introductory section and the tab headers, and it supports the answer by identifying the supported GPU architectures."
+        },
+        {
+          "citation": "## Set up using Python",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This heading exists in the document and supports the answer's claim that Python setup is one of the main installation methods."
+        },
+        {
+          "citation": "### Pre-built wheels {#pre-built-wheels}",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This heading exists in the document and supports the answer's claim that pre-built wheels are an option under the Python setup."
+        },
+        {
+          "citation": "## Set up using Docker",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This heading exists in the document and supports the answer's claim that Docker setup is one of the main installation methods."
+        },
+        {
+          "citation": "### Pre-built images",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This heading exists in the document and supports the answer's claim that pre-built images are an option under the Docker setup."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do the presence, frequency, and repetition penalties differ in how they encourage or discourage new tokens?",
+      "reference_answer": "The presence and frequency penalties both use values greater than 0 to encourage new tokens and values less than 0 to encourage repeating tokens. However, the presence penalty is based simply on whether tokens have appeared so far, while the frequency penalty is based on their actual frequency in the generated text. In contrast, the repetition penalty uses values greater than 1 to encourage new tokens and values less than 1 to encourage repetition, factoring in both the prompt and the generated text.",
+      "expected_source": "vllm/sampling_parameters.md",
+      "question_type": "comparative",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is correct, detailed, and directly addresses the question. It is 100% grounded in the provided text, accurately contrasting the three parameters based on their descriptions.",
+      "citations_validation": [
+        {
+          "citation": "presence_penalty \u2013 Float that penalizes new tokens based on whether they appear in the generated text so far. Values > 0 encourage the model to use new tokens, while values < 0 encourage the model to repeat tokens.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how presence_penalty works and its threshold values."
+        },
+        {
+          "citation": "frequency_penalty \u2013 Float that penalizes new tokens based on their frequency in the generated text so far. Values > 0 encourage the model to use new tokens, while values < 0 encourage the model to repeat tokens.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how frequency_penalty works and its threshold values."
+        },
+        {
+          "citation": "repetition_penalty \u2013 Float that penalizes new tokens based on whether they appear in the prompt and the generated text so far. Values > 1 encourage the model to use new tokens, while values < 1 encourage the model to repeat tokens.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text and supports the explanation of how repetition_penalty works, its threshold values, and how it differs by including the prompt."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I configure the sampling parameters to generate multiple candidate sequences and only return the top ones?",
+      "reference_answer": "You can achieve this by configuring the n and best_of parameters. Set best_of to the total number of output sequences you want the model to generate from the prompt. Then, set n to the number of top sequences you actually want returned, ensuring that best_of is greater than or equal to n.",
+      "expected_source": "vllm/sampling_parameters.md",
+      "question_type": "procedural",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using the provided documentation on vLLM sampling parameters.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is correct, helpful, and directly grounded in the definitions of the 'n' and 'best_of' parameters provided in the document.",
+      "citations_validation": [
+        {
+          "citation": "n \u2013 Number of output sequences to return for the given prompt.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of how 'n' controls the returned sequences."
+        },
+        {
+          "citation": "best_of \u2013 Number of output sequences that are generated from the prompt. From these best_of sequences, the top n sequences are returned.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the explanation of how 'best_of' controls the generated candidate sequences."
+        },
+        {
+          "citation": "best_of must be greater than or equal to n.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the constraint mentioned in the answer that best_of must be greater than or equal to n."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Why are LogitsProcessor objects excluded when creating a deep copy of the sampling parameters using the clone method?",
+      "reference_answer": "LogitsProcessor objects are excluded during a deep copy because they can contain an arbitrary and nontrivial amount of data. This prevents the clone method from copying potentially massive or complex data structures unnecessarily.",
+      "expected_source": "vllm/sampling_parameters.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, directly answers the question, and is fully grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Deep copy excluding LogitsProcessor objects.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the document under the clone() method description and supports the answer by confirming that LogitsProcessor objects are indeed excluded during a deep copy."
+        },
+        {
+          "citation": "LogitsProcessor objects are excluded because they may contain an arbitrary, nontrivial amount of data.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the document under the clone() method description and directly supports the answer by explaining the reason for the exclusion."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How can I implement and register a custom quantization method in vLLM without modifying the core codebase?",
+      "reference_answer": "To implement a custom quantization method, you must create a class that inherits from QuantizationConfig and decorate it with @register_quantization_config. This subclass requires the implementation of several abstract methods, such as get_name(), get_supported_act_dtypes(), and get_quant_method(). Once registered, the custom method can be utilized by passing its name to the quantization parameter when initializing the LLM.",
+      "expected_source": "vllm/quantization.md",
+      "question_type": "procedural",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately describes how to register a custom quantization config, lists some of the required abstract methods, and explains how to use it when initializing the LLM.",
+      "citations_validation": [
+        {
+          "citation": "vLLM supports registering custom, out-of-tree quantization methods using the `@register_quantization_config` decorator.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Out-of-Tree Quantization Plugins' section and supports the answer's explanation of how to register custom methods."
+        },
+        {
+          "citation": "To register a custom quantization method, create a class that inherits from `QuantizationConfig` and decorate it with `@register_quantization_config`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Registering a Custom Quantization Method' section and supports the answer's explanation of the implementation steps."
+        },
+        {
+          "citation": "Once registered, you can use your custom quantization method with vLLM:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Using the Plugin' section and supports the answer's explanation of how to use the registered method with the LLM class."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "When building a custom quantization plugin in vLLM, what is the difference between implementing a method for linear layers versus Mixture of Experts (MoE) layers?",
+      "reference_answer": "When implementing a custom quantization method for linear layers, developers must return a QuantizeMethodBase subclass from the get_quant_method function. Conversely, for Mixture of Experts (MoE) models, developers need to return a FusedMoEMethodBase subclass. If a developer wishes to skip quantization for MoE layers entirely, they can utilize the UnquantizedFusedMoEMethod class.",
+      "expected_source": "vllm/quantization.md",
+      "question_type": "comparative",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and directly addresses the question. It is completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "For linear layers, return a `QuantizeMethodBase` subclass from `get_quant_method`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Implementing a Quantized Linear Method' section and supports the first part of the answer regarding linear layers."
+        },
+        {
+          "citation": "For Mixture of Experts (MoE) models, return a `FusedMoEMethodBase` subclass from `get_quant_method`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Implementing a Quantized MoE Method' section and supports the second part of the answer regarding MoE layers."
+        },
+        {
+          "citation": "You can use `UnquantizedFusedMoEMethod` to skip MoE quantization:",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Implementing a Quantized MoE Method' section and supports the final part of the answer regarding skipping MoE quantization."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What library is recommended for optimizing models for deployment with vLLM, and what quantization formats does it support?",
+      "reference_answer": "vLLM recommends using the LLM Compressor library to optimize models for deployment. This library supports several quantization formats, including FP8, INT8, and INT4.",
+      "expected_source": "vllm/quantization.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, directly answers the question, and is fully grounded in the source document without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "To get started with quantization, see [LLM Compressor](llm_compressor.md), a library for optimizing models for deployment with vLLM that supports FP8, INT8, INT4, and other quantization formats.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "The citation is directly present in the source document as a tip and fully supports the answer by naming the library (LLM Compressor) and its supported formats (FP8, INT8, INT4)."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What is the difference between model-based speculative decoding methods and simpler methods like n-gram in vLLM?",
+      "reference_answer": "Model-based speculative decoding methods, such as EAGLE, MTP, and draft models, provide the highest reduction in latency. In contrast, simpler methods like n-gram and suffix decoding offer more modest speed improvements. However, these simpler methods have the advantage of being lightweight and not increasing the workload during peak traffic periods.",
+      "expected_source": "vllm/speculative_decoding.md",
+      "question_type": "comparative",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and fully grounded in the source document. It accurately describes the differences in latency reduction and workload impact between model-based and simpler speculative decoding methods.",
+      "citations_validation": [
+        {
+          "citation": "Model-based methods such as EAGLE, MTP, draft models, PARD and MLP provide the best latency reduction, while simpler methods such as n-gram and suffix decoding provide modest speedups without increasing workload during peak traffic.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the comparison of latency reduction and peak traffic workload between the two types of methods."
+        },
+        {
+          "citation": "N-gram | Low to medium gain | Medium gain | Lightweight and easy to enable.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the qualitative table and supports the statement that simpler methods like n-gram are lightweight."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "Does vLLM's speculative decoding guarantee that the generated output will be exactly the same across different runs?",
+      "reference_answer": "No, vLLM does not guarantee stable token log probabilities, which can lead to different outputs for the same request across multiple runs. While speculative decoding is theoretically and algorithmically lossless, variations can still occur due to floating-point precision differences in hardware. Additionally, changes in batch size can cause numerical instability or non-deterministic behavior that affects output probabilities.",
+      "expected_source": "vllm/speculative_decoding.md",
+      "question_type": "multi_hop",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, directly answers the question, and is 100% grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "vLLM does not currently guarantee stable token log probabilities (logprobs). This can result in different outputs for the same request across runs.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'vLLM Logprob Stability' section and supports the answer's claim that outputs can vary across runs."
+        },
+        {
+          "citation": "Differences in hardware numerical precision may lead to slight discrepancies in the output distribution.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Floating-Point Precision' bullet point and supports the explanation of why variations occur."
+        },
+        {
+          "citation": "Changes in batch size may cause variations in logprobs and output probabilities, potentially due to non-deterministic behavior in batched operations or numerical instability.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text under the 'Batch Size and Numerical Stability' bullet point and supports the explanation of why variations occur."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the known feature incompatibilities and version constraints for using speculative decoding in vLLM?",
+      "reference_answer": "In vLLM versions 0.15.0 and older, speculative decoding cannot be composed with pipeline parallelism. Additionally, using speculative decoding with a separate draft model is not supported in vLLM versions 0.10.0 and older.",
+      "expected_source": "vllm/speculative_decoding.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is clear, realistic, self-contained, and can be fully answered using the 'Known Feature Incompatibility' section of the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is accurate, directly addresses the question, and is completely grounded in the source text without any external assumptions.",
+      "citations_validation": [
+        {
+          "citation": "Pipeline parallelism is not composible with speculative decoding as of `vllm<=0.15.0`",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the 'Known Feature Incompatibility' section and directly supports the first part of the answer regarding pipeline parallelism."
+        },
+        {
+          "citation": "Speculative decoding with a draft models is not supported in `vllm<=0.10.0`",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the 'Known Feature Incompatibility' section (including the minor typo 'draft models') and directly supports the second part of the answer regarding draft models."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How should I configure my Kubernetes pod spec to enable GPUDirect RDMA for vLLM?",
+      "reference_answer": "To enable GPUDirect RDMA in Kubernetes, you need to configure the container's security context and shared memory. Specifically, add the `IPC_LOCK` capability to the security context to lock memory pages and prevent them from swapping to disk. Additionally, you must mount `/dev/shm` in the pod spec to provide shared memory for interprocess communication.",
+      "expected_source": "vllm/parallelism_scaling.md",
+      "question_type": "procedural",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document (specifically the 'Enabling GPUDirect RDMA' section).",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the source document. It accurately describes the two main configuration requirements (IPC_LOCK and mounting /dev/shm) for enabling GPUDirect RDMA in a Kubernetes pod spec.",
+      "citations_validation": [
+        {
+          "citation": "`IPC_LOCK` security context: add the `IPC_LOCK` capability to the container's security context to lock memory pages and prevent swapping to disk.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the source document and directly supports the answer's explanation of the security context configuration."
+        },
+        {
+          "citation": "Shared memory with `/dev/shm`: mount `/dev/shm` in the pod spec to provide shared memory for interprocess communication (IPC).",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the source document and directly supports the answer's explanation of the shared memory configuration."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What are the default distributed execution backends for single-node versus multi-node inference in vLLM?",
+      "reference_answer": "For single-node inference, vLLM uses native Python `multiprocessing` as the default distributed runtime. In contrast, multi-node inference defaults to using the Ray distributed computing framework. You can override these defaults by configuring the `distributed_executor_backend` setting in the LLM class or API server.",
+      "expected_source": "vllm/parallelism_scaling.md",
+      "question_type": "comparative",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "The default distributed runtimes are Ray for multi-node inference and native Python `multiprocessing` for single-node inference.",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the text and directly supports the answer regarding the default runtimes for single-node and multi-node inference."
+        },
+        {
+          "citation": "You can override the defaults by setting `distributed_executor_backend` in the `LLM` class or `--distributed-executor-backend` in the API server.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is an exact match from the text and directly supports the part of the answer explaining how to override these defaults."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "When provisioning resources for a model in vLLM, what does the 'Maximum concurrency' log message indicate?",
+      "reference_answer": "The 'Maximum concurrency' log message provides an estimate of how many requests the system can serve concurrently if each request requires a specific number of tokens. This token number is based on the model configuration's maximum sequence length. If the estimated concurrency is lower than your required throughput, you will need to add more GPUs or nodes to the cluster.",
+      "expected_source": "vllm/parallelism_scaling.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and completely grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "The `Maximum concurrency` line provides an estimate of how many requests can be served concurrently if each request requires the specified number of tokens (40,960 in the example above).",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and explains what the 'Maximum concurrency' line indicates."
+        },
+        {
+          "citation": "The tokens-per-request number is taken from the model configuration's maximum sequence length, `ModelConfig.max_model_len`.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and explains where the token number comes from."
+        },
+        {
+          "citation": "If these numbers are lower than your throughput requirements, add more GPUs or nodes to your cluster.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the action to take if the concurrency is lower than required."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "What hardware platforms and accelerators are supported for running vLLM?",
+      "reference_answer": "vLLM supports a wide variety of hardware platforms for inference. It can run on NVIDIA GPUs, AMD CPUs and GPUs, Intel CPUs and GPUs, PowerPC CPUs, Arm CPUs, and TPUs. Additionally, it supports diverse hardware plugins including Intel Gaudi, IBM Spyre, and Huawei Ascend.",
+      "expected_source": "vllm/overview.md",
+      "question_type": "factual_lookup",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, detailed, and 100% grounded in the source document without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Support for NVIDIA GPUs, AMD CPUs and GPUs, Intel CPUs and GPUs, PowerPC CPUs, Arm CPUs, and TPU.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the list of supported hardware platforms mentioned in the answer."
+        },
+        {
+          "citation": "Additionally, support for diverse hardware plugins such as Intel Gaudi, IBM Spyre and Huawei Ascend.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the list of hardware plugins mentioned in the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "As a new user, where should I start if I want to run open-source models versus building my own applications with vLLM?",
+      "reference_answer": "If your goal is to run open-source models, you should begin with the Quickstart Guide. However, if you are looking to build applications using vLLM, it is recommended to start with the User Guide instead.",
+      "expected_source": "vllm/overview.md",
+      "question_type": "procedural",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and directly addresses the content of the document regarding where different types of users should start.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The answer is accurate, directly answers the question, and is fully grounded in the source text without any external assumptions or hallucinations.",
+      "citations_validation": [
+        {
+          "citation": "Run open-source models on vLLM, we recommend starting with the Quickstart Guide",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically and almost literally present in the source document and directly supports the first part of the answer."
+        },
+        {
+          "citation": "Build applications with vLLM, we recommend starting with the User Guide",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is semantically and almost literally present in the source document and directly supports the second part of the answer."
+        }
+      ],
+      "overall_is_valid": true
+    },
+    {
+      "question": "How do I get started with vLLM?",
+      "reference_answer": "The best place to get started depends on your specific goals as a user. You should use the Quickstart Guide if you want to run open-source models, or the User Guide if you are looking to build applications. If you intend to contribute to building vLLM itself, you should start with the Developer Guide.",
+      "expected_source": "vllm/overview.md",
+      "question_type": "ambiguous",
+      "domain": "vllm",
+      "is_question_valid": true,
+      "question_reasoning": "The question is realistic, clear, self-contained, and can be fully answered using only the provided document.",
+      "is_answer_valid": true,
+      "answer_reasoning": "The reference answer is correct, helpful, and 100% grounded in the source document, directly addressing the question based on the user's goals.",
+      "citations_validation": [
+        {
+          "citation": "Where to get started with vLLM depends on the type of user.",
+          "exact_match": true,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is directly present in the text and supports the introductory statement of the answer."
+        },
+        {
+          "citation": "Run open-source models on vLLM, we recommend starting with the Quickstart Guide",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (excluding the markdown link) and supports the recommendation for running open-source models."
+        },
+        {
+          "citation": "Build applications with vLLM, we recommend starting with the User Guide",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (excluding the markdown link) and supports the recommendation for building applications."
+        },
+        {
+          "citation": "Build vLLM, we recommend starting with Developer Guide",
+          "exact_match": false,
+          "normalized_match": true,
+          "python_contained": true,
+          "is_contained_semantically": true,
+          "supports_answer": true,
+          "explanation": "This citation is present in the text (excluding the markdown link) and supports the recommendation for building/contributing to vLLM."
+        }
+      ],
+      "overall_is_valid": true
+    }
+  ]
+}
