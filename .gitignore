@@ -34,3 +34,9 @@ data/processed/**
 
 # Runtime logs
 *.log
+
+# Antigravity
+.agents
+
+# Local Cache
+cache/
