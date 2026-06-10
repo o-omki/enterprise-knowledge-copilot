@@ -7,6 +7,19 @@ from sqlalchemy.orm import relationship
 from packages.shared.database import Base
 
 
+class User(Base):
+    """Registered users capable of logging into the UI via JWT."""
+
+    __tablename__ = "users"
+
+    id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
+    email = Column(String(255), nullable=False, unique=True, index=True)
+    password_hash = Column(String(255), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
+
+    sessions = relationship("Session", back_populates="user", cascade="all, delete-orphan")
+
+
 class ApiKey(Base):
     """API Keys for clients accessing the enterprise knowledge copilot."""
 
@@ -16,7 +29,7 @@ class ApiKey(Base):
     key_hash = Column(String(255), nullable=False, unique=True, index=True)
     label = Column(String(255), nullable=False)
     is_active = Column(Boolean, default=True, nullable=False)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
 
     sessions = relationship("Session", back_populates="api_key", cascade="all, delete-orphan")
 
@@ -28,15 +41,17 @@ class Session(Base):
 
     id = Column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
     api_key_id = Column(String(36), ForeignKey("api_keys.id", ondelete="SET NULL"), nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    user_id = Column(String(36), ForeignKey("users.id", ondelete="CASCADE"), nullable=True)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
     last_active = Column(
-        DateTime,
+        DateTime(timezone=True),
         default=lambda: datetime.now(UTC),
         onupdate=lambda: datetime.now(UTC),
         nullable=False,
     )
 
     api_key = relationship("ApiKey", back_populates="sessions")
+    user = relationship("User", back_populates="sessions")
     messages = relationship(
         "Message",
         back_populates="session",
@@ -57,11 +72,9 @@ class Message(Base):
     )
     role = Column(String(50), nullable=False)  # "user" or "assistant"
     content = Column(Text, nullable=False)
-    # Stores list of serialized Citation DTOs
     citations_json = Column(JSON, nullable=True)
-    # Tracing reference for observability
     trace_id = Column(String(64), nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
 
     session = relationship("Session", back_populates="messages")
     feedback = relationship("Feedback", back_populates="message", cascade="all, delete-orphan")
@@ -81,7 +94,7 @@ class Feedback(Base):
     )
     rating = Column(String(10), nullable=False)  # "up" or "down"
     comment = Column(Text, nullable=True)
-    created_at = Column(DateTime, default=lambda: datetime.now(UTC), nullable=False)
+    created_at = Column(DateTime(timezone=True), default=lambda: datetime.now(UTC), nullable=False)
 
     session = relationship("Session", back_populates="feedback")
     message = relationship("Message", back_populates="feedback")
