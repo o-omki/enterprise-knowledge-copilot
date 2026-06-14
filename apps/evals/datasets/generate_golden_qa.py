@@ -44,7 +44,7 @@ class GeneratedQAPair(BaseModel):
     question_type: str = Field(
         ...,
         description=(
-            "One of: 'factual_lookup', 'procedural', 'comparative', " "'multi_hop', 'ambiguous'."
+            "One of: 'factual_lookup', 'procedural', 'comparative', 'multi_hop', 'ambiguous'."
         ),
     )
     key_citations: list[str] = Field(
@@ -161,7 +161,7 @@ async def generate_golden_qa(
             if len(content) > 12000:
                 content = content[:12000] + "\n\n[... document truncated ...]"
 
-            user_prompt = f"Source file: {relative_source}\n\n" f"Document content:\n{content}"
+            user_prompt = f"Source file: {relative_source}\n\nDocument content:\n{content}"
 
             response = await client.aio.models.generate_content(
                 model=config.model,

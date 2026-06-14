@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals
+.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -70,3 +70,11 @@ generate-eval-dataset:
 
 # Legacy aliases (deprecated — use eval-* targets above)
 run-evals: eval-all
+
+worker:
+	poetry run celery -A apps.worker.celery_app worker --loglevel=info
+
+frontend:
+	@echo "Starting Next.js frontend..."
+	cd apps/frontend && npm run dev
+

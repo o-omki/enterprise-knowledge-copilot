@@ -123,7 +123,7 @@ class GroundingJudge:
         GroundingVerdict with per-claim analysis and aggregate score.
         """
         context_str = "\n\n---\n\n".join(
-            f"[Passage {i+1}]\n{passage}" for i, passage in enumerate(context)
+            f"[Passage {i + 1}]\n{passage}" for i, passage in enumerate(context)
         )
 
         user_prompt = f"""\

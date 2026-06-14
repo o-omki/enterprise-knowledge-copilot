@@ -29,6 +29,7 @@ class AnswerResponse(BaseModel):
     answer: str
     citations: list[Citation]
     context_passages: list[str] = Field(default_factory=list)
+    metadata: dict = Field(default_factory=dict)
 
 
 class GenerationService:
@@ -48,7 +49,7 @@ class GenerationService:
         return self._genai_client
 
     async def generate_answer(
-        self, query: str, search_results: list[SearchResult]
+        self, query: str, search_results: list[SearchResult], chat_history: list[dict] | None = None
     ) -> AnswerResponse:
         """Generates an answer from search context and formats the citations."""
         if not search_results:
@@ -96,8 +97,16 @@ CITATION FORMAT:
 You can declare them as function parameters [2]."
 """
 
+        history_str = ""
+        if chat_history:
+            history_parts = ["Chat History:"]
+            for msg in chat_history:
+                role = "User" if msg.get("role") == "user" else "AI"
+                history_parts.append(f"{role}: {msg.get('content')}")
+            history_str = "\n".join(history_parts) + "\n\n"
+
         user_prompt = f"""\
-Context:
+{history_str}Context:
 {context_str}
 
 Question:
@@ -136,3 +145,93 @@ Answer:
                 citations=citations_meta,
                 context_passages=[r.text for r in search_results],
             )
+
+    async def generate_answer_stream(self, query: str, search_results: list[SearchResult]):
+        """Generates an answer from search context and formats the citations as a stream.
+        Yields dicts representing the events:
+        - {"type": "chunk", "text": "..."}
+        - {"type": "done", "citations": [...], "context_passages": [...]}
+        - {"type": "error", "message": "..."}
+        """
+        if not search_results:
+            yield {
+                "type": "chunk",
+                "text": (
+                    "I could not find any relevant information in "
+                    "the knowledge base to answer your question."
+                ),
+            }
+            yield {"type": "done", "citations": [], "context_passages": []}
+            return
+
+        context_parts = []
+        citations_meta = []
+        for idx, result in enumerate(search_results, start=1):
+            context_parts.append(f"[Source {idx}] File: {result.source}\nContent:\n{result.text}\n")
+
+            snippet = (
+                result.text[:200].strip() + "..." if len(result.text) > 200 else result.text.strip()
+            )
+
+            citations_meta.append(
+                Citation(id=idx, source=result.source, snippet=snippet).model_dump()
+            )
+
+        context_str = "\n".join(context_parts)
+
+        system_instruction = """\
+You are an enterprise knowledge assistant. You answer questions based \
+STRICTLY on the provided source documents.
+
+HARD RULES — violating any of these is a critical failure:
+1. ONLY use information that is explicitly stated in the Context below.
+2. NEVER add facts, explanations, examples, or details from your own knowledge, \
+even if you know them to be correct.
+3. EVERY factual sentence in your answer MUST end with an inline citation [N] \
+referencing the source it came from. Multiple sources may be cited as [1][3].
+4. If the Context does not contain enough information to answer the question, \
+respond EXACTLY with: "I don't have enough information in the knowledge base \
+to answer this question."
+5. Stay close to the source wording. Do not heavily paraphrase or embellish.
+6. Do NOT start your answer with "Based on the provided context" or similar \
+meta-commentary. Answer the question directly.
+
+CITATION FORMAT:
+- Use [N] at the end of each sentence, where N is the Source number.
+- Example: "FastAPI supports background tasks for long-running operations [1]. \
+You can declare them as function parameters [2]."
+"""
+
+        user_prompt = f"""\
+Context:
+{context_str}
+
+Question:
+{query}
+
+Answer:
+"""
+
+        try:
+            response_stream = await self.genai_client.aio.models.generate_content_stream(
+                model=self.config.generation_model_name,
+                contents=user_prompt,
+                config={
+                    "system_instruction": system_instruction,
+                    "temperature": 0.2,
+                    "max_output_tokens": 2048,
+                },
+            )
+            async for chunk in response_stream:
+                if chunk.text:
+                    yield {"type": "chunk", "text": chunk.text}
+
+            yield {
+                "type": "done",
+                "citations": citations_meta,
+                "context_passages": [r.text for r in search_results],
+            }
+
+        except Exception as e:
+            logger.exception(f"Failed to generate answer for query: {query}")
+            yield {"type": "error", "message": f"Generation failed: {e}"}

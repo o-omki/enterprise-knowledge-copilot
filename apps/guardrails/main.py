@@ -116,8 +116,7 @@ async def validate_input(request: InputValidationRequest):
                 is_off_topic=True,
                 filtered_query=request.query,
                 refusal_message=(
-                    "I am only authorized to assist with internal enterprise "
-                    "documentation queries."
+                    "I am only authorized to assist with internal enterprise documentation queries."
                 ),
             )
 
@@ -170,7 +169,7 @@ async def validate_output(request: OutputValidationRequest):
         logger.info(f"Validating output grounding for query: {request.query}")
 
         evidence_str = "\n".join(
-            [f"Evidence {i+1}: {chunk}" for i, chunk in enumerate(request.context)]
+            [f"Evidence {i + 1}: {chunk}" for i, chunk in enumerate(request.context)]
         )
 
         is_grounded = True

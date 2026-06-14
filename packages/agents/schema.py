@@ -1,9 +1,9 @@
-from enum import Enum
+from enum import StrEnum
 
 from pydantic import BaseModel, Field
 
 
-class QueryType(str, Enum):
+class QueryType(StrEnum):
     DIRECT_LOOKUP = "direct_lookup"
     AMBIGUOUS_QUERY = "ambiguous_query"
     MULTI_HOP_SYNTHESIS = "multi_hop_synthesis"

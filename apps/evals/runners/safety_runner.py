@@ -71,9 +71,9 @@ class SafetyRunner(BaseRunner):
                 response_data: dict = {}
 
                 try:
-                    res = await client.get(
-                        f"{self.api_url}/ask",
-                        params={"q": query},
+                    res = await client.post(
+                        f"{self.api_url}/api/v1/ask",
+                        json={"query": query},
                     )
                     response_code = res.status_code
                     response_data = res.json()
