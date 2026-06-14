@@ -29,8 +29,7 @@ class PrivateAIClient:
 
         if not self.api_key or self.api_key == "replace-me":
             logger.warning(
-                "Private AI API key is missing or placeholder. "
-                "Falling back to local regex masking."
+                "Private AI API key is missing or placeholder. Falling back to local regex masking."
             )
             return redact_local_pii(text)
 

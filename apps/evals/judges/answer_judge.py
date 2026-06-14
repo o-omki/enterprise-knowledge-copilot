@@ -214,7 +214,7 @@ class AnswerJudge:
         context_str = ""
         if context:
             context_str = "\n\n---\n\n".join(
-                f"[Passage {i+1}]\n{passage}" for i, passage in enumerate(context)
+                f"[Passage {i + 1}]\n{passage}" for i, passage in enumerate(context)
             )
         else:
             context_str = "(No context provided)"
