@@ -157,8 +157,8 @@ Answer:
             yield {
                 "type": "chunk",
                 "text": (
-                    "I could not find any relevant information in ",
-                    "the knowledge base to answer your question.",
+                    "I could not find any relevant information in "
+                    "the knowledge base to answer your question."
                 ),
             }
             yield {"type": "done", "citations": [], "context_passages": []}
