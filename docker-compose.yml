@@ -15,6 +15,9 @@ services:
     environment:
       - QDRANT_URL=http://qdrant:6333
       - POSTGRES_DSN=postgresql://postgres:postgres@postgres:5432/knowledge_copilot
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+      - REDIS_URL=redis://redis:6379/0
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4317
       - OTEL_EXPORTER_OTLP_INSECURE=true
     depends_on:
@@ -22,6 +25,7 @@ services:
       - postgres
       - jaeger
       - guardrails
+      - redis
 
   guardrails:
     image: python:3.11
@@ -74,5 +78,41 @@ services:
     ports:
       - "6379:6379"
 
+  worker:
+    image: python:3.11
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+      - ~/.config/gcloud:/root/.config/gcloud:ro
+    command: >
+      bash -lc "pip install --upgrade pip && pip install -e .[dev] &&
+      celery -A apps.worker.celery_app worker --loglevel=info"
+    env_file:
+      - .env
+    environment:
+      - QDRANT_URL=http://qdrant:6333
+      - POSTGRES_DSN=postgresql://postgres:postgres@postgres:5432/knowledge_copilot
+      - CELERY_BROKER_URL=redis://redis:6379/0
+      - CELERY_RESULT_BACKEND=redis://redis:6379/1
+    depends_on:
+      - redis
+      - qdrant
+      - postgres
+
+  frontend:
+    image: node:20-alpine
+    working_dir: /workspace/apps/frontend
+    volumes:
+      - ./:/workspace
+    command: >
+      sh -c "npm install && npm run dev"
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
+
