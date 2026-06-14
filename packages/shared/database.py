@@ -2,7 +2,7 @@ import os
 from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlalchemy.orm import declarative_base
+from sqlalchemy.orm import DeclarativeBase
 
 postgres_dsn = os.getenv(
     "POSTGRES_DSN", "postgresql://postgres:postgres@localhost:5432/knowledge_copilot"
@@ -26,7 +26,8 @@ async_session_maker = async_sessionmaker(
 )
 
 
-Base = declarative_base()
+class Base(DeclarativeBase):
+    pass
 
 
 async def get_db() -> AsyncGenerator[AsyncSession, None]:
