@@ -1,9 +1,9 @@
 # Milestones
 
 ## Overall Status
-- Current phase: Phase 6 (Evaluation Harness)
-- Last completed phase: Phase 5 (Safety and Guardrails) — **Complete**
-- Last updated: 2026-05-28
+- Current phase: Phase 7 (API & UI Productization)
+- Last completed phase: Phase 6 (Evaluation Harness) — **Complete**
+- Last updated: 2026-06-09
 
 ## Phase 0 Checklist
 <!--  -->
@@ -63,6 +63,7 @@
 - [x] Phase 3 completion sign-off (May 16, 2026)
 - [x] Phase 4 completion sign-off (May 18, 2026)
 - [x] Phase 5 completion sign-off (May 28, 2026)
+- [x] Phase 6 completion sign-off (June 9, 2026)
 
 ## Phase 3: Cross-Encoder Reranking (Complete)
 - [x] Add `sentence-transformers` dependency (`pyproject.toml`)
@@ -115,5 +116,60 @@
   - [x] Task 7.1: Write Architecture Decision Record for NeMo Guardrails integration
   - [x] Task 7.2: Finalize monorepo checklist validation and sign-off
 
+## Phase 6: Evaluation Harness (Complete)
+- [x] Build foundational testing harness
+- [x] Implement eval metrics (Recall, nDCG, MRR)
+- [x] Setup continuous automated evaluation
+- [x] Baseline snapshot mechanism
 
+## Phase 7: API & UI Productization — Task Tracker
+### Epic 1: Backend API Contract Finalization
+- [x] 1.1 Create `apps/api/app/schemas.py`
+- [x] 1.2 Rewrite `apps/api/app/main.py`
+- [x] 1.3 Update `apps/api/app/middleware/safety.py`
+- [x] 1.4 Update `packages/agents/orchestrator.py`
+- [x] 1.5 Update `packages/rag/generation.py`
 
+### Epic 2: Dual-Layer Session & Memory Architecture
+- [x] 2.1 Add new dependencies to `pyproject.toml`
+- [x] 2.2 Create `packages/shared/database.py`
+- [x] 2.3 Create `packages/shared/orm_models.py`
+- [x] 2.4 Create `packages/shared/models.py`
+- [x] 2.5 Scaffold Alembic, configure async `env.py`
+- [x] 2.6 Auto-generate initial migration
+- [x] 2.7 Create `packages/shared/session.py`
+- [x] 2.8 Verify: `alembic upgrade head` runs against PostgreSQL
+
+### Epic 3: API Key Authentication & Rate Limiting
+- [x] 3.1 Create auth middleware
+- [x] 3.2 Create rate limiter
+- [x] 3.3 Create demo key seeder
+- [x] 3.4 Update `.env.example`
+
+### Epic 4: Frontend Web Application
+- [x] 4.1 Scaffold Next.js web app
+- [x] 4.2 Create theme
+- [x] 4.3 Create API config + services
+- [x] 4.4 Create models
+- [x] 4.5 Create providers
+- [x] 4.6 Build ChatScreen + all widgets
+- [x] 4.7 Build SettingsScreen
+- [x] 4.8 Verify build
+
+### Epic 5: Jaeger Trace Integration
+- [x] 5.1 Wire trace_id extraction into orchestrator response
+
+### Epic 6: User Feedback Loop
+- [x] 6.1 Create `packages/shared/feedback.py`
+
+### Epic 7: Async Ingestion Worker (Celery)
+- [x] 7.1 Create `apps/worker/celery_app.py`
+- [x] 7.2 Create `apps/worker/tasks.py`
+
+### Epic 8: Infrastructure & Documentation
+- [x] 8.1 Update `docker-compose.yml`
+- [x] 8.2 Update `Makefile`
+- [x] 8.3 Create ADR `docs/adr/0015-api-v1-contract.md`
+- [x] 8.4 Update `docs/milestones.md`
+- [x] 8.5 Create `apps/frontend/Dockerfile`
+- [x] 8.6 Update eval runners/scripts for new POST API
