@@ -40,7 +40,7 @@ from packages.shared.orm_models import Message, Session
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.3.0")
+app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0")
 
 setup_tracing(app)
 
