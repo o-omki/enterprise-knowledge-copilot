@@ -12,8 +12,16 @@ from packages.shared.orm_models import User
 
 router = APIRouter(prefix="/api/v1/auth", tags=["auth"])
 
-SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev_secret_key_change_in_production")
-ALGORITHM = "HS256"
+SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+
+if SECRET_KEY is None:
+    raise ValueError("[ENCRYPTION ERROR] - JWT_SECRET_KEY is not set.")
+
+ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+if ALGORITHM is None:
+    raise ValueError("[ENCRYPTION ERROR] - JWT_ALGORITHM is not set.")
+
 ACCESS_TOKEN_EXPIRE_MINUTES = 60 * 24 * 7
 
 

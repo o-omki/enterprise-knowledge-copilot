@@ -11,8 +11,14 @@ from starlette.middleware.base import BaseHTTPMiddleware
 from packages.shared.database import async_session_maker
 from packages.shared.orm_models import ApiKey, User
 
-JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY", "dev_secret_key_change_in_production")
-JWT_ALGORITHM = "HS256"
+JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+if JWT_SECRET_KEY is None:
+    raise ValueError("[ENCRYPTION ERROR] - JWT_SECRET_KEY is not set.")
+
+if JWT_ALGORITHM is None:
+    raise ValueError("[ENCRYPTION ERROR] - JWT_ALGORITHM is not set.")
 
 logger = logging.getLogger("apps.api.middleware.auth")
 
