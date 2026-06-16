@@ -1,0 +1,27 @@
+models:
+  gemini-3.1-flash-lite:
+    capabilities:
+      - routing
+      - fast_search
+    max_input_tokens: 32768
+    cost_per_1k_input: 0.00025
+    cost_per_1k_output: 0.0015
+    latency_tier: ultra-fast
+  gemini-3.5-flash:
+    capabilities:
+      - direct_lookup
+      - decomposition
+    max_input_tokens: 1048576
+    cost_per_1k_input: 0.0015
+    cost_per_1k_output: 0.009
+    latency_tier: fast
+  gemini-3.1-pro-preview:
+    capabilities:
+      - multi_hop_synthesis
+      - comparative_query
+      - complex_reasoning
+      - ambiguous_query
+    max_input_tokens: 128000
+    cost_per_1k_input: 0.002
+    cost_per_1k_output: 0.012
+    latency_tier: standard
