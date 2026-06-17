@@ -1,20 +1,21 @@
 import logging
+from pathlib import Path
 
-from google import genai
+import yaml
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
 from packages.rag.search import SearchResult
 
 logger = logging.getLogger(__name__)
 
 
 class GenerationConfig(BaseSettings):
-    project_id: str = Field(alias="GCP_PROJECT_ID")
-    location: str = Field(alias="GCP_LOCATION", default="global")
     generation_model_name: str = Field(
         alias="GCP_GENERATION_MODEL", default="gemini-3.1-pro-preview"
     )
+    prompt_version: str = Field(default="concise")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
@@ -33,23 +34,26 @@ class AnswerResponse(BaseModel):
 
 
 class GenerationService:
-    def __init__(self, config: GenerationConfig | None = None):
+    def __init__(self, llm_client: LLMClient, config: GenerationConfig | None = None):
         self.config = config or GenerationConfig()
-        self._genai_client = None
+        self.llm_client = llm_client
 
-    @property
-    def genai_client(self):
-        """Lazy loader for the genai client."""
-        if self._genai_client is None:
-            self._genai_client = genai.Client(
-                vertexai=True,
-                project=self.config.project_id,
-                location=self.config.location,
-            )
-        return self._genai_client
+        # Load prompt templates
+        prompt_config_path = Path("configs/prompts.yaml")
+        if prompt_config_path.exists():
+            with open(prompt_config_path, encoding="utf-8") as f:
+                prompts_data = yaml.safe_load(f)
+            self.prompts = prompts_data.get("rag", {}).get("generation", {})
+        else:
+            self.prompts = {}
+            logger.warning(f"Prompts file not found at {prompt_config_path}")
 
     async def generate_answer(
-        self, query: str, search_results: list[SearchResult], chat_history: list[dict] | None = None
+        self,
+        query: str,
+        search_results: list[SearchResult],
+        chat_history: list[dict] | None = None,
+        model_override: str | None = None,
     ) -> AnswerResponse:
         """Generates an answer from search context and formats the citations."""
         if not search_results:
@@ -74,28 +78,15 @@ class GenerationService:
 
         context_str = "\n".join(context_parts)
 
-        system_instruction = """\
-You are an enterprise knowledge assistant. You answer questions based \
-STRICTLY on the provided source documents.
+        # Get the selected prompt configuration
+        prompt_def = self.prompts.get(self.config.prompt_version, {})
 
-HARD RULES — violating any of these is a critical failure:
-1. ONLY use information that is explicitly stated in the Context below.
-2. NEVER add facts, explanations, examples, or details from your own knowledge, \
-even if you know them to be correct.
-3. EVERY factual sentence in your answer MUST end with an inline citation [N] \
-referencing the source it came from. Multiple sources may be cited as [1][3].
-4. If the Context does not contain enough information to answer the question, \
-respond EXACTLY with: "I don't have enough information in the knowledge base \
-to answer this question."
-5. Stay close to the source wording. Do not heavily paraphrase or embellish.
-6. Do NOT start your answer with "Based on the provided context" or similar \
-meta-commentary. Answer the question directly.
-
-CITATION FORMAT:
-- Use [N] at the end of each sentence, where N is the Source number.
-- Example: "FastAPI supports background tasks for long-running operations [1]. \
-You can declare them as function parameters [2]."
-"""
+        # Fallback to defaults if missing
+        system_instruction = prompt_def.get("system_instruction", "You are a helpful assistant.")
+        user_prompt_template = prompt_def.get(
+            "user_prompt_template",
+            "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
+        )
 
         history_str = ""
         if chat_history:
@@ -105,26 +96,21 @@ You can declare them as function parameters [2]."
                 history_parts.append(f"{role}: {msg.get('content')}")
             history_str = "\n".join(history_parts) + "\n\n"
 
-        user_prompt = f"""\
-{history_str}Context:
-{context_str}
-
-Question:
-{query}
-
-Answer:
-"""
+        user_prompt = user_prompt_template.format(
+            history_str=history_str,
+            context_str=context_str,
+            query=query,
+        )
 
         try:
-            response = await self.genai_client.aio.models.generate_content(
-                model=self.config.generation_model_name,
-                contents=user_prompt,
-                config={
-                    "system_instruction": system_instruction,
-                    "temperature": 0.2,
-                    "max_output_tokens": 2048,
-                },
+            req = LLMRequest(
+                messages=[LLMMessage(role="user", content=user_prompt)],
+                model=model_override or self.config.generation_model_name,
+                temperature=0.2,
+                max_tokens=2048,
+                system_instruction=system_instruction,
             )
+            response = await self.llm_client.generate(req)
 
         except Exception as e:
             logger.exception(f"Failed to generate answer for query: {query}")
@@ -146,7 +132,12 @@ Answer:
                 context_passages=[r.text for r in search_results],
             )
 
-    async def generate_answer_stream(self, query: str, search_results: list[SearchResult]):
+    async def generate_answer_stream(
+        self,
+        query: str,
+        search_results: list[SearchResult],
+        model_override: str | None = None,
+    ):
         """Generates an answer from search context and formats the citations as a stream.
         Yields dicts representing the events:
         - {"type": "chunk", "text": "..."}
@@ -179,49 +170,31 @@ Answer:
 
         context_str = "\n".join(context_parts)
 
-        system_instruction = """\
-You are an enterprise knowledge assistant. You answer questions based \
-STRICTLY on the provided source documents.
+        # Get the selected prompt configuration
+        prompt_def = self.prompts.get(self.config.prompt_version, {})
 
-HARD RULES — violating any of these is a critical failure:
-1. ONLY use information that is explicitly stated in the Context below.
-2. NEVER add facts, explanations, examples, or details from your own knowledge, \
-even if you know them to be correct.
-3. EVERY factual sentence in your answer MUST end with an inline citation [N] \
-referencing the source it came from. Multiple sources may be cited as [1][3].
-4. If the Context does not contain enough information to answer the question, \
-respond EXACTLY with: "I don't have enough information in the knowledge base \
-to answer this question."
-5. Stay close to the source wording. Do not heavily paraphrase or embellish.
-6. Do NOT start your answer with "Based on the provided context" or similar \
-meta-commentary. Answer the question directly.
+        # Fallback to defaults if missing
+        system_instruction = prompt_def.get("system_instruction", "You are a helpful assistant.")
+        user_prompt_template = prompt_def.get(
+            "user_prompt_template",
+            "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
+        )
 
-CITATION FORMAT:
-- Use [N] at the end of each sentence, where N is the Source number.
-- Example: "FastAPI supports background tasks for long-running operations [1]. \
-You can declare them as function parameters [2]."
-"""
-
-        user_prompt = f"""\
-Context:
-{context_str}
-
-Question:
-{query}
-
-Answer:
-"""
+        user_prompt = user_prompt_template.format(
+            history_str="",
+            context_str=context_str,
+            query=query,
+        )
 
         try:
-            response_stream = await self.genai_client.aio.models.generate_content_stream(
-                model=self.config.generation_model_name,
-                contents=user_prompt,
-                config={
-                    "system_instruction": system_instruction,
-                    "temperature": 0.2,
-                    "max_output_tokens": 2048,
-                },
+            req = LLMRequest(
+                messages=[LLMMessage(role="user", content=user_prompt)],
+                model=model_override or self.config.generation_model_name,
+                temperature=0.2,
+                max_tokens=2048,
+                system_instruction=system_instruction,
             )
+            response_stream = self.llm_client.generate_stream(req)
             async for chunk in response_stream:
                 if chunk.text:
                     yield {"type": "chunk", "text": chunk.text}
