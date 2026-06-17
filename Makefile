@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker
+.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -56,6 +56,9 @@ eval-safety:
 eval-latency:
 	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner latency
 
+eval-serving:
+	PYTHONPATH=. $(PYTHON) -m apps.evals.cli run --runner serving
+
 eval-regression:
 	@echo "Running regression check against baseline..."
 	PYTHONPATH=. $(PYTHON) -m apps.evals.cli compare
@@ -77,4 +80,12 @@ worker:
 frontend:
 	@echo "Starting Next.js frontend..."
 	cd apps/frontend && npm run dev
+
+load-test:
+	@echo "Running load test suite..."
+	PYTHONPATH=. $(PYTHON) scripts/load_test.py
+
+load-test-report:
+	@echo "Generating load test report..."
+	PYTHONPATH=. $(PYTHON) scripts/load_test_report.py
 
