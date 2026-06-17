@@ -2,11 +2,13 @@ import datetime
 import logging
 import os
 import uuid
+from contextlib import asynccontextmanager
 from typing import Literal
 
 from celery.result import AsyncResult
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from redis.asyncio import Redis
 from sqlalchemy import desc, select
 from sqlalchemy.orm import selectinload
 
@@ -29,6 +31,9 @@ from apps.api.app.schemas import (
 from apps.worker.celery_app import app as celery_app
 from apps.worker.tasks import ingest_document
 from packages.agents.orchestrator import QueryOrchestrator
+from packages.llm_serving import LLMClient
+from packages.llm_serving.cost_tracker import CostTracker
+from packages.llm_serving.router import ModelRouter
 from packages.observability import setup_tracing
 from packages.rag.generation import GenerationService
 from packages.rag.reranker import RerankerService
@@ -40,7 +45,52 @@ from packages.shared.orm_models import Message, Session
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0")
+
+redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+redis_client = Redis.from_url(redis_url, decode_responses=True)
+
+model_router = ModelRouter()
+cost_tracker = CostTracker(router=model_router)
+
+llm_client = LLMClient(redis_client=redis_client, cost_tracker=cost_tracker)
+
+search_service = SearchService()
+generation_service = GenerationService(llm_client=llm_client)
+reranker_service = RerankerService()
+orchestrator = QueryOrchestrator(
+    search_service=search_service,
+    generation_service=generation_service,
+    reranker_service=reranker_service,
+    llm_client=llm_client,
+    model_router=model_router,
+)
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup: Warm up lazy-loaded models and client connections
+    logger.info("Initializing and pre-warming SearchService models and LLM connections...")
+    try:
+        # Accessing these properties forces lazy loading to execute immediately on server startup
+        _ = search_service.sparse_model
+        logger.info("FastEmbed sparse model pre-warmed successfully.")
+    except Exception as e:
+        logger.error(f"Failed to pre-warm sparse model during startup: {e}")
+
+    try:
+        # Triggers genai.Client initialization and connection warming
+        _ = search_service.genai_client
+        logger.info("Google GenAI client initialized successfully.")
+    except Exception as e:
+        logger.error(f"Failed to initialize GenAI client during startup: {e}")
+
+    yield
+    # Shutdown: Clean up open connections
+    await redis_client.close()
+    logger.info("API server shutting down. Closed Redis connection.")
+
+
+app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0", lifespan=lifespan)
 
 setup_tracing(app)
 
@@ -59,15 +109,6 @@ app.add_middleware(
 )
 
 app.include_router(auth_router)
-
-search_service = SearchService()
-generation_service = GenerationService()
-reranker_service = RerankerService()
-orchestrator = QueryOrchestrator(
-    search_service=search_service,
-    generation_service=generation_service,
-    reranker_service=reranker_service,
-)
 
 v1_router = APIRouter(prefix="/api/v1")
 
