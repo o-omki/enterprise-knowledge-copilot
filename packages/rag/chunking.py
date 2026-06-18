@@ -11,7 +11,11 @@ class Chunk:
 
 
 def chunk_text(
-    text: str, source: str, chunk_size: int = 800, chunk_overlap: int = 0, metadata: dict = None
+    text: str,
+    source: str,
+    chunk_size: int = 800,
+    chunk_overlap: int = 0,
+    metadata: dict | None = None,
 ) -> list[Chunk]:
     if metadata is None:
         metadata = {}
