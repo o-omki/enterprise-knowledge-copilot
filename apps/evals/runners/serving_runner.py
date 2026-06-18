@@ -191,7 +191,7 @@ class ServingRunner(BaseRunner):
             {
                 "test_suite": "CircuitBreaker",
                 "details": (
-                    f"Total Checks: {cb_total_checks}, " f"Passed Checks: {cb_success_transitions}",
+                    f"Total Checks: {cb_total_checks}, Passed Checks: {cb_success_transitions}",
                 ),
             },
         ]
