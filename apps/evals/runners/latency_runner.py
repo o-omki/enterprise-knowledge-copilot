@@ -13,6 +13,7 @@ import time
 from apps.evals.config import EvalConfig
 from apps.evals.runners.base import BaseRunner, EvalResult
 from packages.agents.orchestrator import QueryOrchestrator
+from packages.llm_serving.client import LLMClient
 from packages.rag.generation import GenerationService
 from packages.rag.reranker import RerankerService
 from packages.rag.search import SearchConfig, SearchService
@@ -42,15 +43,20 @@ class LatencyRunner(BaseRunner):
         search_service: SearchService | None = None,
         generation_service: GenerationService | None = None,
         reranker_service: RerankerService | None = None,
+        llm_client: LLMClient | None = None,
     ) -> None:
         super().__init__(config)
+        self.llm_client = llm_client or LLMClient()
         self.search_service = search_service or SearchService(SearchConfig())
-        self.generation_service = generation_service or GenerationService()
+        self.generation_service = generation_service or GenerationService(
+            llm_client=self.llm_client
+        )
         self.reranker_service = reranker_service or RerankerService()
         self.orchestrator = QueryOrchestrator(
             search_service=self.search_service,
             generation_service=self.generation_service,
             reranker_service=self.reranker_service,
+            llm_client=self.llm_client,
         )
 
     async def run(self) -> EvalResult:
