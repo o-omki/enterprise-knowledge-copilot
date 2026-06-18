@@ -19,6 +19,7 @@ dependencies = [
   "qdrant-client[fastembed] (>=1.17.1,<2.0.0)",
   "google-genai>=1.0.0",
   "pytest>=8.3.0",
+  "pytest-asyncio>=0.23.0",
   "ruff>=0.6.0",
   "pre-commit>=3.8.0",
   "pydantic-settings[dotenv]>=2.14.0",
