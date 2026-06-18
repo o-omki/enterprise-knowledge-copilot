@@ -1,9 +1,9 @@
 # Milestones
 
 ## Overall Status
-- Current phase: Phase 7 (API & UI Productization)
-- Last completed phase: Phase 6 (Evaluation Harness) — **Complete**
-- Last updated: 2026-06-09
+- Current phase: Phase 9 (Observability and Reliability)
+- Last completed phase: Phase 8 (Serving & Inference Optimization) — **Complete**
+- Last updated: 2026-06-16
 
 ## Phase 0 Checklist
 <!--  -->
@@ -64,6 +64,8 @@
 - [x] Phase 4 completion sign-off (May 18, 2026)
 - [x] Phase 5 completion sign-off (May 28, 2026)
 - [x] Phase 6 completion sign-off (June 9, 2026)
+- [x] Phase 7 completion sign-off (June 15, 2026)
+- [x] Phase 8 completion sign-off (June 16, 2026)
 
 ## Phase 3: Cross-Encoder Reranking (Complete)
 - [x] Add `sentence-transformers` dependency (`pyproject.toml`)
@@ -173,3 +175,32 @@
 - [x] 8.4 Update `docs/milestones.md`
 - [x] 8.5 Create `apps/frontend/Dockerfile`
 - [x] 8.6 Update eval runners/scripts for new POST API
+
+## Phase 8: Serving & Inference Optimization (Complete)
+- [x] Epic 1: Unified LLM Abstraction Layer (`packages/llm_serving`)
+  - [x] Task 1.1: Standardize input/output interfaces (`LLMMessage`, `LLMRequest`, `LLMResponse`)
+  - [x] Task 1.2: Implement `VertexAIBackend` and `OpenAICompatibleBackend` wrappers
+  - [x] Task 1.3: Wrap client calls with a threshold-trip `CircuitBreaker`
+  - [x] Task 1.4: Integrate Redis-backed `ResponseCache` for query memorization
+- [x] Epic 2: Intelligent Model Router with SLO Enforcement
+  - [x] Task 2.1: Create `configs/models.yaml` mapping capabilities and latency tiers
+  - [x] Task 2.2: Implement dynamic model profile selection logic
+  - [x] Task 2.3: Wire model routing selection in multi-agent planning pipelines
+- [x] Epic 3: Prompt & Retrieval Depth Optimization
+  - [x] Task 3.1: Centralize prompts in `configs/prompts.yaml` (baseline, concise, detailed)
+  - [x] Task 3.2: Configure grid sweep testing matrix for parameters
+  - [x] Task 3.3: Select Option B (`concise` prompt, `top_k: 3`) as system default
+- [x] Epic 4: Serving Benchmark Harness
+  - [x] Task 4.1: Implement `ServingRunner` targeting router, caching, and breaker behaviors
+  - [x] Task 4.2: Register the runner in CLI and regression checking suites
+  - [x] Task 4.3: Add Makefile target `eval-serving` and unit tests
+- [x] Epic 5: Load Testing Infrastructure
+  - [x] Task 5.1: Create Locust load testing script (`scripts/load_test.py`) with session tracking
+  - [x] Task 5.2: Create compliance checker script (`scripts/load_test_report.py`) enforcing latency targets
+  - [x] Task 5.3: Add Makefile targets for headless load testing
+- [x] Epic 6: Inference Configuration & Environment
+  - [x] Task 6.1: Add serving env variables in `.env` and `.env.example`
+  - [x] Task 6.2: Configure interactive Locust service in `docker-compose.yml`
+- [x] Epic 7: Documentation & ADR
+  - [x] Task 7.1: Write ADR 0016 (LLM Abstraction Layer) and ADR 0017 (Model Routing Strategy)
+  - [x] Task 7.2: Create developer guide `docs/model-serving.md`
