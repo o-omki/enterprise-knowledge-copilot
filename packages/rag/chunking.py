@@ -50,7 +50,7 @@ def chunk_text_hierarchical(
     parent_chunk_size: int = 1500,
     child_chunk_size: int = 400,
     child_chunk_overlap: int = 100,
-    metadata: dict = None,
+    metadata: dict | None = None,
 ) -> list[Chunk]:
     if metadata is None:
         metadata = {}
