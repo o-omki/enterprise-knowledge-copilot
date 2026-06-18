@@ -1,0 +1,50 @@
+[
+  {
+    "scenario": "Fast search query with low latency requirement",
+    "capability": "fast_search",
+    "slo_priority": "latency",
+    "expected_model": "gemini-3.1-flash-lite"
+  },
+  {
+    "scenario": "Direct lookup query with quality priority",
+    "capability": "direct_lookup",
+    "slo_priority": "quality",
+    "expected_model": "gemini-3.5-flash"
+  },
+  {
+    "scenario": "Complex multi-hop synthesis with quality priority",
+    "capability": "multi_hop_synthesis",
+    "slo_priority": "quality",
+    "expected_model": "gemini-3.1-pro-preview"
+  },
+  {
+    "scenario": "Query decomposition with cost priority",
+    "capability": "decomposition",
+    "slo_priority": "cost",
+    "expected_model": "gemini-3.5-flash"
+  },
+  {
+    "scenario": "Comparative query with cost priority",
+    "capability": "comparative_query",
+    "slo_priority": "cost",
+    "expected_model": "gemini-3.1-pro-preview"
+  },
+  {
+    "scenario": "Routing query with cost priority",
+    "capability": "routing",
+    "slo_priority": "cost",
+    "expected_model": "gemini-3.1-flash-lite"
+  },
+  {
+    "scenario": "Ambiguous query with quality priority",
+    "capability": "ambiguous_query",
+    "slo_priority": "quality",
+    "expected_model": "gemini-3.1-pro-preview"
+  },
+  {
+    "scenario": "Complex reasoning query with latency priority",
+    "capability": "complex_reasoning",
+    "slo_priority": "latency",
+    "expected_model": "gemini-3.1-pro-preview"
+  }
+]
