@@ -43,7 +43,7 @@ from apps.evals.runners.base import EvalResult
 logger = logging.getLogger(__name__)
 
 
-RUNNER_NAMES = ["retrieval", "reranking", "generation", "safety", "latency"]
+RUNNER_NAMES = ["retrieval", "reranking", "generation", "safety", "latency", "serving"]
 
 
 def _get_runner(name: str, config):
@@ -68,6 +68,10 @@ def _get_runner(name: str, config):
         from apps.evals.runners.latency_runner import LatencyRunner
 
         return LatencyRunner(config)
+    elif name == "serving":
+        from apps.evals.runners.serving_runner import ServingRunner
+
+        return ServingRunner(config)
     else:
         raise ValueError(f"Unknown runner: {name}. Valid: {RUNNER_NAMES}")
 
