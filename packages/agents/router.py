@@ -1,7 +1,7 @@
-from google import genai
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
 from packages.observability import get_tracer
 
 from .schema import RoutingDecision
@@ -10,30 +10,15 @@ tracer = get_tracer(__name__)
 
 
 class RouterConfig(BaseSettings):
-    project_id: str = Field(alias="GCP_PROJECT_ID")
-    location: str = Field(alias="GCP_LOCATION", default="global")
-    routing_model_name: str = Field(
-        alias="GCP_ROUTING_MODEL", default="gemini-3.1-flash-lite-preview"
-    )
+    routing_model_name: str = Field(alias="GCP_ROUTING_MODEL", default="gemini-3.1-flash-lite")
 
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
 class QueryRouter:
-    def __init__(self, config: RouterConfig | None = None):
+    def __init__(self, llm_client: LLMClient, config: RouterConfig | None = None):
         self.config = config or RouterConfig()
-        self._genai_client = None
-
-    @property
-    def genai_client(self):
-        """Lazy loader for the genai client."""
-        if self._genai_client is None:
-            self._genai_client = genai.Client(
-                vertexai=True,
-                project=self.config.project_id,
-                location=self.config.location,
-            )
-        return self._genai_client
+        self.llm_client = llm_client
 
     async def route(self, query: str) -> RoutingDecision:
         """Route the query to one of the defined QueryType categories."""
@@ -50,16 +35,15 @@ class QueryRouter:
             """
 
             try:
-                response = await self.genai_client.aio.models.generate_content(
+                req = LLMRequest(
+                    messages=[LLMMessage(role="user", content=query)],
                     model=self.config.routing_model_name,
-                    contents=query,
-                    config={
-                        "system_instruction": prompt,
-                        "response_mime_type": "application/json",
-                        "response_schema": RoutingDecision,
-                        "temperature": 0.1,
-                    },
+                    temperature=0.1,
+                    system_instruction=prompt,
+                    response_mime_type="application/json",
+                    response_schema=RoutingDecision,
                 )
+                response = await self.llm_client.generate(req)
 
                 decision: RoutingDecision = response.parsed
 

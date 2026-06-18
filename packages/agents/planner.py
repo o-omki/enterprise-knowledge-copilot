@@ -1,7 +1,7 @@
-from google import genai
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
 from packages.observability import get_tracer
 
 from .schema import DecompositionResult
@@ -10,8 +10,6 @@ tracer = get_tracer(__name__)
 
 
 class DecomposerConfig(BaseSettings):
-    project_id: str = Field(alias="GCP_PROJECT_ID")
-    location: str = Field(alias="GCP_LOCATION", default="global")
     decomposition_model_name: str = Field(
         alias="GCP_DECOMPOSITION_MODEL", default="gemini-3-flash-preview"
     )
@@ -20,20 +18,9 @@ class DecomposerConfig(BaseSettings):
 
 
 class DecomposerAgent:
-    def __init__(self, config: DecomposerConfig | None = None):
+    def __init__(self, llm_client: LLMClient, config: DecomposerConfig | None = None):
         self.config = config or DecomposerConfig()
-        self._genai_client = None
-
-    @property
-    def genai_client(self):
-        """Lazy loader for the genai client."""
-        if self._genai_client is None:
-            self._genai_client = genai.Client(
-                vertexai=True,
-                project=self.config.project_id,
-                location=self.config.location,
-            )
-        return self._genai_client
+        self.llm_client = llm_client
 
     async def decompose(self, query: str) -> DecompositionResult:
         """Break down a complex or comparative query into atomic, standalone sub-queries."""
@@ -58,16 +45,15 @@ class DecomposerAgent:
             """
 
             try:
-                response = await self.genai_client.aio.models.generate_content(
+                req = LLMRequest(
+                    messages=[LLMMessage(role="user", content=query)],
                     model=self.config.decomposition_model_name,
-                    contents=query,
-                    config={
-                        "system_instruction": system_instruction,
-                        "response_mime_type": "application/json",
-                        "response_schema": DecompositionResult,
-                        "temperature": 0.1,
-                    },
+                    temperature=0.1,
+                    system_instruction=system_instruction,
+                    response_mime_type="application/json",
+                    response_schema=DecompositionResult,
                 )
+                response = await self.llm_client.generate(req)
 
                 decision: DecompositionResult = response.parsed
 

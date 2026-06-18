@@ -17,18 +17,20 @@ The system answers enterprise knowledge queries using grounded retrieval, rankin
 11. API Layer
 12. Frontend/UI
 13. Deployment Infrastructure
+14. LLM Serving & Abstraction Layer (Model Client, Response Cache, Circuit Breaker, Router)
 
 ## Request Flow
 1. User submits a query through UI or API.
-2. Query router decides whether the request is direct, ambiguous, or multi-hop.
-3. Planner optionally decomposes the query.
-4. Retrieval layer fetches candidate chunks using sparse and dense search.
-5. Reranker scores and reorders retrieved candidates.
-6. Safety checks inspect query and context.
-7. Generation layer produces answer using grounded evidence.
-8. Citation formatter attaches source references.
-9. Observability stack records metrics, traces, and logs.
-10. Response returns to UI.
+2. Model Router selects the optimal model profile based on complexity and SLO priorities.
+3. Query router decides whether the request is direct, ambiguous, or multi-hop.
+4. Planner optionally decomposes the query.
+5. Retrieval layer fetches candidate chunks using sparse and dense search.
+6. Reranker scores and reorders retrieved candidates.
+7. Safety checks inspect query and context.
+8. Generation layer produces answer using grounded evidence, routing requests through the `LLMClient` (with Redis caching and Circuit Breaker gates).
+9. Citation formatter attaches source references.
+10. Observability stack records metrics, traces, and logs.
+11. Response returns to UI.
 
 ## Offline Flows
 - document ingestion and indexing
@@ -39,6 +41,7 @@ The system answers enterprise knowledge queries using grounded retrieval, rankin
 ## Storage and Infra
 - vector database for dense retrieval
 - relational or document DB for metadata
+- Redis for response caching and rate-limiting states
 - object storage for source documents and artifacts
 - metrics/logging/tracing backend
 - model serving backend for inference

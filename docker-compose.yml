@@ -113,6 +113,21 @@ services:
     depends_on:
       - api
 
+  locust:
+    image: python:3.11
+    working_dir: /workspace
+    volumes:
+      - ./:/workspace
+    command: >
+      bash -lc "pip install --upgrade pip && pip install -e .[dev] &&
+      locust -f scripts/load_test.py --host http://api:8000"
+    ports:
+      - "8089:8089"
+    env_file:
+      - .env
+    depends_on:
+      - api
+
 volumes:
   postgres_data:
 

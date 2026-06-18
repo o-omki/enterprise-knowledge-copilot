@@ -37,6 +37,7 @@ def mock_db_session():
     """Fixture to mock database session and query results."""
     with patch("apps.api.app.main.async_session_maker") as mock_maker:
         mock_session = AsyncMock()
+        mock_session.add = MagicMock()
         mock_result = MagicMock()
         mock_session.execute.return_value = mock_result
 

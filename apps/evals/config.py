@@ -20,6 +20,7 @@ class DatasetPaths(BaseModel):
     generation: str = "data/eval/generation/golden_qa.json"
     agentic: str = "data/eval/agentic/ground_truth.json"
     safety: str = "data/eval/safety/static_adversarial_dataset.json"
+    serving: str = "data/eval/serving/test_cases.json"
 
 
 class JudgeConfig(BaseModel):
@@ -58,6 +59,12 @@ class LatencyRegressionThresholds(BaseModel):
     p95_generation_ms_max: float = 5000.0
 
 
+class ServingRegressionThresholds(BaseModel):
+    cache_hit_rate_min: float = 80.0
+    router_accuracy_min: float = 90.0
+    circuit_breaker_trip_rate_min: float = 100.0
+
+
 class RegressionThresholds(BaseModel):
     retrieval: RetrievalRegressionThresholds = Field(
         default_factory=RetrievalRegressionThresholds,
@@ -71,11 +78,20 @@ class RegressionThresholds(BaseModel):
     latency: LatencyRegressionThresholds = Field(
         default_factory=LatencyRegressionThresholds,
     )
+    serving: ServingRegressionThresholds = Field(
+        default_factory=ServingRegressionThresholds,
+    )
 
 
 class CostConfig(BaseModel):
     input_rate_per_million: float = 0.075
     output_rate_per_million: float = 0.30
+
+
+class SweepConfig(BaseModel):
+    top_k: list[int] = Field(default_factory=lambda: [3, 5, 10])
+    prompt_versions: list[str] = Field(default_factory=lambda: ["baseline", "concise", "detailed"])
+    output_dir: str = "data/eval/reports/sweep"
 
 
 class EvalConfig(BaseSettings):
@@ -97,6 +113,7 @@ class EvalConfig(BaseSettings):
     reports: ReportConfig = Field(default_factory=ReportConfig)
     regression: RegressionThresholds = Field(default_factory=RegressionThresholds)
     cost: CostConfig = Field(default_factory=CostConfig)
+    sweep: SweepConfig = Field(default_factory=SweepConfig)
 
     model_config = SettingsConfigDict(
         env_prefix="EVAL_",

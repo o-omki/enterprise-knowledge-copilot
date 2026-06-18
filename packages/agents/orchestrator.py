@@ -4,6 +4,9 @@ import logging
 from packages.agents.planner import DecomposerAgent
 from packages.agents.router import QueryRouter
 from packages.agents.schema import QueryType
+from packages.llm_serving import LLMClient
+from packages.llm_serving.router import ModelRouter
+from packages.llm_serving.slo import SLOConfig
 from packages.observability import get_tracer
 from packages.rag.generation import AnswerResponse, GenerationService
 from packages.rag.reranker import RerankerService
@@ -25,12 +28,16 @@ class QueryOrchestrator:
         search_service: SearchService,
         generation_service: GenerationService,
         reranker_service: RerankerService,
+        llm_client: LLMClient,
+        model_router: ModelRouter | None = None,
     ):
         self.search_service = search_service
         self.generation_service = generation_service
         self.reranker_service = reranker_service
-        self.router = QueryRouter()
-        self.decomposer = DecomposerAgent()
+        self.router = QueryRouter(llm_client=llm_client)
+        self.decomposer = DecomposerAgent(llm_client=llm_client)
+        self.model_router = model_router or ModelRouter()
+        self.slo_config = SLOConfig()
 
     async def answer_query(
         self,
@@ -98,9 +105,16 @@ class QueryOrchestrator:
                 capped_results = aggregated_results[: limit * 2]
                 agg_span.set_attribute("total_unique_chunks", len(capped_results))
 
+            selected_model = self.model_router.select_model(
+                routing_decision.query_type.value, self.slo_config
+            )
+
             with tracer.start_as_current_span("synthesize_answer"):
                 response = await self.generation_service.generate_answer(
-                    query=query, search_results=capped_results, chat_history=chat_history
+                    query=query,
+                    search_results=capped_results,
+                    chat_history=chat_history,
+                    model_override=selected_model.name,
                 )
 
             response.metadata = {
@@ -156,9 +170,13 @@ class QueryOrchestrator:
 
             capped_results = aggregated_results[: limit * 2]
 
+            selected_model = self.model_router.select_model(
+                routing_decision.query_type.value, self.slo_config
+            )
+
             with tracer.start_as_current_span("synthesize_answer_stream"):
                 async for event in self.generation_service.generate_answer_stream(
-                    query=query, search_results=capped_results
+                    query=query, search_results=capped_results, model_override=selected_model.name
                 ):
                     if event.get("type") == "done":
                         event["metadata"] = {

@@ -168,6 +168,30 @@ def _build_threshold_checks(config: EvalConfig) -> list[dict[str, Any]]:
         ]
     )
 
+    # Serving thresholds
+    checks.extend(
+        [
+            {
+                "runner": "serving",
+                "metric": "cache_hit_rate",
+                "threshold": reg.serving.cache_hit_rate_min,
+                "direction": "min",
+            },
+            {
+                "runner": "serving",
+                "metric": "router_accuracy",
+                "threshold": reg.serving.router_accuracy_min,
+                "direction": "min",
+            },
+            {
+                "runner": "serving",
+                "metric": "circuit_breaker_trip_rate",
+                "threshold": reg.serving.circuit_breaker_trip_rate_min,
+                "direction": "min",
+            },
+        ]
+    )
+
     return checks
 
 
