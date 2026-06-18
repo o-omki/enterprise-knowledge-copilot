@@ -3,7 +3,7 @@ import logging
 import os
 import uuid
 from contextlib import asynccontextmanager
-from typing import Literal
+from typing import Literal, cast
 
 from celery.result import AsyncResult
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
@@ -305,7 +305,7 @@ async def get_session_messages(session_id: str, request: Request):
                     id=fb.id,
                     message_id=fb.message_id,
                     session_id=fb.session_id,
-                    rating=fb.rating,
+                    rating=cast(Literal["up", "down"], fb.rating),
                     comment=fb.comment,
                     created_at=fb.created_at.isoformat(),
                 )
@@ -353,7 +353,7 @@ async def submit_feedback(message_id: str, req: FeedbackRequest, request: Reques
                 id=feedback.id,
                 message_id=feedback.message_id,
                 session_id=feedback.session_id,
-                rating=feedback.rating,
+                rating=cast(Literal["up", "down"], feedback.rating),
                 comment=feedback.comment,
                 created_at=feedback.created_at.isoformat(),
             )
