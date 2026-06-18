@@ -14,7 +14,7 @@ class SearchConfig(BaseSettings):
     qdrant_url: str = "http://localhost:6333"
     vector_size: int = 768
 
-    project_id: str = Field(alias="GCP_PROJECT_ID")
+    project_id: str = Field(alias="GCP_PROJECT_ID", default="")
     location: str = Field(alias="GCP_LOCATION", default="global")
     embedding_model_name: str = Field(alias="GCP_EMBEDDING_MODEL", default="gemini-embedding-2")
 
