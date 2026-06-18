@@ -1,0 +1,164 @@
+[
+  {
+    "prompt_version": "baseline",
+    "top_k": 3,
+    "metrics": {
+      "correctness": 0.9479,
+      "faithfulness": 1.0,
+      "completeness": 0.8958,
+      "citation_quality": 0.9028,
+      "conciseness": 0.9931,
+      "grounding": 0.9861,
+      "avg_latency_ms": 13839.5,
+      "total_input_tokens_est": 16242,
+      "total_output_tokens_est": 8063,
+      "estimated_cost_usd": 0.003637,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "baseline",
+    "top_k": 5,
+    "metrics": {
+      "correctness": 0.9444,
+      "faithfulness": 1.0,
+      "completeness": 0.9028,
+      "citation_quality": 0.8889,
+      "conciseness": 0.9931,
+      "grounding": 0.9444,
+      "avg_latency_ms": 14527.1,
+      "total_input_tokens_est": 25878,
+      "total_output_tokens_est": 8472,
+      "estimated_cost_usd": 0.004482,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "baseline",
+    "top_k": 10,
+    "metrics": {
+      "correctness": 0.9653,
+      "faithfulness": 1.0,
+      "completeness": 0.9236,
+      "citation_quality": 0.9306,
+      "conciseness": 1.0,
+      "grounding": 0.9167,
+      "avg_latency_ms": 14235.2,
+      "total_input_tokens_est": 47583,
+      "total_output_tokens_est": 9029,
+      "estimated_cost_usd": 0.006277,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "concise",
+    "top_k": 3,
+    "metrics": {
+      "correctness": 0.934,
+      "faithfulness": 1.0,
+      "completeness": 0.8646,
+      "citation_quality": 0.8993,
+      "conciseness": 0.9896,
+      "grounding": 0.9861,
+      "avg_latency_ms": 11456.4,
+      "total_input_tokens_est": 16389,
+      "total_output_tokens_est": 5454,
+      "estimated_cost_usd": 0.002865,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "concise",
+    "top_k": 5,
+    "metrics": {
+      "correctness": 0.9375,
+      "faithfulness": 1.0,
+      "completeness": 0.8785,
+      "citation_quality": 0.9097,
+      "conciseness": 0.9896,
+      "grounding": 0.9708,
+      "avg_latency_ms": 11588.9,
+      "total_input_tokens_est": 25577,
+      "total_output_tokens_est": 5570,
+      "estimated_cost_usd": 0.003589,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "concise",
+    "top_k": 10,
+    "metrics": {
+      "correctness": 0.9792,
+      "faithfulness": 1.0,
+      "completeness": 0.9201,
+      "citation_quality": 0.9236,
+      "conciseness": 0.9792,
+      "grounding": 0.9833,
+      "avg_latency_ms": 12208.7,
+      "total_input_tokens_est": 48475,
+      "total_output_tokens_est": 5969,
+      "estimated_cost_usd": 0.005426,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "detailed",
+    "top_k": 3,
+    "metrics": {
+      "correctness": 0.7917,
+      "faithfulness": 0.8611,
+      "completeness": 0.7674,
+      "citation_quality": 0.7917,
+      "conciseness": 0.9271,
+      "grounding": 0.7905,
+      "avg_latency_ms": 17598.1,
+      "total_input_tokens_est": 16542,
+      "total_output_tokens_est": 19056,
+      "estimated_cost_usd": 0.006957,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "detailed",
+    "top_k": 5,
+    "metrics": {
+      "correctness": 0.7674,
+      "faithfulness": 0.8333,
+      "completeness": 0.7431,
+      "citation_quality": 0.8021,
+      "conciseness": 0.9236,
+      "grounding": 0.7616,
+      "avg_latency_ms": 17351.6,
+      "total_input_tokens_est": 25432,
+      "total_output_tokens_est": 20276,
+      "estimated_cost_usd": 0.00799,
+      "queries_evaluated": 72,
+      "queries_failed": 0
+    }
+  },
+  {
+    "prompt_version": "detailed",
+    "top_k": 10,
+    "metrics": {
+      "correctness": 0.7676,
+      "faithfulness": 0.8028,
+      "completeness": 0.7394,
+      "citation_quality": 0.7711,
+      "conciseness": 0.9472,
+      "grounding": 0.7465,
+      "avg_latency_ms": 17442.5,
+      "total_input_tokens_est": 45204,
+      "total_output_tokens_est": 19003,
+      "estimated_cost_usd": 0.009091,
+      "queries_evaluated": 71,
+      "queries_failed": 1
+    }
+  }
+]
