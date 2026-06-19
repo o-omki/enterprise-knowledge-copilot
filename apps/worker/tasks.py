@@ -1,12 +1,12 @@
 import asyncio
 from pathlib import Path
 
+import structlog
 from celery import shared_task
-from celery.utils.log import get_task_logger
 
 from packages.rag.ingestion import Document, IngestionPipeline
 
-logger = get_task_logger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 async def _async_ingest(file_path_str: str, metadata: dict) -> dict:
@@ -58,11 +58,28 @@ def ingest_document(self, file_path: str, metadata: dict) -> dict:
 
     This runs the async pipeline using asyncio.run.
     """
-    logger.info(f"Ingesting file {file_path} with metadata: {metadata}")
+    structlog.contextvars.clear_contextvars()
+    structlog.contextvars.bind_contextvars(
+        task_id=self.request.id,
+        task_name=self.name,
+        file_path=file_path,
+    )
+
+    logger.info("worker.ingest.started", metadata=metadata)
     try:
         result = asyncio.run(_async_ingest(file_path, metadata))
-        logger.info(f"Successfully completed ingestion for {file_path}. Result: {result}")
+        logger.info(
+            "worker.ingest.completed",
+            chunks_indexed=result.get("chunks_indexed", 0),
+        )
         return result
     except Exception as e:
-        logger.exception(f"Error occurred during ingestion of {file_path}: {e}")
+        logger.error(
+            "worker.ingest.failed",
+            error=str(e),
+            retry_count=self.request.retries,
+            exc_info=True,
+        )
         raise self.retry(exc=e)
+    finally:
+        structlog.contextvars.clear_contextvars()

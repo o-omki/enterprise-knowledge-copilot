@@ -1,8 +1,8 @@
 import hashlib
-import logging
 import os
 
 import jwt
+import structlog
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from sqlalchemy import select
@@ -20,7 +20,7 @@ if JWT_SECRET_KEY is None:
 if JWT_ALGORITHM is None:
     raise ValueError("[ENCRYPTION ERROR] - JWT_ALGORITHM is not set.")
 
-logger = logging.getLogger("apps.api.middleware.auth")
+logger = structlog.get_logger(__name__)
 
 
 class MultiAuthMiddleware(BaseHTTPMiddleware):
@@ -55,7 +55,7 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
         api_key_header = request.headers.get("X-API-Key")
 
         if not auth_header and not api_key_header:
-            logger.warning(f"Missing authentication for request to {path}")
+            logger.warning("auth.missing", path=path)
             return JSONResponse(
                 status_code=401,
                 content={
@@ -80,9 +80,9 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
                         raise ValueError("User not found")
 
                     request.state.user_id = user.id
-                    logger.info(f"Authenticated request to {path} using JWT User ID {user.id}")
+                    logger.info("auth.authenticated", auth_type="jwt", user_id=user.id, path=path)
                 except Exception as e:
-                    logger.warning(f"Invalid JWT for request to {path}: {e}")
+                    logger.warning("auth.rejected", auth_type="jwt", error=str(e), path=path)
                     return JSONResponse(
                         status_code=401,
                         content={
@@ -99,7 +99,9 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
                     api_key_record = result.scalar_one_or_none()
 
                     if not api_key_record:
-                        logger.warning(f"Invalid API key hash for request to {path}")
+                        logger.warning(
+                            "auth.rejected", auth_type="api_key", reason="invalid_key", path=path
+                        )
                         return JSONResponse(
                             status_code=401,
                             content={"detail": "Invalid API key", "error_code": "UNAUTHORIZED"},
@@ -107,10 +109,13 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
 
                     request.state.api_key_id = api_key_record.id
                     logger.info(
-                        f"Authenticated request to {path} using API Key ID {api_key_record.id}"
+                        "auth.authenticated",
+                        auth_type="api_key",
+                        api_key_id=api_key_record.id,
+                        path=path,
                     )
                 except Exception as e:
-                    logger.error(f"Error during API key validation: {e}", exc_info=True)
+                    logger.error("auth.error", auth_type="api_key", error=str(e), exc_info=True)
                     return JSONResponse(
                         status_code=500,
                         content={

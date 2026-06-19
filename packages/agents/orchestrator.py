@@ -1,5 +1,6 @@
 import asyncio
-import logging
+
+import structlog
 
 from packages.agents.planner import DecomposerAgent
 from packages.agents.router import QueryRouter
@@ -12,7 +13,7 @@ from packages.rag.generation import AnswerResponse, GenerationService
 from packages.rag.reranker import RerankerService
 from packages.rag.search import SearchService
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 tracer = get_tracer(__name__)
 
 
@@ -51,6 +52,9 @@ class QueryOrchestrator:
     ) -> AnswerResponse:
         """Executes the full agentic RAG loop using traces to link steps."""
 
+        logger.info(
+            "orchestrator.query.started", query=query, limit=limit, method=method, rerank=rerank
+        )
         with tracer.start_as_current_span("orchestrate_query") as span:
             span.set_attribute("query", query)
             span.set_attribute("params.limit", limit)
@@ -60,6 +64,10 @@ class QueryOrchestrator:
             trace_id = format(span.get_span_context().trace_id, "032x")
 
             routing_decision = await self.router.route(query=query)
+            logger.info(
+                "orchestrator.routing.completed",
+                query_type=routing_decision.query_type.value,
+            )
 
             sub_queries = [query]
             if routing_decision.query_type in [
@@ -68,6 +76,11 @@ class QueryOrchestrator:
             ]:
                 decomp_result = await self.decomposer.decompose(query=query)
                 sub_queries = decomp_result.sub_queries
+                logger.info(
+                    "orchestrator.query.decomposed",
+                    sub_query_count=len(sub_queries),
+                    sub_queries=sub_queries,
+                )
 
             with tracer.start_as_current_span("parallel_search_and_rerank") as agg_span:
                 fetch_limit = limit * 2 if rerank else limit
@@ -104,11 +117,13 @@ class QueryOrchestrator:
 
                 capped_results = aggregated_results[: limit * 2]
                 agg_span.set_attribute("total_unique_chunks", len(capped_results))
+                logger.info("orchestrator.search.completed", chunks_retrieved=len(capped_results))
 
             selected_model = self.model_router.select_model(
                 routing_decision.query_type.value, self.slo_config
             )
 
+            logger.info("orchestrator.synthesis.completed", model_name=selected_model.name)
             with tracer.start_as_current_span("synthesize_answer"):
                 response = await self.generation_service.generate_answer(
                     query=query,
@@ -133,11 +148,23 @@ class QueryOrchestrator:
         rerank: bool = False,
     ):
         """Executes the full agentic RAG loop and streams the synthesis."""
+        logger.info(
+            "orchestrator.query_stream.started",
+            query=query,
+            limit=limit,
+            method=method,
+            rerank=rerank,
+        )
         with tracer.start_as_current_span("orchestrate_query_stream") as span:
             span.set_attribute("query", query)
             trace_id = format(span.get_span_context().trace_id, "032x")
 
             routing_decision = await self.router.route(query=query)
+            logger.info(
+                "orchestrator.routing.completed",
+                query_type=routing_decision.query_type.value,
+            )
+
             sub_queries = [query]
             if routing_decision.query_type in [
                 QueryType.MULTI_HOP_SYNTHESIS,
@@ -145,6 +172,11 @@ class QueryOrchestrator:
             ]:
                 decomp_result = await self.decomposer.decompose(query=query)
                 sub_queries = decomp_result.sub_queries
+                logger.info(
+                    "orchestrator.query.decomposed",
+                    sub_query_count=len(sub_queries),
+                    sub_queries=sub_queries,
+                )
 
             fetch_limit = limit * 2 if rerank else limit
 
@@ -169,11 +201,13 @@ class QueryOrchestrator:
                         aggregated_results.append(res)
 
             capped_results = aggregated_results[: limit * 2]
+            logger.info("orchestrator.search.completed", chunks_retrieved=len(capped_results))
 
             selected_model = self.model_router.select_model(
                 routing_decision.query_type.value, self.slo_config
             )
 
+            logger.info("orchestrator.synthesis_stream.started", model_name=selected_model.name)
             with tracer.start_as_current_span("synthesize_answer_stream"):
                 async for event in self.generation_service.generate_answer_stream(
                     query=query, search_results=capped_results, model_override=selected_model.name

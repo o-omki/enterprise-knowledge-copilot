@@ -1,6 +1,6 @@
-import logging
 from pathlib import Path
 
+import structlog
 import yaml
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -8,7 +8,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
 from packages.rag.search import SearchResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class GenerationConfig(BaseSettings):
@@ -46,7 +46,7 @@ class GenerationService:
             self.prompts = prompts_data.get("rag", {}).get("generation", {})
         else:
             self.prompts = {}
-            logger.warning(f"Prompts file not found at {prompt_config_path}")
+            logger.warning("generation.prompt_config_missing", path=str(prompt_config_path))
 
     async def generate_answer(
         self,
@@ -102,10 +102,13 @@ class GenerationService:
             query=query,
         )
 
+        selected_model = model_override or self.config.generation_model_name
+        logger.info("generation.started", model=selected_model, context_length=len(search_results))
+
         try:
             req = LLMRequest(
                 messages=[LLMMessage(role="user", content=user_prompt)],
-                model=model_override or self.config.generation_model_name,
+                model=selected_model,
                 temperature=0.2,
                 max_tokens=2048,
                 system_instruction=system_instruction,
@@ -113,8 +116,7 @@ class GenerationService:
             response = await self.llm_client.generate(req)
 
         except Exception as e:
-            logger.exception(f"Failed to generate answer for query: {query}")
-
+            logger.error("generation.failed", model=selected_model, error=str(e), exc_info=True)
             raise RuntimeError(f"Generation failed: {e}") from e
 
         else:
@@ -126,6 +128,7 @@ class GenerationService:
             except Exception:
                 answer_text = "I cannot answer this question due to safety policy restrictions."
 
+            logger.info("generation.completed", model=selected_model)
             return AnswerResponse(
                 answer=answer_text,
                 citations=citations_meta,
@@ -186,10 +189,18 @@ class GenerationService:
             query=query,
         )
 
+        selected_model = model_override or self.config.generation_model_name
+        logger.info(
+            "generation.started",
+            model=selected_model,
+            context_length=len(search_results),
+            stream=True,
+        )
+
         try:
             req = LLMRequest(
                 messages=[LLMMessage(role="user", content=user_prompt)],
-                model=model_override or self.config.generation_model_name,
+                model=selected_model,
                 temperature=0.2,
                 max_tokens=2048,
                 system_instruction=system_instruction,
@@ -199,6 +210,7 @@ class GenerationService:
                 if chunk.text:
                     yield {"type": "chunk", "text": chunk.text}
 
+            logger.info("generation.completed", model=selected_model, stream=True)
             yield {
                 "type": "done",
                 "citations": citations_meta,
@@ -206,5 +218,7 @@ class GenerationService:
             }
 
         except Exception as e:
-            logger.exception(f"Failed to generate answer for query: {query}")
+            logger.error(
+                "generation.failed", model=selected_model, error=str(e), stream=True, exc_info=True
+            )
             yield {"type": "error", "message": f"Generation failed: {e}"}

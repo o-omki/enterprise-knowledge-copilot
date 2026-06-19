@@ -1,10 +1,10 @@
 import datetime
-import logging
 import os
 import uuid
 from contextlib import asynccontextmanager
 from typing import Literal, cast
 
+import structlog
 from celery.result import AsyncResult
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
@@ -14,6 +14,7 @@ from sqlalchemy.orm import selectinload
 
 from apps.api.app.middleware.auth import MultiAuthMiddleware
 from apps.api.app.middleware.rate_limiter import RateLimiterMiddleware
+from apps.api.app.middleware.request_context import RequestContextMiddleware
 from apps.api.app.middleware.safety import SafetyGuardrailsMiddleware
 from apps.api.app.routers.auth import router as auth_router
 from apps.api.app.schemas import (
@@ -34,7 +35,7 @@ from packages.agents.orchestrator import QueryOrchestrator
 from packages.llm_serving import LLMClient
 from packages.llm_serving.cost_tracker import CostTracker
 from packages.llm_serving.router import ModelRouter
-from packages.observability import setup_tracing
+from packages.observability import configure_logging, setup_tracing
 from packages.rag.generation import GenerationService
 from packages.rag.reranker import RerankerService
 from packages.rag.search import SearchService
@@ -42,8 +43,8 @@ from packages.shared.database import async_session_maker
 from packages.shared.feedback import FeedbackService
 from packages.shared.orm_models import Message, Session
 
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+configure_logging("api", os.getenv("LOG_LEVEL", "INFO"))
+logger = structlog.get_logger(__name__)
 
 
 redis_url = os.getenv("REDIS_URL", "redis://localhost:6379/0")
@@ -69,25 +70,25 @@ orchestrator = QueryOrchestrator(
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Warm up lazy-loaded models and client connections
-    logger.info("Initializing and pre-warming SearchService models and LLM connections...")
+    logger.info("startup.prewarm_started")
     try:
         # Accessing these properties forces lazy loading to execute immediately on server startup
         _ = search_service.sparse_model
-        logger.info("FastEmbed sparse model pre-warmed successfully.")
+        logger.info("startup.sparse_model_prewarmed")
     except Exception as e:
-        logger.error(f"Failed to pre-warm sparse model during startup: {e}")
+        logger.error("startup.sparse_model_prewarm_failed", error=str(e), exc_info=True)
 
     try:
         # Triggers genai.Client initialization and connection warming
         _ = search_service.genai_client
-        logger.info("Google GenAI client initialized successfully.")
+        logger.info("startup.genai_client_initialized")
     except Exception as e:
-        logger.error(f"Failed to initialize GenAI client during startup: {e}")
+        logger.error("startup.genai_client_init_failed", error=str(e), exc_info=True)
 
     yield
     # Shutdown: Clean up open connections
     await redis_client.close()
-    logger.info("API server shutting down. Closed Redis connection.")
+    logger.info("shutdown.completed")
 
 
 app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0", lifespan=lifespan)
@@ -95,11 +96,12 @@ app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0", lifespa
 setup_tracing(app)
 
 # Middlewares are executed in reverse order of addition:
-# Request -> ApiKeyAuth -> RateLimiter -> Safety -> Router
+# Request -> RequestContext -> ApiKeyAuth -> RateLimiter -> Safety -> Router
 guardrails_url = os.getenv("GUARDRAILS_SERVICE_URL", "http://guardrails:8001")
 app.add_middleware(SafetyGuardrailsMiddleware, service_url=guardrails_url)
 app.add_middleware(RateLimiterMiddleware)
 app.add_middleware(MultiAuthMiddleware)
+app.add_middleware(RequestContextMiddleware)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -143,7 +145,7 @@ async def search(req: SearchRequest) -> SearchResponse:
 async def ask(request: Request, req: AskRequest):
     """Answers a question using LLM generation and knowledge base context with citations."""
     try:
-        logger.info(f"Processing query: {req.query}")
+        logger.info("ask.query_received", query=req.query)
 
         user_id = getattr(request.state, "user_id", None)
         api_key_id = getattr(request.state, "api_key_id", None)
@@ -217,7 +219,7 @@ async def ask(request: Request, req: AskRequest):
             return AskResponse(**response_dict)
 
     except Exception as e:
-        logger.error(f"Error in ask endpoint: {str(e)}", exc_info=True)
+        logger.error("ask.failed", error=str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=str(e))
 
 
@@ -360,7 +362,7 @@ async def submit_feedback(message_id: str, req: FeedbackRequest, request: Reques
         except ValueError as e:
             raise HTTPException(status_code=404, detail=str(e))
         except Exception as e:
-            logger.error(f"Failed to submit feedback: {e}", exc_info=True)
+            logger.error("feedback.submit_failed", error=str(e), exc_info=True)
             raise HTTPException(status_code=500, detail="Failed to submit feedback")
 
 
@@ -391,18 +393,18 @@ async def upload_document(
             while chunk := await file.read(1024 * 1024):  # 1MB chunks
                 buffer.write(chunk)
     except Exception as e:
-        logger.error(f"Failed to save uploaded file: {e}", exc_info=True)
+        logger.error("upload.save_failed", error=str(e), filename=filename, exc_info=True)
         raise HTTPException(status_code=500, detail="Failed to save uploaded file.")
 
     abs_path = os.path.abspath(dest_path)
     try:
         task = ingest_document.delay(abs_path, {"domain": domain, "doc_type": doc_type})
-        logger.info(f"Dispatched ingestion task {task.id} for file {abs_path}")
+        logger.info("upload.task_dispatched", job_id=task.id, path=abs_path)
         return UploadResponse(
             job_id=task.id, status="queued", message="Document ingestion successfully queued."
         )
     except Exception as e:
-        logger.error(f"Failed to dispatch Celery task: {e}", exc_info=True)
+        logger.error("upload.dispatch_failed", error=str(e), path=abs_path, exc_info=True)
         if os.path.exists(dest_path):
             os.remove(dest_path)
         raise HTTPException(status_code=500, detail="Failed to dispatch background ingestion task.")
@@ -434,7 +436,7 @@ async def get_job_status(job_id: str) -> JobStatusResponse:
 
         return JobStatusResponse(job_id=job_id, status=status, result=result, error=error)
     except Exception as e:
-        logger.error(f"Failed to query job status for {job_id}: {e}", exc_info=True)
+        logger.error("job.query_status_failed", job_id=job_id, error=str(e), exc_info=True)
         raise HTTPException(status_code=500, detail=f"Failed to retrieve status for job: {job_id}")
 
 

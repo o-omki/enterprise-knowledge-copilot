@@ -1,5 +1,4 @@
-import logging
-
+import structlog
 from fastembed import SparseTextEmbedding
 from google import genai
 from google.genai import types
@@ -7,7 +6,7 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client import AsyncQdrantClient
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class SearchConfig(BaseSettings):
@@ -76,6 +75,7 @@ class SearchService:
         method: str = "dense",
     ) -> list[SearchResult]:
         """Performs vector search in the global collection with optional payload filtering."""
+        logger.info("retrieval.started", method=method, domain=domain, doc_type=doc_type)
         from qdrant_client.http import models
 
         collection_name = "enterprise_knowledge"
@@ -140,6 +140,14 @@ class SearchService:
         )
 
         latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+        logger.info(
+            "retrieval.completed",
+            method=method,
+            domain=domain,
+            doc_type=doc_type,
+            result_count=len(results.points),
+            latency_ms=latency_ms,
+        )
 
         return [
             SearchResult(

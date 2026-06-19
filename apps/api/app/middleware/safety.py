@@ -1,13 +1,13 @@
 import json
-import logging
 
+import structlog
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from packages.safety import SafetyGuardrailsClient, verify_citations_bounds
 
-logger = logging.getLogger("apps.api.middleware.safety")
+logger = structlog.get_logger(__name__)
 
 
 class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
@@ -59,31 +59,33 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
             request._receive = receive
             return await call_next(request)
 
-        logger.info(f"[SafetyMiddleware] Intercepted input query: {query}")
+        logger.info("safety.input.checking", query=query)
 
         input_result = await self.safety_client.validate_input(query)
+        is_safe = input_result.get("is_safe", True)
+        is_off_topic = input_result.get("is_off_topic", False)
 
         # Block if unsafe or off-topic
-        if not input_result.get("is_safe", True) or input_result.get("is_off_topic", False):
+        if not is_safe or is_off_topic:
             refusal = (
                 input_result.get("refusal_message")
                 or "I cannot fulfill this request as it violates enterprise security policies."
             )
-            logger.warning(
-                f"[SafetyMiddleware] Blocked unsafe/off-topic input query: {query}."
-                f"Reason: {refusal}"
-            )
+            logger.warning("safety.blocked", check_type="input", reason=refusal)
             return JSONResponse(
                 status_code=400,
                 content={"detail": refusal, "error_code": "SAFETY_POLICY_VIOLATION", "safe": False},
             )
 
+        logger.info("safety.input.checked", is_safe=is_safe, is_off_topic=is_off_topic)
+
         # PII Masking
         filtered_query = input_result.get("filtered_query", query)
         if filtered_query != query:
             logger.info(
-                f"[SafetyMiddleware] Masked PII in input query. "
-                f"Original: {query} -> Filtered: {filtered_query}"
+                "safety.input.pii_masked",
+                original=query,
+                filtered=filtered_query,
             )
             body_json["query"] = filtered_query
             new_body = json.dumps(body_json).encode("utf-8")
@@ -125,8 +127,9 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                     if answer:
                         if not verify_citations_bounds(answer, len(citations)):
                             logger.warning(
-                                "[SafetyMiddleware] Citation out-of-bounds detected locally! "
-                                "Blocking response."
+                                "safety.blocked",
+                                check_type="citation_bounds",
+                                reason="citation out of bounds",
                             )
                             refusal = (
                                 "I'm sorry, but I cannot verify this information with internal "
@@ -136,21 +139,22 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                             response_json["citations"] = []
                             body_bytes_out = json.dumps(response_json).encode("utf-8")
                         elif context_chunks:
-                            logger.info(
-                                "[SafetyMiddleware] Validating grounding for generated answer."
-                            )
+                            logger.info("safety.output.checking", filtered_query=filtered_query)
                             output_result = await self.safety_client.validate_output(
                                 query=filtered_query, answer=answer, context=context_chunks
                             )
+                            is_grounded = output_result.get("is_grounded", True)
+                            logger.info("safety.output.checked", is_grounded=is_grounded)
 
-                            if not output_result.get("is_grounded", True):
+                            if not is_grounded:
                                 refusal = output_result.get("refusal_message") or (
                                     "I'm sorry, but I cannot verify this information with "
                                     "internal sources. Please try rephrasing your query."
                                 )
                                 logger.warning(
-                                    "[SafetyMiddleware] Hallucination detected! Answer was "
-                                    "ungrounded. Replacing with refusal."
+                                    "safety.blocked",
+                                    check_type="output_grounding",
+                                    reason="hallucination detected",
                                 )
                                 response_json["answer"] = refusal
                                 response_json["citations"] = []
@@ -169,7 +173,9 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                 )
             except Exception as out_err:
                 logger.error(
-                    f"[SafetyMiddleware] Error in output grounding interceptor: {out_err}",
+                    "safety.error",
+                    check_type="output",
+                    error=str(out_err),
                     exc_info=True,
                 )
 

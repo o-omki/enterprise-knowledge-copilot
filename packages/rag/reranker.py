@@ -13,16 +13,16 @@ async FastAPI handler without blocking the event loop.
 """
 
 import asyncio
-import logging
 import time
 
+import structlog
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sentence_transformers import CrossEncoder
 
 from packages.rag.search import SearchResult
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class RerankerConfig(BaseSettings):
@@ -59,9 +59,9 @@ class RerankerService:
     def model(self) -> CrossEncoder:
         """Lazy-load the cross-encoder model (downloaded once, then cached)."""
         if self._model is None:
-            logger.info("Loading cross-encoder model: %s", self.config.model_name)
+            logger.info("reranker.loading_model", model_name=self.config.model_name)
             self._model = CrossEncoder(self.config.model_name)
-            logger.info("Cross-encoder model loaded.")
+            logger.info("reranker.model_loaded", model_name=self.config.model_name)
         return self._model
 
     def rerank(
@@ -85,17 +85,18 @@ class RerankerService:
         if not results:
             return results
 
+        logger.info("reranking.started", candidate_count=len(results), top_k=top_k)
         pairs = [(query, r.text) for r in results]
 
         start = time.perf_counter()
         scores: list[float] = list(self.model.predict(pairs))
         latency_ms = round((time.perf_counter() - start) * 1000, 2)
 
-        logger.debug(
-            "Reranker scored %d candidates in %.3f ms (query: %.60s…)",
-            len(results),
-            latency_ms,
-            query,
+        logger.info(
+            "reranking.completed",
+            candidate_count=len(results),
+            top_k=top_k,
+            latency_ms=latency_ms,
         )
 
         for result, score in zip(results, scores):
@@ -121,8 +122,10 @@ class RerankerService:
         not stall the FastAPI event loop.
         """
         if not self.config.enabled:
-            logger.debug(
-                "Reranker disabled; returning first %d of %d raw results.", top_k, len(results)
+            logger.info(
+                "reranking.disabled",
+                top_k=top_k,
+                candidate_count=len(results),
             )
             return results[:top_k]
 

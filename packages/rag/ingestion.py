@@ -1,9 +1,9 @@
 import asyncio
 import hashlib
-import logging
 import uuid
 from pathlib import Path
 
+import structlog
 from fastembed import SparseTextEmbedding
 from google import genai
 from google.genai import types
@@ -14,7 +14,7 @@ from qdrant_client.http import models
 
 from packages.rag.chunking import Chunk, chunk_text_hierarchical
 
-logger = logging.getLogger(__name__)
+logger = structlog.get_logger(__name__)
 
 
 class IngestionConfig(BaseSettings):
@@ -96,7 +96,7 @@ class IngestionPipeline:
                 doc = Document(content=content, path=file_path, metadata=meta)
                 documents.append(doc)
             except Exception as e:
-                logger.error(f"Failed to read file: {file_path}. Error: {e}")
+                logger.error("ingestion.load_failed", file_path=str(file_path), error=str(e))
         return documents
 
     async def process_documents(self, documents: list[Document]) -> list[Chunk]:
@@ -121,7 +121,7 @@ class IngestionPipeline:
         exists = any(c.name == collection_name for c in collections.collections)
 
         if not exists:
-            logger.info(f"Creating global collection: {collection_name}")
+            logger.info("ingestion.collection.initializing", collection=collection_name)
             await self.client.create_collection(
                 collection_name=collection_name,
                 vectors_config=models.VectorParams(
@@ -141,7 +141,9 @@ class IngestionPipeline:
                 field_schema=models.PayloadSchemaType.KEYWORD,
             )
         else:
-            logger.info(f"Global collection {collection_name} already exists.")
+            logger.info(
+                "ingestion.collection.initialized", collection=collection_name, status="exists"
+            )
 
     async def get_embeddings(self, texts: list[str]) -> list[list[float]]:
         semaphore = asyncio.Semaphore(8)
@@ -212,11 +214,16 @@ class IngestionPipeline:
             ]
 
             await self.client.upsert(collection_name=collection_name, points=points)
-            logger.info(f"Upserted batch {i // batch_size + 1} into {collection_name}")
+            logger.info(
+                "ingestion.batch.completed",
+                collection=collection_name,
+                batch_index=i // batch_size + 1,
+                batch_size=len(batch),
+            )
 
     async def run(self, data_roots: list[Path]):
         """Executes the full ingestion pipeline for the global knowledge base."""
-        logger.info(f"Starting ingestion from roots: {[str(r) for r in data_roots]}")
+        logger.info("ingestion.run.started", data_roots=[str(r) for r in data_roots])
         collection_name = "enterprise_knowledge"
 
         await self.initialize_collection(collection_name)
@@ -226,29 +233,39 @@ class IngestionPipeline:
             if root.exists():
                 corpora.extend(await self.list_corpora(root))
 
-        logger.info(f"Found {len(corpora)} domains to ingest: {[c.name for c in corpora]}")
+        logger.info(
+            "ingestion.corpora_found", count=len(corpora), domains=[c.name for c in corpora]
+        )
 
         for corpus_path in corpora:
-            logger.info(f"Processing domain: {corpus_path.name}")
+            logger.info("ingestion.domain.started", domain=corpus_path.name)
 
             docs = await self.load_markdown_files(corpus_path)
             if not docs:
-                logger.warning(f"No documents found in {corpus_path}")
+                logger.warning(
+                    "ingestion.domain.no_documents", domain=corpus_path.name, path=str(corpus_path)
+                )
                 continue
-            logger.info(f"Loaded {len(docs)} documents from {corpus_path.name}.")
+            logger.info(
+                "ingestion.domain.loaded_documents", domain=corpus_path.name, count=len(docs)
+            )
 
             chunks = await self.process_documents(docs)
-            logger.info(f"Generated {len(chunks)} chunks for {corpus_path.name}.")
+            logger.info(
+                "ingestion.domain.generated_chunks", domain=corpus_path.name, count=len(chunks)
+            )
 
             await self.upsert_chunks(collection_name, chunks)
-            logger.info(f"Completed ingestion for domain: {corpus_path.name}.")
+            logger.info("ingestion.domain.completed", domain=corpus_path.name)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
+    from packages.observability import configure_logging
+
+    configure_logging("ingestion", "INFO")
     pipeline = IngestionPipeline()
     raw_dir = Path("data/raw/official_docs/fastapi")
     if raw_dir.exists():
         asyncio.run(pipeline.run([raw_dir]))
     else:
-        logger.error(f"Directory {raw_dir} not found.")
+        logger.error("ingestion.run.failed", reason="directory not found", path=str(raw_dir))

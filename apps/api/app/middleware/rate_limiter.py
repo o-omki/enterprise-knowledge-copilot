@@ -1,17 +1,17 @@
-import logging
 import os
 import time
 import uuid
 from collections.abc import Awaitable
 from typing import cast
 
+import structlog
 from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from redis.asyncio import Redis
 from redis.exceptions import RedisError
 from starlette.middleware.base import BaseHTTPMiddleware
 
-logger = logging.getLogger("apps.api.middleware.rate_limiter")
+logger = structlog.get_logger(__name__)
 
 
 class RateLimiterMiddleware(BaseHTTPMiddleware):
@@ -89,7 +89,11 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
                     retry_after = 1
 
                 logger.warning(
-                    f"Rate limit exceeded for client {client_id} on {path}. Limit: {limit}"
+                    "rate_limiter.throttled",
+                    key=client_id,
+                    path=path,
+                    limit=limit,
+                    remaining=0,
                 )
                 return JSONResponse(
                     status_code=429,
@@ -100,6 +104,13 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
                     },
                 )
 
+            logger.info(
+                "rate_limiter.allowed",
+                key=client_id,
+                path=path,
+                limit=limit,
+                remaining=remaining,
+            )
             response = await call_next(request)
             response.headers["X-RateLimit-Limit"] = str(limit)
             response.headers["X-RateLimit-Remaining"] = str(remaining)
@@ -108,5 +119,5 @@ class RateLimiterMiddleware(BaseHTTPMiddleware):
 
         except RedisError as e:
             # Graceful degradation - fail-open if Redis is down
-            logger.error(f"Redis error in RateLimiterMiddleware: {e}. Failing open.", exc_info=True)
+            logger.error("rate_limiter.redis_error", error=str(e), exc_info=True)
             return await call_next(request)

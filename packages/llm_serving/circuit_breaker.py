@@ -1,7 +1,8 @@
-import logging
 import time
 
-logger = logging.getLogger(__name__)
+import structlog
+
+logger = structlog.get_logger(__name__)
 
 
 class CircuitBreakerOpenException(Exception):
@@ -18,7 +19,9 @@ class CircuitBreaker:
 
     def record_success(self):
         if self.state in ("OPEN", "HALF_OPEN"):
-            logger.info("Circuit breaker RECOVERED to CLOSED state.")
+            logger.info(
+                "circuit_breaker.state_change", from_state=self.state, to_state="CLOSED", failures=0
+            )
         self.failures = 0
         self.state = "CLOSED"
 
@@ -27,16 +30,31 @@ class CircuitBreaker:
         self.last_failure_time = time.time()
         if self.state == "CLOSED" and self.failures >= self.failure_threshold:
             self.state = "OPEN"
-            logger.warning("Circuit breaker OPENED after %d failures.", self.failures)
+            logger.warning(
+                "circuit_breaker.state_change",
+                from_state="CLOSED",
+                to_state="OPEN",
+                failures=self.failures,
+            )
         elif self.state == "HALF_OPEN":
             self.state = "OPEN"
-            logger.warning("Circuit breaker re-OPENED in HALF_OPEN state.")
+            logger.warning(
+                "circuit_breaker.state_change",
+                from_state="HALF_OPEN",
+                to_state="OPEN",
+                failures=self.failures,
+            )
 
     def check_state(self):
         if self.state == "OPEN":
             if time.time() - self.last_failure_time > self.recovery_timeout:
                 self.state = "HALF_OPEN"
-                logger.info("Circuit breaker transitioned to HALF_OPEN state.")
+                logger.info(
+                    "circuit_breaker.state_change",
+                    from_state="OPEN",
+                    to_state="HALF_OPEN",
+                    elapsed=time.time() - self.last_failure_time,
+                )
             else:
                 raise CircuitBreakerOpenException("Circuit breaker is OPEN.")
 
