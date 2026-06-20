@@ -2,6 +2,7 @@ import os
 
 from opentelemetry import metrics, trace
 from opentelemetry.exporter.otlp.proto.grpc.trace_exporter import OTLPSpanExporter
+from opentelemetry.exporter.prometheus import PrometheusMetricReader
 from opentelemetry.instrumentation.fastapi import FastAPIInstrumentor
 from opentelemetry.sdk.metrics import MeterProvider
 from opentelemetry.sdk.resources import Resource
@@ -64,8 +65,9 @@ def setup_tracing(app=None, service_name="enterprise-knowledge-copilot"):
     processor = BatchSpanProcessor(exporter)
     provider.add_span_processor(processor)
 
-    # Setup shared MeterProvider using the same Resource configuration
-    meter_provider = MeterProvider(resource=resource)
+    # Setup shared MeterProvider using the same Resource configuration with Prometheus reader
+    prometheus_reader = PrometheusMetricReader()
+    meter_provider = MeterProvider(resource=resource, metric_readers=[prometheus_reader])
     metrics.set_meter_provider(meter_provider)
 
     if app:
