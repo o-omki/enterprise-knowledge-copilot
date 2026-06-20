@@ -8,6 +8,7 @@ import structlog
 from celery.result import AsyncResult
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from prometheus_client import make_asgi_app
 from redis.asyncio import Redis
 from sqlalchemy import desc, select
 from sqlalchemy.orm import selectinload
@@ -91,13 +92,16 @@ async def lifespan(app: FastAPI):
     logger.info("shutdown.completed")
 
 
-app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.6.0", lifespan=lifespan)
+app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.9.0", lifespan=lifespan)
 
 setup_tracing(app)
 
+app.mount("/metrics", make_asgi_app())
+
+guardrails_url = os.getenv("GUARDRAILS_SERVICE_URL", "http://guardrails:8001")
+
 # Middlewares are executed in reverse order of addition:
 # Request -> RequestContext -> ApiKeyAuth -> RateLimiter -> Safety -> Router
-guardrails_url = os.getenv("GUARDRAILS_SERVICE_URL", "http://guardrails:8001")
 app.add_middleware(SafetyGuardrailsMiddleware, service_url=guardrails_url)
 app.add_middleware(RateLimiterMiddleware)
 app.add_middleware(MultiAuthMiddleware)
