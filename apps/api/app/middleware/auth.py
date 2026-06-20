@@ -39,6 +39,8 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
             "/openapi.json",
             "/api/v1/auth/login",
             "/api/v1/auth/register",
+            "/metrics",
+            "/metrics/",
         }
 
     async def dispatch(self, request: Request, call_next) -> Response:
