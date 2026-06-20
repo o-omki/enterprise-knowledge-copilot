@@ -20,6 +20,7 @@ from packages.llm_serving.metrics import (
 from packages.llm_serving.response_cache import ResponseCache
 from packages.llm_serving.types import LLMRequest, LLMResponse, LLMStreamChunk
 from packages.observability import get_tracer
+from packages.observability.metrics import cache_hit_counter
 
 logger = structlog.get_logger(__name__)
 tracer = get_tracer(__name__)
@@ -38,6 +39,9 @@ class LLMClient:
             failure_threshold=self.config.circuit_breaker_failure_threshold,
             recovery_timeout=self.config.circuit_breaker_recovery_timeout_sec,
         )
+        from packages.observability.metrics import register_circuit_breaker
+
+        register_circuit_breaker("llm_client", self.circuit_breaker)
         self.cache = ResponseCache(config=self.config, redis_client=redis_client)
         self.backend = self._init_backend()
 
@@ -61,6 +65,7 @@ class LLMClient:
                 logger.info(
                     "llm.request.cached", model=request.model, backend=self.config.default_backend
                 )
+                cache_hit_counter.add(1, {"model": request.model, "hit": "true"})
                 span.set_attribute("llm.cached", True)
                 span.set_attribute(
                     "llm.tokens.total",
@@ -69,6 +74,7 @@ class LLMClient:
                 span.set_attribute("llm.latency_s", 0.0)
                 return cached_response
 
+            cache_hit_counter.add(1, {"model": request.model, "hit": "false"})
             span.set_attribute("llm.cached", False)
             start_time = time.time()
             try:
@@ -114,6 +120,7 @@ class LLMClient:
             span.set_attribute("llm.model", request.model)
             span.set_attribute("llm.backend", self.config.default_backend)
             span.set_attribute("llm.cached", False)
+            cache_hit_counter.add(1, {"model": request.model, "hit": "false"})
 
             logger.info(
                 "llm.request.started",

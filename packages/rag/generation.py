@@ -7,6 +7,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
 from packages.observability import get_tracer
+from packages.observability.metrics import (
+    generation_duration,
+    generation_token_count,
+    generation_total,
+)
 from packages.rag.search import SearchResult
 
 logger = structlog.get_logger(__name__)
@@ -109,6 +114,9 @@ class GenerationService:
         selected_model = model_override or self.config.generation_model_name
         logger.info("generation.started", model=selected_model, context_length=len(search_results))
 
+        import time
+
+        start_time = time.perf_counter()
         try:
             req = LLMRequest(
                 messages=[LLMMessage(role="user", content=user_prompt)],
@@ -123,10 +131,21 @@ class GenerationService:
                 response = await self.llm_client.generate(req)
 
         except Exception as e:
+            duration = time.perf_counter() - start_time
+            generation_duration.record(duration, {"model": selected_model})
+            generation_total.add(1, {"model": selected_model, "status": "failed"})
             logger.error("generation.failed", model=selected_model, error=str(e), exc_info=True)
             raise RuntimeError(f"Generation failed: {e}") from e
 
         else:
+            duration = time.perf_counter() - start_time
+            generation_duration.record(duration, {"model": selected_model})
+            generation_total.add(1, {"model": selected_model, "status": "completed"})
+            if response.usage:
+                generation_token_count.record(
+                    response.usage.total_tokens, {"model": selected_model}
+                )
+
             try:
                 answer_text = (
                     response.text
@@ -206,6 +225,10 @@ class GenerationService:
             stream=True,
         )
 
+        import time
+
+        start_time = time.perf_counter()
+        total_tokens = 0
         try:
             req = LLMRequest(
                 messages=[LLMMessage(role="user", content=user_prompt)],
@@ -219,8 +242,16 @@ class GenerationService:
                 span.set_attribute("generation.context_passages", [r.text for r in search_results])
                 response_stream = self.llm_client.generate_stream(req)
                 async for chunk in response_stream:
+                    if chunk.usage:
+                        total_tokens += chunk.usage.total_tokens
                     if chunk.text:
                         yield {"type": "chunk", "text": chunk.text}
+
+            duration = time.perf_counter() - start_time
+            generation_duration.record(duration, {"model": selected_model})
+            generation_total.add(1, {"model": selected_model, "status": "completed"})
+            if total_tokens > 0:
+                generation_token_count.record(total_tokens, {"model": selected_model})
 
             logger.info("generation.completed", model=selected_model, stream=True)
             yield {
@@ -230,6 +261,9 @@ class GenerationService:
             }
 
         except Exception as e:
+            duration = time.perf_counter() - start_time
+            generation_duration.record(duration, {"model": selected_model})
+            generation_total.add(1, {"model": selected_model, "status": "failed"})
             logger.error(
                 "generation.failed", model=selected_model, error=str(e), stream=True, exc_info=True
             )

@@ -1,3 +1,5 @@
+import time
+
 import structlog
 from fastembed import SparseTextEmbedding
 from google import genai
@@ -5,8 +7,15 @@ from google.genai import types
 from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client import AsyncQdrantClient
+from qdrant_client.http import models
 
 from packages.observability import get_tracer
+from packages.observability.metrics import (
+    retrieval_duration,
+    retrieval_hit_quality,
+    retrieval_result_count,
+    retrieval_total,
+)
 
 logger = structlog.get_logger(__name__)
 tracer = get_tracer(__name__)
@@ -80,8 +89,9 @@ class SearchService:
         method: str = "dense",
     ) -> list[SearchResult]:
         """Performs vector search in the global collection with optional payload filtering."""
+        search_start_time = time.perf_counter()
+        retrieval_total.add(1, {"method": method, "domain": domain or "unknown"})
         logger.info("retrieval.started", method=method, domain=domain, doc_type=doc_type)
-        from qdrant_client.http import models
 
         collection_name = "enterprise_knowledge"
 
@@ -130,8 +140,6 @@ class SearchService:
             for p in prefetch:
                 p.filter = query_filter
 
-        import time
-
         start_time = time.perf_counter()
 
         with tracer.start_as_current_span("retrieval.qdrant_query") as span:
@@ -160,6 +168,12 @@ class SearchService:
             result_count=len(results.points),
             latency_ms=latency_ms,
         )
+
+        search_duration_sec = time.perf_counter() - search_start_time
+        retrieval_duration.record(search_duration_sec, {"method": method})
+        retrieval_result_count.record(len(results.points), {"method": method})
+        if results.points:
+            retrieval_hit_quality.record(results.points[0].score, {"method": method})
 
         return [
             SearchResult(
