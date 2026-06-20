@@ -12,9 +12,11 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client import AsyncQdrantClient
 from qdrant_client.http import models
 
+from packages.observability import get_tracer
 from packages.rag.chunking import Chunk, chunk_text_hierarchical
 
 logger = structlog.get_logger(__name__)
+tracer = get_tracer(__name__)
 
 
 class IngestionConfig(BaseSettings):
@@ -84,36 +86,41 @@ class IngestionPipeline:
 
     async def load_markdown_files(self, directory: Path) -> list[Document]:
         """Loads all markdown files from a directory."""
-        documents = []
-        for file_path in directory.glob("**/*.md"):
-            try:
-                content = file_path.read_text(encoding="utf-8")
+        with tracer.start_as_current_span("ingestion.load_documents") as span:
+            documents = []
+            for file_path in directory.glob("**/*.md"):
+                try:
+                    content = file_path.read_text(encoding="utf-8")
 
-                # Extract metadata
-                meta = self._parse_metadata_from_path(file_path, directory)
-                meta["filename"] = file_path.name
+                    # Extract metadata
+                    meta = self._parse_metadata_from_path(file_path, directory)
+                    meta["filename"] = file_path.name
 
-                doc = Document(content=content, path=file_path, metadata=meta)
-                documents.append(doc)
-            except Exception as e:
-                logger.error("ingestion.load_failed", file_path=str(file_path), error=str(e))
-        return documents
+                    doc = Document(content=content, path=file_path, metadata=meta)
+                    documents.append(doc)
+                except Exception as e:
+                    logger.error("ingestion.load_failed", file_path=str(file_path), error=str(e))
+            span.set_attribute("ingestion.doc_count", len(documents))
+            return documents
 
     async def process_documents(self, documents: list[Document]) -> list[Chunk]:
         """Chunks documents based on configuration."""
-        all_chunks = []
-        for doc in documents:
-            # We will use hierarchical chunking for finer retrieval but larger context mapping
-            chunks = chunk_text_hierarchical(
-                doc.content,
-                source=str(doc.path),
-                parent_chunk_size=self.config.parent_chunk_size,
-                child_chunk_size=self.config.child_chunk_size,
-                child_chunk_overlap=self.config.child_chunk_overlap,
-                metadata=doc.metadata,
-            )
-            all_chunks.extend(chunks)
-        return all_chunks
+        with tracer.start_as_current_span("ingestion.chunk_documents") as span:
+            span.set_attribute("ingestion.doc_count", len(documents))
+            all_chunks = []
+            for doc in documents:
+                # We will use hierarchical chunking for finer retrieval but larger context mapping
+                chunks = chunk_text_hierarchical(
+                    doc.content,
+                    source=str(doc.path),
+                    parent_chunk_size=self.config.parent_chunk_size,
+                    child_chunk_size=self.config.child_chunk_size,
+                    child_chunk_overlap=self.config.child_chunk_overlap,
+                    metadata=doc.metadata,
+                )
+                all_chunks.extend(chunks)
+            span.set_attribute("ingestion.chunk_count", len(all_chunks))
+            return all_chunks
 
     async def initialize_collection(self, collection_name: str = "enterprise_knowledge"):
         """Creates the global Qdrant collection if it doesn't exist."""
@@ -181,10 +188,13 @@ class IngestionPipeline:
         for i in range(0, len(chunks), batch_size):
             batch = chunks[i : i + batch_size]
             texts = [c.text for c in batch]
+            batch_index = i // batch_size + 1
 
-            embeddings = await self.get_embeddings(texts)
-
-            sparse_embeddings = list(self.sparse_model.embed(texts))
+            with tracer.start_as_current_span("ingestion.embed_batch") as span:
+                span.set_attribute("ingestion.batch_index", batch_index)
+                span.set_attribute("ingestion.chunk_count", len(batch))
+                embeddings = await self.get_embeddings(texts)
+                sparse_embeddings = list(self.sparse_model.embed(texts))
 
             points = [
                 models.PointStruct(
@@ -213,11 +223,15 @@ class IngestionPipeline:
                 for idx, chunk in enumerate(batch)
             ]
 
-            await self.client.upsert(collection_name=collection_name, points=points)
+            with tracer.start_as_current_span("ingestion.upsert_batch") as span:
+                span.set_attribute("ingestion.batch_index", batch_index)
+                span.set_attribute("ingestion.chunk_count", len(batch))
+                await self.client.upsert(collection_name=collection_name, points=points)
+
             logger.info(
                 "ingestion.batch.completed",
                 collection=collection_name,
-                batch_index=i // batch_size + 1,
+                batch_index=batch_index,
                 batch_size=len(batch),
             )
 

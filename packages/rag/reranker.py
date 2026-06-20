@@ -20,9 +20,11 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from sentence_transformers import CrossEncoder
 
+from packages.observability import get_tracer
 from packages.rag.search import SearchResult
 
 logger = structlog.get_logger(__name__)
+tracer = get_tracer(__name__)
 
 
 class RerankerConfig(BaseSettings):
@@ -85,12 +87,19 @@ class RerankerService:
         if not results:
             return results
 
-        logger.info("reranking.started", candidate_count=len(results), top_k=top_k)
-        pairs = [(query, r.text) for r in results]
+        with tracer.start_as_current_span("reranking.score") as span:
+            span.set_attribute("reranking.candidate_count", len(results))
+            span.set_attribute("reranking.top_k", top_k)
+            span.set_attribute("reranking.model", self.config.model_name)
 
-        start = time.perf_counter()
-        scores: list[float] = list(self.model.predict(pairs))
-        latency_ms = round((time.perf_counter() - start) * 1000, 2)
+            logger.info("reranking.started", candidate_count=len(results), top_k=top_k)
+            pairs = [(query, r.text) for r in results]
+
+            start = time.perf_counter()
+            scores: list[float] = list(self.model.predict(pairs))
+            latency_ms = round((time.perf_counter() - start) * 1000, 2)
+
+            span.set_attribute("reranking.latency_ms", latency_ms)
 
         logger.info(
             "reranking.completed",

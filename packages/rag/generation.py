@@ -6,9 +6,11 @@ from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 from packages.llm_serving import LLMClient, LLMMessage, LLMRequest
+from packages.observability import get_tracer
 from packages.rag.search import SearchResult
 
 logger = structlog.get_logger(__name__)
+tracer = get_tracer(__name__)
 
 
 class GenerationConfig(BaseSettings):
@@ -38,7 +40,6 @@ class GenerationService:
         self.config = config or GenerationConfig()
         self.llm_client = llm_client
 
-        # Load prompt templates
         prompt_config_path = Path("configs/prompts.yaml")
         if prompt_config_path.exists():
             with open(prompt_config_path, encoding="utf-8") as f:
@@ -78,29 +79,32 @@ class GenerationService:
 
         context_str = "\n".join(context_parts)
 
-        # Get the selected prompt configuration
-        prompt_def = self.prompts.get(self.config.prompt_version, {})
+        with tracer.start_as_current_span("generation.build_prompt") as span:
+            prompt_def = self.prompts.get(self.config.prompt_version, {})
 
-        # Fallback to defaults if missing
-        system_instruction = prompt_def.get("system_instruction", "You are a helpful assistant.")
-        user_prompt_template = prompt_def.get(
-            "user_prompt_template",
-            "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
-        )
+            # Fallback to defaults if missing
+            system_instruction = prompt_def.get(
+                "system_instruction", "You are a helpful assistant."
+            )
+            user_prompt_template = prompt_def.get(
+                "user_prompt_template",
+                "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
+            )
 
-        history_str = ""
-        if chat_history:
-            history_parts = ["Chat History:"]
-            for msg in chat_history:
-                role = "User" if msg.get("role") == "user" else "AI"
-                history_parts.append(f"{role}: {msg.get('content')}")
-            history_str = "\n".join(history_parts) + "\n\n"
+            history_str = ""
+            if chat_history:
+                history_parts = ["Chat History:"]
+                for msg in chat_history:
+                    role = "User" if msg.get("role") == "user" else "AI"
+                    history_parts.append(f"{role}: {msg.get('content')}")
+                history_str = "\n".join(history_parts) + "\n\n"
 
-        user_prompt = user_prompt_template.format(
-            history_str=history_str,
-            context_str=context_str,
-            query=query,
-        )
+            user_prompt = user_prompt_template.format(
+                history_str=history_str,
+                context_str=context_str,
+                query=query,
+            )
+            span.set_attribute("generation.prompt_length", len(user_prompt))
 
         selected_model = model_override or self.config.generation_model_name
         logger.info("generation.started", model=selected_model, context_length=len(search_results))
@@ -113,7 +117,10 @@ class GenerationService:
                 max_tokens=2048,
                 system_instruction=system_instruction,
             )
-            response = await self.llm_client.generate(req)
+            with tracer.start_as_current_span("generation.llm_call") as span:
+                span.set_attribute("generation.model", selected_model)
+                span.set_attribute("generation.context_passages", [r.text for r in search_results])
+                response = await self.llm_client.generate(req)
 
         except Exception as e:
             logger.error("generation.failed", model=selected_model, error=str(e), exc_info=True)
@@ -173,21 +180,23 @@ class GenerationService:
 
         context_str = "\n".join(context_parts)
 
-        # Get the selected prompt configuration
-        prompt_def = self.prompts.get(self.config.prompt_version, {})
+        with tracer.start_as_current_span("generation.build_prompt") as span:
+            prompt_def = self.prompts.get(self.config.prompt_version, {})
 
-        # Fallback to defaults if missing
-        system_instruction = prompt_def.get("system_instruction", "You are a helpful assistant.")
-        user_prompt_template = prompt_def.get(
-            "user_prompt_template",
-            "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
-        )
+            system_instruction = prompt_def.get(
+                "system_instruction", "You are a helpful assistant."
+            )
+            user_prompt_template = prompt_def.get(
+                "user_prompt_template",
+                "{history_str}Context:\n{context_str}\n\nQuestion:\n{query}\n\nAnswer:\n",
+            )
 
-        user_prompt = user_prompt_template.format(
-            history_str="",
-            context_str=context_str,
-            query=query,
-        )
+            user_prompt = user_prompt_template.format(
+                history_str="",
+                context_str=context_str,
+                query=query,
+            )
+            span.set_attribute("generation.prompt_length", len(user_prompt))
 
         selected_model = model_override or self.config.generation_model_name
         logger.info(
@@ -205,10 +214,13 @@ class GenerationService:
                 max_tokens=2048,
                 system_instruction=system_instruction,
             )
-            response_stream = self.llm_client.generate_stream(req)
-            async for chunk in response_stream:
-                if chunk.text:
-                    yield {"type": "chunk", "text": chunk.text}
+            with tracer.start_as_current_span("generation.llm_call") as span:
+                span.set_attribute("generation.model", selected_model)
+                span.set_attribute("generation.context_passages", [r.text for r in search_results])
+                response_stream = self.llm_client.generate_stream(req)
+                async for chunk in response_stream:
+                    if chunk.text:
+                        yield {"type": "chunk", "text": chunk.text}
 
             logger.info("generation.completed", model=selected_model, stream=True)
             yield {

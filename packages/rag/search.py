@@ -6,7 +6,10 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 from qdrant_client import AsyncQdrantClient
 
+from packages.observability import get_tracer
+
 logger = structlog.get_logger(__name__)
+tracer = get_tracer(__name__)
 
 
 class SearchConfig(BaseSettings):
@@ -55,16 +58,18 @@ class SearchService:
 
     async def get_query_embedding(self, query: str) -> list[float]:
         """Converts user query to a vector using Vertex AI via google-genai."""
-        content = f"query: {query}"
+        with tracer.start_as_current_span("retrieval.embed_query") as span:
+            span.set_attribute("retrieval.embedding_model", self.config.embedding_model_name)
+            content = f"query: {query}"
 
-        response = await self.genai_client.aio.models.embed_content(
-            model=self.config.embedding_model_name,
-            contents=content,
-            config=types.EmbedContentConfig(
-                task_type="RETRIEVAL_QUERY", output_dimensionality=self.config.vector_size
-            ),
-        )
-        return response.embeddings[0].values
+            response = await self.genai_client.aio.models.embed_content(
+                model=self.config.embedding_model_name,
+                contents=content,
+                config=types.EmbedContentConfig(
+                    task_type="RETRIEVAL_QUERY", output_dimensionality=self.config.vector_size
+                ),
+            )
+            return response.embeddings[0].values
 
     async def search(
         self,
@@ -129,17 +134,24 @@ class SearchService:
 
         start_time = time.perf_counter()
 
-        results = await self.client.query_points(
-            collection_name=collection_name,
-            query=query_vector,
-            prefetch=prefetch,
-            using=using,
-            limit=limit,
-            with_payload=True,
-            query_filter=query_filter,
-        )
+        with tracer.start_as_current_span("retrieval.qdrant_query") as span:
+            span.set_attribute("retrieval.collection", collection_name)
+            span.set_attribute("retrieval.method", method)
 
-        latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            results = await self.client.query_points(
+                collection_name=collection_name,
+                query=query_vector,
+                prefetch=prefetch,
+                using=using,
+                limit=limit,
+                with_payload=True,
+                query_filter=query_filter,
+            )
+
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+            span.set_attribute("retrieval.result_count", len(results.points))
+            span.set_attribute("retrieval.latency_ms", latency_ms)
+
         logger.info(
             "retrieval.completed",
             method=method,

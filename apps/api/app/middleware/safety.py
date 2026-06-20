@@ -5,9 +5,11 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from packages.observability import get_tracer
 from packages.safety import SafetyGuardrailsClient, verify_citations_bounds
 
 logger = structlog.get_logger(__name__)
+tracer = get_tracer(__name__)
 
 
 class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
@@ -61,12 +63,23 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
 
         logger.info("safety.input.checking", query=query)
 
-        input_result = await self.safety_client.validate_input(query)
-        is_safe = input_result.get("is_safe", True)
-        is_off_topic = input_result.get("is_off_topic", False)
+        import time
+
+        start_time = time.perf_counter()
+
+        with tracer.start_as_current_span("safety.input_validation") as span:
+            input_result = await self.safety_client.validate_input(query)
+            is_safe = input_result.get("is_safe", True)
+            is_off_topic = input_result.get("is_off_topic", False)
+            blocked = not is_safe or is_off_topic
+            latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
+
+            span.set_attribute("safety.is_safe", is_safe)
+            span.set_attribute("safety.blocked", blocked)
+            span.set_attribute("safety.latency_ms", latency_ms)
 
         # Block if unsafe or off-topic
-        if not is_safe or is_off_topic:
+        if blocked:
             refusal = (
                 input_result.get("refusal_message")
                 or "I cannot fulfill this request as it violates enterprise security policies."
@@ -140,10 +153,20 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                             body_bytes_out = json.dumps(response_json).encode("utf-8")
                         elif context_chunks:
                             logger.info("safety.output.checking", filtered_query=filtered_query)
-                            output_result = await self.safety_client.validate_output(
-                                query=filtered_query, answer=answer, context=context_chunks
-                            )
-                            is_grounded = output_result.get("is_grounded", True)
+                            out_start_time = time.perf_counter()
+                            with tracer.start_as_current_span("safety.output_validation") as span:
+                                output_result = await self.safety_client.validate_output(
+                                    query=filtered_query, answer=answer, context=context_chunks
+                                )
+                                is_grounded = output_result.get("is_grounded", True)
+                                latency_ms_out = round(
+                                    (time.perf_counter() - out_start_time) * 1000, 2
+                                )
+
+                                span.set_attribute("safety.is_grounded", is_grounded)
+                                span.set_attribute("safety.blocked", not is_grounded)
+                                span.set_attribute("safety.latency_ms", latency_ms_out)
+
                             logger.info("safety.output.checked", is_grounded=is_grounded)
 
                             if not is_grounded:
