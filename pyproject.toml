@@ -9,7 +9,7 @@ exclude = ["data*", "docs*"]
 
 [project]
 name = "enterprise-knowledge-copilot"
-version = "0.6.0"
+version = "0.9.0"
 description = "Production-grade enterprise knowledge copilot"
 readme = "README.md"
 requires-python = ">=3.11,<3.14"
@@ -50,6 +50,12 @@ dependencies = [
   "locust>=2.29.0",
   "mypy (>=2.1.0,<3.0.0)",
   "structlog (>=26.1.0,<27.0.0)",
+  "opentelemetry-exporter-prometheus (>=0.63b1,<0.64)",
+  "prometheus-client (>=0.25.0,<0.26.0)",
+  "opentelemetry-instrumentation-redis (>=0.63b1,<0.64)",
+  "opentelemetry-instrumentation-sqlalchemy (>=0.63b1,<0.64)",
+  "opentelemetry-instrumentation-celery (>=0.63b1,<0.64)",
+  "opentelemetry-instrumentation-httpx (>=0.63b1,<0.64)",
 ]
 
 [tool.pytest.ini_options]
