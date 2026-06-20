@@ -6,6 +6,8 @@ import structlog
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
 
+from packages.observability.metrics import active_requests, request_total
+
 logger = structlog.get_logger(__name__)
 
 
@@ -46,6 +48,7 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             request_id=request_id, session_id=session_id, path=path, method=method
         )
 
+        active_requests.add(1)
         start_time = time.perf_counter()
         logger.info("request.started")
 
@@ -55,11 +58,16 @@ class RequestContextMiddleware(BaseHTTPMiddleware):
             logger.info(
                 "request.completed", status_code=response.status_code, latency_ms=latency_ms
             )
+            request_total.add(
+                1, {"endpoint": path, "method": method, "status": str(response.status_code)}
+            )
             response.headers["X-Request-ID"] = request_id
             return response
         except Exception as e:
             latency_ms = round((time.perf_counter() - start_time) * 1000, 2)
             logger.error("request.failed", error=str(e), latency_ms=latency_ms, exc_info=True)
+            request_total.add(1, {"endpoint": path, "method": method, "status": "500"})
             raise e
         finally:
+            active_requests.add(-1)
             structlog.contextvars.clear_contextvars()

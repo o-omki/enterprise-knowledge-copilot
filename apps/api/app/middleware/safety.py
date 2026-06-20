@@ -6,6 +6,11 @@ from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
 from packages.observability import get_tracer
+from packages.observability.metrics import (
+    safety_block_total,
+    safety_check_total,
+    safety_duration,
+)
 from packages.safety import SafetyGuardrailsClient, verify_citations_bounds
 
 logger = structlog.get_logger(__name__)
@@ -78,8 +83,17 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
             span.set_attribute("safety.blocked", blocked)
             span.set_attribute("safety.latency_ms", latency_ms)
 
+        duration = time.perf_counter() - start_time
+        safety_duration.record(duration, {"check_type": "input"})
+
         # Block if unsafe or off-topic
         if blocked:
+            safety_check_total.add(1, {"check_type": "input", "result": "blocked"})
+            if not is_safe:
+                safety_block_total.add(1, {"reason": "jailbreak"})
+            if is_off_topic:
+                safety_block_total.add(1, {"reason": "off_topic"})
+
             refusal = (
                 input_result.get("refusal_message")
                 or "I cannot fulfill this request as it violates enterprise security policies."
@@ -89,6 +103,10 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                 status_code=400,
                 content={"detail": refusal, "error_code": "SAFETY_POLICY_VIOLATION", "safe": False},
             )
+
+        safety_check_total.add(1, {"check_type": "input", "result": "allowed"})
+        if input_result.get("is_pii_detected"):
+            safety_block_total.add(1, {"reason": "pii"})
 
         logger.info("safety.input.checked", is_safe=is_safe, is_off_topic=is_off_topic)
 
@@ -139,6 +157,8 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
 
                     if answer:
                         if not verify_citations_bounds(answer, len(citations)):
+                            safety_check_total.add(1, {"check_type": "output", "result": "blocked"})
+                            safety_block_total.add(1, {"reason": "hallucination"})
                             logger.warning(
                                 "safety.blocked",
                                 check_type="citation_bounds",
@@ -167,9 +187,16 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                                 span.set_attribute("safety.blocked", not is_grounded)
                                 span.set_attribute("safety.latency_ms", latency_ms_out)
 
+                            out_duration = time.perf_counter() - out_start_time
+                            safety_duration.record(out_duration, {"check_type": "output"})
+
                             logger.info("safety.output.checked", is_grounded=is_grounded)
 
                             if not is_grounded:
+                                safety_check_total.add(
+                                    1, {"check_type": "output", "result": "blocked"}
+                                )
+                                safety_block_total.add(1, {"reason": "hallucination"})
                                 refusal = output_result.get("refusal_message") or (
                                     "I'm sorry, but I cannot verify this information with "
                                     "internal sources. Please try rephrasing your query."
@@ -182,6 +209,10 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
                                 response_json["answer"] = refusal
                                 response_json["citations"] = []
                                 body_bytes_out = json.dumps(response_json).encode("utf-8")
+                            else:
+                                safety_check_total.add(
+                                    1, {"check_type": "output", "result": "allowed"}
+                                )
                 except json.JSONDecodeError:
                     pass  # Non-JSON or malformed output, let it pass
 
