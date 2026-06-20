@@ -3,10 +3,25 @@ from pathlib import Path
 
 import structlog
 from celery import shared_task
+from celery.signals import worker_process_init
 
+from packages.observability import configure_logging, setup_tracing
+from packages.observability.metrics import (
+    ingestion_chunk_count,
+    ingestion_duration,
+    ingestion_total,
+)
 from packages.rag.ingestion import Document, IngestionPipeline
 
 logger = structlog.get_logger(__name__)
+
+
+@worker_process_init.connect(weak=False)
+def init_worker_process(*args, **kwargs):
+    import os
+
+    configure_logging("worker", os.getenv("LOG_LEVEL", "INFO"))
+    setup_tracing(service_name="worker")
 
 
 async def _async_ingest(file_path_str: str, metadata: dict) -> dict:
@@ -65,15 +80,30 @@ def ingest_document(self, file_path: str, metadata: dict) -> dict:
         file_path=file_path,
     )
 
+    import time
+
+    start_time = time.perf_counter()
     logger.info("worker.ingest.started", metadata=metadata)
     try:
         result = asyncio.run(_async_ingest(file_path, metadata))
+        duration = time.perf_counter() - start_time
+        ingestion_duration.record(duration, {})
+        ingestion_total.add(1, {"status": "completed"})
+
+        chunks_count = result.get("chunks_indexed", 0)
+        if chunks_count > 0:
+            ingestion_chunk_count.add(chunks_count, {})
+
         logger.info(
             "worker.ingest.completed",
-            chunks_indexed=result.get("chunks_indexed", 0),
+            chunks_indexed=chunks_count,
         )
         return result
     except Exception as e:
+        duration = time.perf_counter() - start_time
+        ingestion_duration.record(duration, {})
+        ingestion_total.add(1, {"status": "failed"})
+
         logger.error(
             "worker.ingest.failed",
             error=str(e),
