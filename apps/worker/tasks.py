@@ -5,7 +5,12 @@ import structlog
 from celery import shared_task
 from celery.signals import worker_process_init
 
-from packages.observability import configure_logging, setup_tracing
+from packages.observability import (
+    FailureTracker,
+    classify_exception,
+    configure_logging,
+    setup_tracing,
+)
 from packages.observability.metrics import (
     ingestion_chunk_count,
     ingestion_duration,
@@ -110,6 +115,23 @@ def ingest_document(self, file_path: str, metadata: dict) -> dict:
             retry_count=self.request.retries,
             exc_info=True,
         )
+
+        error_class = classify_exception(e)
+        FailureTracker.record_failure(component="worker", error_type=error_class, details=str(e))
+
+        retries = (
+            self.request.retries if isinstance(getattr(self.request, "retries", None), int) else 0
+        )
+        max_retries = self.max_retries if isinstance(getattr(self, "max_retries", None), int) else 3
+
+        if retries < max_retries:
+            FailureTracker.record_retry(
+                component="worker",
+                operation="ingest_document",
+                attempt=retries + 1,
+                max_retries=max_retries,
+            )
+
         raise self.retry(exc=e)
     finally:
         structlog.contextvars.clear_contextvars()
