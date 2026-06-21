@@ -113,6 +113,30 @@ class LLMClient:
                 span.record_exception(e)
                 span.set_status(StatusCode.ERROR, str(e))
                 span.set_attribute("llm.latency_s", latency)
+
+                import asyncio
+
+                from packages.observability.failure_tracker import (
+                    FailureTracker,
+                    classify_exception,
+                )
+
+                is_timeout = (
+                    isinstance(e, asyncio.TimeoutError | TimeoutError)
+                    or "timeout" in type(e).__name__.lower()
+                    or "timeout" in str(e).lower()
+                )
+                if is_timeout:
+                    FailureTracker.record_timeout(
+                        component="llm_client",
+                        operation="generate",
+                        timeout_sec=0.0,
+                        elapsed_sec=latency,
+                    )
+                else:
+                    FailureTracker.record_failure(
+                        component="llm_client", error_type=classify_exception(e), details=str(e)
+                    )
                 raise e
 
     async def generate_stream(self, request: LLMRequest) -> AsyncGenerator[LLMStreamChunk, None]:
@@ -170,4 +194,28 @@ class LLMClient:
                 span.record_exception(e)
                 span.set_status(StatusCode.ERROR, str(e))
                 span.set_attribute("llm.latency_s", latency)
+
+                import asyncio
+
+                from packages.observability.failure_tracker import (
+                    FailureTracker,
+                    classify_exception,
+                )
+
+                is_timeout = (
+                    isinstance(e, asyncio.TimeoutError | TimeoutError)
+                    or "timeout" in type(e).__name__.lower()
+                    or "timeout" in str(e).lower()
+                )
+                if is_timeout:
+                    FailureTracker.record_timeout(
+                        component="llm_client",
+                        operation="generate_stream",
+                        timeout_sec=0.0,
+                        elapsed_sec=latency,
+                    )
+                else:
+                    FailureTracker.record_failure(
+                        component="llm_client", error_type=classify_exception(e), details=str(e)
+                    )
                 raise e
