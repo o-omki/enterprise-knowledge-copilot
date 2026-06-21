@@ -16,13 +16,14 @@ class SafetyGuardrailsClient:
     """
 
     def __init__(self, service_url: str | None = None):
-        self.service_url = (
-            service_url or os.getenv("GUARDRAILS_SERVICE_URL", "http://localhost:8001")
-        ).rstrip("/")
+        raw_url = service_url or os.getenv("GUARDRAILS_SERVICE_URL") or "http://localhost:8001"
+        self.service_url = raw_url.rstrip("/")
 
     async def validate_input(self, query: str) -> dict:
         """Sends query to /validate/input for input safety and PII masking checks."""
         url = f"{self.service_url}/validate/input"
+        error_type = None
+        error_msg = None
 
         try:
             async with httpx.AsyncClient(timeout=4.0) as client:
@@ -33,13 +34,20 @@ class SafetyGuardrailsClient:
                     data["is_pii_detected"] = data.get("filtered_query") != query
                     return data
 
-                logger.error(
-                    "Guardrails microservice returned status %d: %s",
-                    response.status_code,
-                    response.text,
+                error_msg = (
+                    f"Guardrails microservice returned status {response.status_code}: "
+                    f"{response.text}"
                 )
+                logger.error(error_msg)
+                error_type = "connection_error"
+        except httpx.TimeoutException as e:
+            error_type = "timeout"
+            error_msg = f"Timeout connecting to guardrails microservice at {self.service_url}: {e}"
+            logger.error(error_msg)
         except Exception as e:
-            logger.error(f"Unreachable guardrails microservice at {self.service_url}: {e}")
+            error_type = "connection_error"
+            error_msg = f"Unreachable guardrails microservice at {self.service_url}: {e}"
+            logger.error(error_msg)
 
         # Fail-safe local fallback
         logger.warning(
@@ -74,6 +82,8 @@ class SafetyGuardrailsClient:
             "filtered_query": filtered_query,
             "refusal_message": refusal_message,
             "fallback_active": True,
+            "error_type": error_type,
+            "error_msg": error_msg,
         }
 
     async def validate_output(self, query: str, answer: str, context: list[str]) -> dict:
@@ -81,6 +91,8 @@ class SafetyGuardrailsClient:
         validation.
         """
         url = f"{self.service_url}/validate/output"
+        error_type = None
+        error_msg = None
 
         try:
             async with httpx.AsyncClient(timeout=6.0) as client:
@@ -92,17 +104,30 @@ class SafetyGuardrailsClient:
                     data["fallback_active"] = False
                     return data
 
-                logger.error(
-                    "Guardrails microservice returned status %d: %s",
-                    response.status_code,
-                    response.text,
+                error_msg = (
+                    f"Guardrails microservice returned status {response.status_code}: "
+                    f"{response.text}"
                 )
+                logger.error(error_msg)
+                error_type = "connection_error"
+        except httpx.TimeoutException as e:
+            error_type = "timeout"
+            error_msg = f"Timeout connecting to guardrails microservice at {self.service_url}: {e}"
+            logger.error(error_msg)
         except Exception as e:
-            logger.error(f"Unreachable guardrails microservice at {self.service_url}: {e}")
+            error_type = "connection_error"
+            error_msg = f"Unreachable guardrails microservice at {self.service_url}: {e}"
+            logger.error(error_msg)
 
         # Fallback for output grounding
         logger.warning(
             "Unreachable/error guardrails microservice. "
             "Passing through answer to maintain service continuity."
         )
-        return {"is_grounded": True, "refusal_message": None, "fallback_active": True}
+        return {
+            "is_grounded": True,
+            "refusal_message": None,
+            "fallback_active": True,
+            "error_type": error_type,
+            "error_msg": error_msg,
+        }

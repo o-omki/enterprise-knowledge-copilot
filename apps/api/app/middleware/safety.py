@@ -5,7 +5,7 @@ from fastapi import Request, Response
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
-from packages.observability import get_tracer
+from packages.observability import FailureTracker, get_tracer
 from packages.observability.metrics import (
     safety_block_total,
     safety_check_total,
@@ -85,6 +85,26 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
 
         duration = time.perf_counter() - start_time
         safety_duration.record(duration, {"check_type": "input"})
+
+        if input_result.get("fallback_active"):
+            logger.warning(
+                "safety.fallback_to_local",
+                check_type="input",
+                error_type=input_result.get("error_type"),
+            )
+            if input_result.get("error_type") == "timeout":
+                FailureTracker.record_timeout(
+                    component="safety",
+                    operation="validate_input",
+                    timeout_sec=4.0,
+                    elapsed_sec=duration,
+                )
+            else:
+                FailureTracker.record_failure(
+                    component="safety",
+                    error_type=input_result.get("error_type", "connection_error"),
+                    details=input_result.get("error_msg", "Guardrails microservice unreachable"),
+                )
 
         # Block if unsafe or off-topic
         if blocked:
@@ -189,6 +209,30 @@ class SafetyGuardrailsMiddleware(BaseHTTPMiddleware):
 
                             out_duration = time.perf_counter() - out_start_time
                             safety_duration.record(out_duration, {"check_type": "output"})
+
+                            if output_result.get("fallback_active"):
+                                logger.warning(
+                                    "safety.fallback_to_local",
+                                    check_type="output",
+                                    error_type=output_result.get("error_type"),
+                                )
+                                if output_result.get("error_type") == "timeout":
+                                    FailureTracker.record_timeout(
+                                        component="safety",
+                                        operation="validate_output",
+                                        timeout_sec=6.0,
+                                        elapsed_sec=out_duration,
+                                    )
+                                else:
+                                    FailureTracker.record_failure(
+                                        component="safety",
+                                        error_type=output_result.get(
+                                            "error_type", "connection_error"
+                                        ),
+                                        details=output_result.get(
+                                            "error_msg", "Guardrails microservice unreachable"
+                                        ),
+                                    )
 
                             logger.info("safety.output.checked", is_grounded=is_grounded)
 
