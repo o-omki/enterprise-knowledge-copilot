@@ -4,9 +4,10 @@ from contextlib import asynccontextmanager
 import structlog
 from fastapi import FastAPI, HTTPException
 from nemoguardrails import LLMRails, RailsConfig
+from prometheus_client import make_asgi_app
 from pydantic import BaseModel, Field
 
-from packages.observability import configure_logging
+from packages.observability import configure_logging, setup_tracing
 from packages.safety import contains_jailbreak_local, contains_off_topic_local, redact_local_pii
 
 configure_logging("guardrails", os.getenv("LOG_LEVEL", "INFO"))
@@ -40,6 +41,8 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Safety Guardrails Microservice", version="1.0.0", lifespan=lifespan)
+setup_tracing(app, service_name="guardrails")
+app.mount("/metrics", make_asgi_app())
 
 
 class InputValidationRequest(BaseModel):
