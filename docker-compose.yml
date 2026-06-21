@@ -61,6 +61,8 @@ services:
     ports:
       - "6333:6333"
       - "6334:6334"
+    volumes:
+      - qdrant_data:/qdrant/storage
 
   postgres:
     image: postgres:16
@@ -154,5 +156,6 @@ services:
 
 volumes:
   postgres_data:
+  qdrant_data:
 
 
