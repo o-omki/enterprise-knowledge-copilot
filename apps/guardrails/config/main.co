@@ -18,8 +18,7 @@ flow trigger output validation
 
 flow input rails $input_text
   await self check input
-  await jailbreak detection heuristics
-  await mask sensitive data on input
+  # await jailbreak detection heuristics # Auto invoked by sensitive_data_detection in config.yml
   await check off topic intent
 
 flow output rails $output_text
