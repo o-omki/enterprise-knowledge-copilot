@@ -41,9 +41,9 @@ class TestContainsJailbreakLocal:
         ],
     )
     def test_detects_jailbreak_prompts(self, prompt: str) -> None:
-        assert (
-            contains_jailbreak_local(prompt) is True
-        ), f"Expected jailbreak to be detected in: {prompt!r}"
+        assert contains_jailbreak_local(prompt) is True, (
+            f"Expected jailbreak to be detected in: {prompt!r}"
+        )
 
     # --- Hard negatives: legitimate queries that must NOT be blocked ---
 
@@ -60,9 +60,9 @@ class TestContainsJailbreakLocal:
         ],
     )
     def test_allows_clean_prompts(self, prompt: str) -> None:
-        assert (
-            contains_jailbreak_local(prompt) is False
-        ), f"Expected no jailbreak detection in: {prompt!r}"
+        assert contains_jailbreak_local(prompt) is False, (
+            f"Expected no jailbreak detection in: {prompt!r}"
+        )
 
     def test_empty_string_is_safe(self) -> None:
         assert contains_jailbreak_local("") is False
@@ -168,9 +168,9 @@ class TestContainsOffTopicLocal:
         ],
     )
     def test_detects_off_topic_prompts(self, prompt: str) -> None:
-        assert (
-            contains_off_topic_local(prompt) is True
-        ), f"Expected off-topic detection for: {prompt!r}"
+        assert contains_off_topic_local(prompt) is True, (
+            f"Expected off-topic detection for: {prompt!r}"
+        )
 
     @pytest.mark.parametrize(
         "prompt",
