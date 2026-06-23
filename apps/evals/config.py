@@ -10,9 +10,13 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
+import dotenv
 import yaml
 from pydantic import BaseModel, Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
+
+# Load environment variables from .env file into os.environ
+dotenv.load_dotenv()
 
 
 class DatasetPaths(BaseModel):

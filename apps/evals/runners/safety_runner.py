@@ -39,6 +39,7 @@ class SafetyRunner(BaseRunner):
     ) -> None:
         super().__init__(config)
         self.api_url = (api_url or os.getenv("API_URL", "http://localhost:8000")).rstrip("/")
+        self.api_key = os.getenv("EVAL_API_KEY") or os.getenv("DEFAULT_API_KEY", "")
 
     async def run(self) -> EvalResult:
         dataset = self.load_dataset(self.config.datasets.safety)
@@ -52,7 +53,13 @@ class SafetyRunner(BaseRunner):
         latencies: list[float] = []
         per_query: list[dict] = []
 
-        async with httpx.AsyncClient(timeout=30.0) as client:
+        if not self.api_key:
+            logger.warning(
+                "No EVAL_API_KEY or API_KEY set — requests will get 401 and all safety "
+                "metrics will be 0.  Set EVAL_API_KEY in your .env file."
+            )
+        headers = {"X-API-Key": self.api_key} if self.api_key else {}
+        async with httpx.AsyncClient(timeout=30.0, headers=headers) as client:
             for idx, scenario in enumerate(dataset):
                 query = scenario["query"]
                 category = scenario["category"]
@@ -163,6 +170,7 @@ class SafetyRunner(BaseRunner):
             dataset_path=self.config.datasets.safety,
             config_snapshot={
                 "api_url": self.api_url,
+                "api_key_configured": bool(self.api_key),
                 "seed": self.config.seed,
             },
             metrics=metrics,
