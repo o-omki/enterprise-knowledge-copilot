@@ -43,7 +43,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(retrieval_request_duration_bucket[5m])) by (le, method))",
+          "expr": "histogram_quantile(0.95, sum(rate(retrieval_request_duration_seconds_bucket[5m])) by (le, method))",
           "legendFormat": "P95 {{method}}",
           "range": true
         },
@@ -53,7 +53,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(retrieval_request_duration_bucket[5m])) by (le, method))",
+          "expr": "histogram_quantile(0.50, sum(rate(retrieval_request_duration_seconds_bucket[5m])) by (le, method))",
           "legendFormat": "P50 {{method}}",
           "range": true
         }
@@ -172,7 +172,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(retrieval_request_total_total[1m]) * 60) by (domain) or sum(rate(retrieval_request_total[1m]) * 60) by (domain)",
+          "expr": "sum(rate(retrieval_request_total[1m]) * 60) by (domain)",
           "legendFormat": "{{domain}}",
           "range": true
         }
@@ -208,7 +208,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(reranking_request_duration_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.95, sum(rate(reranking_request_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "P95 Reranker",
           "range": true
         },
@@ -218,7 +218,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(reranking_request_duration_bucket[5m])) by (le))",
+          "expr": "histogram_quantile(0.50, sum(rate(reranking_request_duration_seconds_bucket[5m])) by (le))",
           "legendFormat": "P50 Reranker",
           "range": true
         }

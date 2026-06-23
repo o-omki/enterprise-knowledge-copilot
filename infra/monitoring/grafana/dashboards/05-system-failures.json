@@ -63,8 +63,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(http_server_request_total_total{status=~\"5..\"}[1m]) * 60) by (endpoint)",
-          "legendFormat": "FastAPI 5xx: {{endpoint}}",
+          "expr": "sum(rate(http_server_request_total{http_status_code=~\"5..\"}[1m]) * 60) by (http_route)",
+          "legendFormat": "FastAPI 5xx: {{http_route}}",
           "range": true
         }
       ],
@@ -171,7 +171,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(ingestion_task_total_total{status=\"failed\"}[5m])) / (sum(rate(ingestion_task_total_total[5m])) or 1) * 100 or sum(rate(ingestion_task_total{status=\"failed\"}[5m])) / (sum(rate(ingestion_task_total[5m])) or 1) * 100",
+          "expr": "sum(rate(ingestion_task_total{status=\"failed\"}[5m])) / (sum(rate(ingestion_task_total[5m])) + 0.001) * 100",
           "legendFormat": "Ingestion Failure Rate",
           "range": true
         }

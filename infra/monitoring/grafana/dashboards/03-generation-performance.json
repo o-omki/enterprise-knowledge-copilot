@@ -43,7 +43,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.95, sum(rate(llm_request_duration_bucket[5m])) by (le, model))",
+          "expr": "histogram_quantile(0.95, sum(rate(llm_request_duration_seconds_bucket[5m])) by (le, model))",
           "legendFormat": "P95 {{model}}",
           "range": true
         },
@@ -53,7 +53,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "histogram_quantile(0.50, sum(rate(llm_request_duration_bucket[5m])) by (le, model))",
+          "expr": "histogram_quantile(0.50, sum(rate(llm_request_duration_seconds_bucket[5m])) by (le, model))",
           "legendFormat": "P50 {{model}}",
           "range": true
         }
@@ -90,7 +90,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(llm_tokens_total_total[5m])) by (model) or sum(rate(llm_tokens_total[5m])) by (model)",
+          "expr": "sum(rate(llm_tokens_total[5m])) by (model)",
           "legendFormat": "{{model}}",
           "range": true
         }
@@ -126,7 +126,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(llm_requests_errors_total[1m])) by (model) or sum(rate(llm_requests_errors[1m])) by (model)",
+          "expr": "sum(rate(llm_requests_errors_total[1m])) by (model)",
           "legendFormat": "{{model}} errors",
           "range": true
         }
@@ -162,7 +162,7 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(llm_cache_hit_total_total{hit=\"true\"}[5m])) / (sum(rate(llm_cache_hit_total_total[5m])) or 1) * 100 or sum(rate(llm_cache_hit_total{hit=\"true\"}[5m])) / (sum(rate(llm_cache_hit_total[5m])) or 1) * 100",
+          "expr": "sum(rate(llm_cache_hit_total_total{hit=\"true\"}[5m])) / (sum(rate(llm_cache_hit_total_total[5m])) + 0.001) * 100 or sum(rate(llm_cache_hit_total{hit=\"true\"}[5m])) / (sum(rate(llm_cache_hit_total[5m])) + 0.001) * 100",
           "legendFormat": "Cache Hit Rate",
           "range": true
         }
@@ -185,7 +185,7 @@
         "y": 8
       },
       "id": 5,
-      "title": "Estimated Cost per Hour (USD)",
+      "title": "Generation Request Rate by Status",
       "type": "timeseries",
       "datasource": {
         "type": "prometheus",
@@ -198,8 +198,8 @@
             "uid": "Prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(rate(llm_cost_total_usd_total[5m]) * 3600) or sum(rate(llm_cost_total_usd[5m]) * 3600)",
-          "legendFormat": "Estimated cost/hr",
+          "expr": "sum(rate(generation_request_total[1m]) * 60) by (model, status)",
+          "legendFormat": "{{model}} ({{status}})",
           "range": true
         }
       ],
@@ -208,7 +208,7 @@
           "custom": {
             "drawStyle": "line"
           },
-          "unit": "usd"
+          "unit": "req/min"
         }
       }
     },
