@@ -59,7 +59,7 @@ dependencies = [
 ]
 
 [tool.pytest.ini_options]
-testpaths = ["apps"]
+testpaths = ["apps", "packages"]
 python_files = ["test_*.py"]
 
 [tool.mypy]
