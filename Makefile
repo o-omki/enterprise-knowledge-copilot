@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report
+.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report dashboards observability-check
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -88,4 +88,15 @@ load-test:
 load-test-report:
 	@echo "Generating load test report..."
 	PYTHONPATH=. $(PYTHON) scripts/load_test_report.py
+
+dashboards:
+	@echo "Grafana: http://localhost:3001 (admin/admin)"
+	@echo "Prometheus: http://localhost:9090"
+	@echo "Jaeger: http://localhost:16686"
+
+observability-check:
+	@echo "Checking observability stack health..."
+	curl -sf http://localhost:9090/-/healthy && echo "Prometheus: OK" || echo "Prometheus: FAIL"
+	curl -sf http://localhost:3001/api/health && echo "Grafana: OK" || echo "Grafana: FAIL"
+	curl -sf http://localhost:16686/ && echo "Jaeger: OK" || echo "Jaeger: FAIL"
 
