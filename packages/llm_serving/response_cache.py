@@ -30,10 +30,19 @@ class ResponseCache:
         cached = await self.redis.get(key)
         if cached:
             data = json.loads(cached)
+            parsed = data.get("parsed")
+            if parsed is not None and request.response_schema is not None:
+                try:
+                    if hasattr(request.response_schema, "model_validate"):
+                        parsed = request.response_schema.model_validate(parsed)
+                    elif hasattr(request.response_schema, "parse_obj"):
+                        parsed = request.response_schema.parse_obj(parsed)
+                except Exception:
+                    pass
             return LLMResponse(
                 text=data.get("text", ""),
                 usage=UsageMetadata(**data.get("usage", {})),
-                parsed=data.get("parsed"),
+                parsed=parsed,
             )
         return None
 
@@ -41,9 +50,17 @@ class ResponseCache:
         if not self.config.cache_enabled or not self.redis:
             return
         key = self._generate_key(request)
+
+        parsed_val = response.parsed
+        if parsed_val is not None:
+            if hasattr(parsed_val, "model_dump"):
+                parsed_val = parsed_val.model_dump()
+            elif hasattr(parsed_val, "dict"):
+                parsed_val = parsed_val.dict()
+
         data = {
             "text": response.text,
             "usage": response.usage.model_dump(),
-            "parsed": response.parsed,
+            "parsed": parsed_val,
         }
         await self.redis.set(key, json.dumps(data), ex=self.config.cache_ttl_sec)
