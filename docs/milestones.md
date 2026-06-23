@@ -1,9 +1,9 @@
 # Milestones
 
 ## Overall Status
-- Current phase: Phase 9 (Observability and Reliability)
-- Last completed phase: Phase 8 (Serving & Inference Optimization) — **Complete**
-- Last updated: 2026-06-16
+- Current phase: Phase 10 (Deployment & Cloud Infrastructure)
+- Last completed phase: Phase 9 (Observability and Reliability) — **Complete**
+- Last updated: 2026-06-21
 
 ## Phase 0 Checklist
 <!--  -->
@@ -66,6 +66,7 @@
 - [x] Phase 6 completion sign-off (June 9, 2026)
 - [x] Phase 7 completion sign-off (June 15, 2026)
 - [x] Phase 8 completion sign-off (June 16, 2026)
+- [x] Phase 9 completion sign-off (June 21, 2026)
 
 ## Phase 3: Cross-Encoder Reranking (Complete)
 - [x] Add `sentence-transformers` dependency (`pyproject.toml`)
@@ -204,3 +205,28 @@
 - [x] Epic 7: Documentation & ADR
   - [x] Task 7.1: Write ADR 0016 (LLM Abstraction Layer) and ADR 0017 (Model Routing Strategy)
   - [x] Task 7.2: Create developer guide `docs/model-serving.md`
+
+## Phase 9: Observability and Reliability (Complete)
+- [x] Epic 1: Structured Logging Overhaul
+  - [x] Configure structlog with JSON renderer
+  - [x] Create API request context middleware
+  - [x] Update pipeline components to use structured logging
+- [x] Epic 2: Distributed Tracing Instrumentation
+  - [x] Instrument API, Guardrails, and Worker services with OTel
+  - [x] Set up span attributes and error logging
+- [x] Epic 3: Prometheus Metrics Exporter & Custom Application Counters
+  - [x] Define counters and histograms for request, retrieval, reranking, generation, and safety layers
+  - [x] Setup PrometheusMetricReader and mount /metrics route in FastAPI
+- [x] Epic 4: Grafana Dashboards
+  - [x] Build and auto-provision Grafana dashboards
+  - [x] Add Prometheus and Grafana containers in docker-compose.yml
+- [x] Epic 5: Failure Rate & Timeout Pattern Tracking
+  - [x] Build FailureTracker class
+  - [x] Wire timeout and retry tracking into pipeline components
+- [x] Epic 6: Alerting Rules & Runbooks
+  - [x] Define multi-tier alerts in `alert_rules.yml`
+  - [x] Write operational runbooks in `docs/runbooks/`
+- [x] Epic 7: Dependencies, Configuration, and Documentation
+  - [x] Document observability architecture, dashboards, and Jaeger guides
+  - [x] Write ADR 0018 (Observability Stack)
+  - [x] Configure environment variables and Makefile targets

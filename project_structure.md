@@ -31,7 +31,22 @@ enterprise-knowledge-copilot/
 │   │   ├── 0001-monorepo.md
 │   │   ├── 0002-vector-db-choice.md
 │   │   ├── 0003-reranker-choice.md
-│   │   └── 0004-frontend-choice.md
+│   │   ├── 0004-frontend-choice.md
+│   │   ├── 0005-cloud-provider-choice.md
+│   │   ├── 0006-queue-choice.md
+│   │   ├── 0011-hybrid-scoring-evaluation.md
+│   │   ├── 0012-reranker-choice.md
+│   │   ├── 0015-api-v1-contract.md
+│   │   ├── 0016-llm-abstraction-layer.md
+│   │   ├── 0017-model-routing-strategy.md
+│   │   ├── 0018-observability-stack.md
+│   │   └── 003_nemo_guardrails_integration.md
+│   ├── runbooks/
+│   │   ├── high_p95_latency.md
+│   │   ├── circuit_breaker_open.md
+│   │   ├── ingestion_failures.md
+│   │   ├── vector_db_connectivity.md
+│   │   └── safety_block_spike.md
 │   ├── diagrams/
 │   │   ├── high-level-architecture.png
 │   │   ├── sequence-query-flow.png
@@ -97,8 +112,20 @@ enterprise-knowledge-copilot/
 │   ├── helm/
 │   └── monitoring/
 │       ├── prometheus/
-│       ├── grafana/
-│       └── alerts/
+│       │   ├── prometheus.yml
+│       │   └── alert_rules.yml
+│       └── grafana/
+│           ├── provisioning/
+│           │   ├── dashboards/
+│           │   │   └── dashboard.yml
+│           │   └── datasources/
+│           │       └── prometheus.yml
+│           └── dashboards/
+│               ├── 01-request-health.json
+│               ├── 02-retrieval-performance.json
+│               ├── 03-generation-performance.json
+│               ├── 04-safety.json
+│               └── 05-system-failures.json
 ├── configs/
 │   ├── app.yaml
 │   ├── retrieval.yaml
