@@ -1,6 +1,6 @@
 PYTHON ?= python
 
-.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report dashboards observability-check
+.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report dashboards observability-check tf-init tf-validate tf-plan tf-apply tf-destroy
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -99,4 +99,21 @@ observability-check:
 	curl -sf http://localhost:9090/-/healthy && echo "Prometheus: OK" || echo "Prometheus: FAIL"
 	curl -sf http://localhost:3001/api/health && echo "Grafana: OK" || echo "Grafana: FAIL"
 	curl -sf http://localhost:16686/ && echo "Jaeger: OK" || echo "Jaeger: FAIL"
+
+tf-init:
+	terraform -chdir=infra/terraform init
+
+tf-validate:
+	terraform -chdir=infra/terraform validate
+
+tf-plan:
+	terraform -chdir=infra/terraform plan
+
+tf-apply:
+	terraform -chdir=infra/terraform apply
+
+tf-destroy:
+	@echo "WARNING: Running terraform destroy will tear down the infrastructure."
+	@read -p "Are you sure? [y/N]: " ans && [ $${ans:-N} = y ]
+	terraform -chdir=infra/terraform destroy
 
