@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ekc-guardrails
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ekc-guardrails
+  template:
+    metadata:
+      labels:
+        app: ekc-guardrails
+    spec:
+      serviceAccountName: ekc-workload-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: guardrails
+          image: ekc-guardrails:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+          ports:
+            - containerPort: 8001
+              name: http
+          envFrom:
+            - configMapRef:
+                name: ekc-config
+          env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ekc-secrets
+                  key: GEMINI_API_KEY
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            httpGet:
+              path: /health/live
+              port: 8001
+            initialDelaySeconds: 30
+            periodSeconds: 15
+          readinessProbe:
+            httpGet:
+              path: /health/ready
+              port: 8001
+            initialDelaySeconds: 15
+            periodSeconds: 10

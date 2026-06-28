@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ekc-config
+data:
+  QDRANT_URL: "http://ekc-qdrant:6333"
+  REDIS_URL: "redis://ekc-redis:6379/0"
+  CELERY_BROKER_URL: "redis://ekc-redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://ekc-redis:6379/1"
+  GUARDRAILS_SERVICE_URL: "http://ekc-guardrails:8001"
+  LOG_FORMAT: "json"
+  METRICS_ENABLED: "true"
+  PROMPT_VERSION: "v1"
+  GCP_PROJECT_ID: "clean-carrier-500104-i0"
+  GCP_LOCATION: "us-central1"
+  GCP_EMBEDDING_MODEL: "gemini-embedding-2"
+  LLM_DEFAULT_BACKEND: "vertex_ai"
+  OTEL_TRACES_SAMPLER: "always_on"
+  OTEL_TRACES_SAMPLER_ARG: "0.1"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://ekc-jaeger:4317"
+  OTEL_EXPORTER_OTLP_INSECURE: "true"
+  DEPLOYMENT_ENVIRONMENT: "base"

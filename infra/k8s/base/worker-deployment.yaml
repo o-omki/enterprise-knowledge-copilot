@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ekc-worker
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ekc-worker
+  template:
+    metadata:
+      labels:
+        app: ekc-worker
+    spec:
+      serviceAccountName: ekc-workload-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1001
+        runAsGroup: 1001
+        fsGroup: 1001
+      containers:
+        - name: worker
+          image: ekc-worker:latest
+          imagePullPolicy: IfNotPresent
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: false
+          command:
+            - celery
+            - -A
+            - apps.worker.celery_app
+            - worker
+            - --loglevel=info
+            - --concurrency=2
+          envFrom:
+            - configMapRef:
+                name: ekc-config
+          env:
+            - name: GEMINI_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ekc-secrets
+                  key: GEMINI_API_KEY
+            - name: JWT_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ekc-secrets
+                  key: JWT_SECRET_KEY
+            - name: POSTGRES_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: ekc-secrets
+                  key: POSTGRES_DSN
+            - name: DEFAULT_API_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: ekc-secrets
+                  key: DEFAULT_API_KEY
+          resources:
+            requests:
+              cpu: 250m
+              memory: 512Mi
+            limits:
+              cpu: 500m
+              memory: 1Gi
+          livenessProbe:
+            exec:
+              command:
+                - celery
+                - -A
+                - apps.worker.celery_app
+                - inspect
+                - ping
+                - --timeout
+                - "5"
+            initialDelaySeconds: 45
+            periodSeconds: 30
+            timeoutSeconds: 15

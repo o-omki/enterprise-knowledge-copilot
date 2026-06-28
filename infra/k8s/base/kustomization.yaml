@@ -1,0 +1,63 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+labels:
+  - pairs:
+      app.kubernetes.io/part-of: ekc
+      app.kubernetes.io/managed-by: kustomize
+
+resources:
+  - namespace.yaml
+  - service-account.yaml
+  - configmap.yaml
+  - secrets.yaml
+  - api-deployment.yaml
+  - api-service.yaml
+  - api-hpa.yaml
+  - worker-deployment.yaml
+  - guardrails-deployment.yaml
+  - guardrails-service.yaml
+  - frontend-deployment.yaml
+  - frontend-service.yaml
+  - qdrant-statefulset.yaml
+  - qdrant-service.yaml
+  - redis-deployment.yaml
+  - redis-service.yaml
+  - jaeger-deployment.yaml
+  - jaeger-service.yaml
+  - prometheus-deployment.yaml
+  - grafana-deployment.yaml
+  - monitoring-services.yaml
+  - network-policy.yaml
+
+images:
+  - name: ekc-api
+    newName: us-central1-docker.pkg.dev/clean-carrier-500104-i0/ekc-images/api
+    newTag: latest
+  - name: ekc-worker
+    newName: us-central1-docker.pkg.dev/clean-carrier-500104-i0/ekc-images/worker
+    newTag: latest
+  - name: ekc-guardrails
+    newName: us-central1-docker.pkg.dev/clean-carrier-500104-i0/ekc-images/guardrails
+    newTag: latest
+  - name: ekc-frontend
+    newName: us-central1-docker.pkg.dev/clean-carrier-500104-i0/ekc-images/frontend
+    newTag: latest
+
+configMapGenerator:
+  - name: ekc-prometheus-config
+    files:
+      - prometheus.yml=monitoring/prometheus/prometheus.yml
+      - alert_rules.yml=monitoring/prometheus/alert_rules.yml
+  - name: ekc-grafana-provisioning
+    files:
+      - datasources/prometheus.yml=monitoring/grafana/provisioning/datasources/prometheus.yml
+      - dashboards/dashboard.yml=monitoring/grafana/provisioning/dashboards/dashboard.yml
+  - name: ekc-grafana-dashboards
+    files:
+      - dashboards/01-request-health.json=monitoring/grafana/dashboards/01-request-health.json
+      - dashboards/02-retrieval-performance.json=monitoring/grafana/dashboards/02-retrieval-performance.json
+      - dashboards/03-generation-performance.json=monitoring/grafana/dashboards/03-generation-performance.json
+      - dashboards/04-safety.json=monitoring/grafana/dashboards/04-safety.json
+      - dashboards/05-system-failures.json=monitoring/grafana/dashboards/05-system-failures.json
+
