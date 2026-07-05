@@ -254,7 +254,11 @@
 - [x] Epic 4: Secrets Management & Workload Identity (Complete)
   - [x] Task 4.1: Implement shell script (`scripts/sync_secrets.sh`) to sync secrets from Secret Manager
   - [x] Task 4.2: Add operations runbook (`docs/runbooks/secrets_rotation.md`) for secrets rotation
-- [ ] Epic 5: CI/CD Pipeline & Cluster Teardown (GitHub Actions) (Pending)
+- [x] Epic 5: CI/CD Pipeline & Cluster Teardown (GitHub Actions) (Complete)
+  - [x] Task 5.1: Update CI workflow to build and push Docker images to Artifact Registry
+  - [x] Task 5.2: Create deploy workflow for Staging and Production with automated rollback and alerts
+  - [x] Task 5.3: Create Terraform workflow with PR planning, cost estimation, and automatic apply
+  - [x] Task 5.4: Create manual teardown workflow with safety gates and resource destruction
 - [ ] Epic 6: Health Checks, Probes & Graceful Shutdown (Pending)
 - [ ] Epic 7: Deployment Documentation & Runbooks (Pending)
 - [ ] Epic 8: Integration, Environment Configs & Makefile (Pending)
