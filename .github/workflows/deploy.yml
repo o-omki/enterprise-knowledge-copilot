@@ -1,0 +1,135 @@
+name: Deploy
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types:
+      - completed
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy (staging or production)'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+          - staging
+          - production
+
+jobs:
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'staging')
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials ekc-cluster \
+            --region us-central1 \
+            --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Sync Secrets to K8s Manifest
+        run: |
+          chmod +x scripts/sync_secrets.sh
+          ./scripts/sync_secrets.sh --environment staging --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Deploy Staging Workloads
+        run: |
+          kubectl apply -k infra/k8s/overlays/staging
+
+      - name: Monitor Rollout Status
+        id: monitor
+        run: |
+          kubectl rollout status deployment/staging-ekc-api -n ekc-staging --timeout=300s
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Rolling back staging-ekc-api..."
+          kubectl rollout undo deployment/staging-ekc-api -n ekc-staging
+          
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -s -X POST -H 'Content-type: application/json' \
+              --data '{"text":"🚨 *Staging Deployment Failed!* Rollback initiated for `staging-ekc-api` in namespace `ekc-staging`."}' \
+              "${{ secrets.SLACK_WEBHOOK_URL }}"
+          else
+            echo "Slack Webhook URL not set, skipping alert."
+          fi
+
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    if: |
+      (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success' && startsWith(github.event.workflow_run.head_branch, 'v')) ||
+      (github.event_name == 'workflow_dispatch' && github.event.inputs.environment == 'production')
+    environment: production
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Get GKE Credentials
+        run: |
+          gcloud container clusters get-credentials ekc-cluster \
+            --region us-central1 \
+            --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Sync Secrets to K8s Manifest
+        run: |
+          chmod +x scripts/sync_secrets.sh
+          ./scripts/sync_secrets.sh --environment prod --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Deploy Production Workloads
+        run: |
+          kubectl apply -k infra/k8s/overlays/prod
+
+      - name: Monitor Rollout Status
+        id: monitor
+        run: |
+          kubectl rollout status deployment/prod-ekc-api -n ekc-prod --timeout=300s
+
+      - name: Rollback on Failure
+        if: failure()
+        run: |
+          echo "Deployment failed! Rolling back prod-ekc-api..."
+          kubectl rollout undo deployment/prod-ekc-api -n ekc-prod
+          
+          if [ -n "${{ secrets.SLACK_WEBHOOK_URL }}" ]; then
+            curl -s -X POST -H 'Content-type: application/json' \
+              --data '{"text":"🚨 *Production Deployment Failed!* Rollback initiated for `prod-ekc-api` in namespace `ekc-prod`."}' \
+              "${{ secrets.SLACK_WEBHOOK_URL }}"
+          else
+            echo "Slack Webhook URL not set, skipping alert."
+          fi
