@@ -230,3 +230,31 @@
   - [x] Document observability architecture, dashboards, and Jaeger guides
   - [x] Write ADR 0018 (Observability Stack)
   - [x] Configure environment variables and Makefile targets
+
+## Phase 10: Deployment and Cloud Infrastructure (In Progress)
+
+- [x] Epic 1: Production-Grade Dockerfiles
+  - [x] Task 1.1: Multi-stage API Dockerfile with curl health check
+  - [x] Task 1.2: Multi-stage Celery Worker Dockerfile with ping health check
+  - [x] Task 1.3: Multi-stage Guardrails Dockerfile with slim python & health check
+  - [x] Task 1.4: Multi-stage Frontend Dockerfile with wget health check
+  - [x] Task 1.5: Optimized .dockerignore file exclusions
+- [x] Epic 2: Terraform Infrastructure as Code (Complete)
+  - [x] Task 2.1: Initialize provider, remote state, APIs enablement configuration (`main.tf`)
+  - [x] Task 2.2: Implement configurable input variables & validation (`variables.tf`)
+  - [x] Task 2.3: Expose resource endpoints and metadata attributes (`outputs.tf`)
+  - [x] Task 2.4: Setup custom VPC, subnets, NAT, and database peering (`network.tf`)
+  - [x] Task 2.5: Configure custom Node SA & Workload Identity bindings (`iam.tf`)
+  - [x] Task 2.6: Create Artifact Registry repository with cleanup rules (`registry.tf`)
+  - [x] Task 2.7: Define GCP Secret Manager placeholders and versioning (`secrets.tf`)
+  - [x] Task 2.8: Provision Private GKE Autopilot cluster with lifecycle guards (`gke.tf`)
+  - [x] Task 2.9: Provision private Postgres instance & DB user (`database.tf`)
+  - [x] Task 2.10: Setup monthly cost breakdown and HCL check rules (`cost_estimation.tf`)
+- [x] Epic 3: Kustomize Kubernetes Manifests (Complete)
+- [x] Epic 4: Secrets Management & Workload Identity (Complete)
+  - [x] Task 4.1: Implement shell script (`scripts/sync_secrets.sh`) to sync secrets from Secret Manager
+  - [x] Task 4.2: Add operations runbook (`docs/runbooks/secrets_rotation.md`) for secrets rotation
+- [ ] Epic 5: CI/CD Pipeline & Cluster Teardown (GitHub Actions) (Pending)
+- [ ] Epic 6: Health Checks, Probes & Graceful Shutdown (Pending)
+- [ ] Epic 7: Deployment Documentation & Runbooks (Pending)
+- [ ] Epic 8: Integration, Environment Configs & Makefile (Pending)

@@ -46,7 +46,8 @@ enterprise-knowledge-copilot/
 │   │   ├── circuit_breaker_open.md
 │   │   ├── ingestion_failures.md
 │   │   ├── vector_db_connectivity.md
-│   │   └── safety_block_spike.md
+│   │   ├── safety_block_spike.md
+│   │   └── secrets_rotation.md
 │   ├── diagrams/
 │   │   ├── high-level-architecture.png
 │   │   ├── sequence-query-flow.png
@@ -100,32 +101,45 @@ enterprise-knowledge-copilot/
 │   ├── build_index.py
 │   ├── run_evals.py
 │   ├── load_test.py
-│   └── seed_demo_data.py
+│   ├── seed_demo_data.py
+│   └── sync_secrets.sh
 ├── infra/
 │   ├── docker/
 │   ├── k8s/
 │   │   ├── base/
+│   │   │   ├── monitoring/
+│   │   │   │   ├── prometheus/
+│   │   │   │   │   ├── prometheus.yml
+│   │   │   │   │   └── alert_rules.yml
+│   │   │   │   └── grafana/
+│   │   │   │       ├── provisioning/
+│   │   │   │       │   ├── dashboards/
+│   │   │   │       │   │   └── dashboard.yml
+│   │   │   │       │   └── datasources/
+│   │   │   │       │       └── prometheus.yml
+│   │   │   │       └── dashboards/
+│   │   │   │           ├── 01-request-health.json
+│   │   │   │           ├── 02-retrieval-performance.json
+│   │   │   │           ├── 03-generation-performance.json
+│   │   │   │           ├── 04-safety.json
+│   │   │   │           └── 05-system-failures.json
 │   │   ├── overlays/dev/
 │   │   ├── overlays/staging/
 │   │   └── overlays/prod/
 │   ├── terraform/
-│   ├── helm/
-│   └── monitoring/
-│       ├── prometheus/
-│       │   ├── prometheus.yml
-│       │   └── alert_rules.yml
-│       └── grafana/
-│           ├── provisioning/
-│           │   ├── dashboards/
-│           │   │   └── dashboard.yml
-│           │   └── datasources/
-│           │       └── prometheus.yml
-│           └── dashboards/
-│               ├── 01-request-health.json
-│               ├── 02-retrieval-performance.json
-│               ├── 03-generation-performance.json
-│               ├── 04-safety.json
-│               └── 05-system-failures.json
+│   │   ├── .gitignore
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   ├── network.tf
+│   │   ├── iam.tf
+│   │   ├── registry.tf
+│   │   ├── secrets.tf
+│   │   ├── gke.tf
+│   │   ├── database.tf
+│   │   ├── cost_estimation.tf
+│   │   └── terraform.tfvars.example
+│   └── helm/
 ├── configs/
 │   ├── app.yaml
 │   ├── retrieval.yaml
