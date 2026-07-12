@@ -1,16 +1,20 @@
+import asyncio
 import datetime
 import os
+import signal
 import uuid
 from contextlib import asynccontextmanager
 from typing import Literal, cast
 
+import httpx
 import structlog
 from celery.result import AsyncResult
 from fastapi import APIRouter, FastAPI, File, Form, HTTPException, Request, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 from prometheus_client import make_asgi_app
 from redis.asyncio import Redis
-from sqlalchemy import desc, select
+from sqlalchemy import desc, select, text
 from sqlalchemy.orm import selectinload
 
 from apps.api.app.middleware.auth import MultiAuthMiddleware
@@ -40,7 +44,7 @@ from packages.observability import configure_logging, setup_tracing
 from packages.rag.generation import GenerationService
 from packages.rag.reranker import RerankerService
 from packages.rag.search import SearchService
-from packages.shared.database import async_session_maker
+from packages.shared.database import async_session_maker, engine
 from packages.shared.feedback import FeedbackService
 from packages.shared.orm_models import Message, Session
 
@@ -86,6 +90,50 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error("startup.genai_client_init_failed", error=str(e), exc_info=True)
 
+    app.state.shutting_down = False
+    app.state.active_requests = 0
+
+    async def graceful_shutdown():
+        logger.info("shutdown.graceful_start")
+        app.state.shutting_down = True
+
+        shutdown_grace_period = float(os.getenv("SHUTDOWN_GRACE_PERIOD", "20"))
+        logger.info("shutdown.sleeping_for_grace_period", period=shutdown_grace_period)
+        await asyncio.sleep(shutdown_grace_period)
+
+        drain_timeout = float(os.getenv("SHUTDOWN_DRAIN_TIMEOUT", "10"))
+        start_time = asyncio.get_event_loop().time()
+        logger.info(
+            "shutdown.draining_active_requests",
+            active_requests=app.state.active_requests,
+        )
+        while app.state.active_requests > 0:
+            if asyncio.get_event_loop().time() - start_time > drain_timeout:
+                logger.warning(
+                    "shutdown.drain_timeout_reached",
+                    active_requests=app.state.active_requests,
+                )
+                break
+            logger.info(
+                "shutdown.waiting_for_active_requests",
+                active_requests=app.state.active_requests,
+            )
+            await asyncio.sleep(0.5)
+
+        logger.info("shutdown.triggering_uvicorn_exit")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def handle_sigterm():
+        logger.info("shutdown.sigterm_received")
+        asyncio.create_task(graceful_shutdown())
+
+    try:
+        loop = asyncio.get_running_loop()
+        loop.add_signal_handler(signal.SIGTERM, handle_sigterm)
+        logger.info("shutdown.sigterm_handler_registered")
+    except ValueError as e:
+        logger.warning("shutdown.sigterm_handler_registration_failed", error=str(e))
+
     yield
     # Shutdown: Clean up open connections
     await redis_client.close()
@@ -93,6 +141,26 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Enterprise Knowledge Copilot API", version="0.9.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def track_active_requests(request: Request, call_next):
+    if not hasattr(request.app.state, "active_requests"):
+        request.app.state.active_requests = 0
+
+    path = request.url.path
+    is_probe = path in ("/health", "/readiness", "/metrics")
+
+    if not is_probe:
+        request.app.state.active_requests += 1
+
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        if not is_probe:
+            request.app.state.active_requests -= 1
+
 
 setup_tracing(app)
 
@@ -122,6 +190,61 @@ v1_router = APIRouter(prefix="/api/v1")
 @app.get("/health")
 async def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.get("/readiness")
+async def readiness():
+    shutting_down = getattr(app.state, "shutting_down", False)
+
+    # 1. Check Redis
+    try:
+        await redis_client.ping()
+        redis_ok = True
+        redis_detail = "healthy"
+    except Exception as e:
+        redis_ok = False
+        redis_detail = f"unhealthy: {str(e)}"
+
+    # 2. Check Qdrant
+    try:
+        async with httpx.AsyncClient() as client:
+            qdrant_url = search_service.config.qdrant_url.rstrip("/")
+            resp = await client.get(f"{qdrant_url}/healthz", timeout=3.0)
+            if resp.status_code == 200:
+                qdrant_ok = True
+                qdrant_detail = "healthy"
+            else:
+                qdrant_ok = False
+                qdrant_detail = f"unhealthy: HTTP {resp.status_code}"
+    except Exception as e:
+        qdrant_ok = False
+        qdrant_detail = f"unhealthy: {str(e)}"
+
+    # 3. Check PostgreSQL
+    try:
+        async with engine.connect() as conn:
+            await conn.execute(text("SELECT 1"))
+        db_ok = True
+        db_detail = "healthy"
+    except Exception as e:
+        db_ok = False
+        db_detail = f"unhealthy: {str(e)}"
+
+    is_ready = redis_ok and qdrant_ok and db_ok and not shutting_down
+    status_code = 200 if is_ready else 503
+
+    status_str = "ready" if is_ready else "unhealthy"
+    if shutting_down:
+        status_str = "shutting_down"
+
+    payload = {
+        "status": status_str,
+        "redis": redis_detail,
+        "qdrant": qdrant_detail,
+        "database": db_detail,
+    }
+
+    return JSONResponse(status_code=status_code, content=payload)
 
 
 @v1_router.post("/search", response_model=SearchResponse)

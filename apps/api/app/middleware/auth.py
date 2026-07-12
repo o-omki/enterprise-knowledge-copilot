@@ -34,6 +34,8 @@ class MultiAuthMiddleware(BaseHTTPMiddleware):
         self.bypass_paths = {
             "/health",
             "/api/v1/health",
+            "/readiness",
+            "/api/v1/readiness",
             "/docs",
             "/redoc",
             "/openapi.json",
