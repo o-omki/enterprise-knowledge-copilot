@@ -1,9 +1,9 @@
 # Milestones
 
 ## Overall Status
-- Current phase: Phase 10 (Deployment & Cloud Infrastructure)
-- Last completed phase: Phase 9 (Observability and Reliability) — **Complete**
-- Last updated: 2026-06-21
+- Current phase: Phase 11 (Hardening and Showcase)
+- Last completed phase: Phase 10 (Deployment & Cloud Infrastructure) — **Complete**
+- Last updated: 2026-07-12
 
 ## Phase 0 Checklist
 <!--  -->
@@ -67,6 +67,7 @@
 - [x] Phase 7 completion sign-off (June 15, 2026)
 - [x] Phase 8 completion sign-off (June 16, 2026)
 - [x] Phase 9 completion sign-off (June 21, 2026)
+- [x] Phase 10 completion sign-off (July 12, 2026)
 
 ## Phase 3: Cross-Encoder Reranking (Complete)
 - [x] Add `sentence-transformers` dependency (`pyproject.toml`)
@@ -231,7 +232,7 @@
   - [x] Write ADR 0018 (Observability Stack)
   - [x] Configure environment variables and Makefile targets
 
-## Phase 10: Deployment and Cloud Infrastructure (In Progress)
+## Phase 10: Deployment and Cloud Infrastructure (Complete)
 
 - [x] Epic 1: Production-Grade Dockerfiles
   - [x] Task 1.1: Multi-stage API Dockerfile with curl health check
@@ -259,6 +260,6 @@
   - [x] Task 5.2: Create deploy workflow for Staging and Production with automated rollback and alerts
   - [x] Task 5.3: Create Terraform workflow with PR planning, cost estimation, and automatic apply
   - [x] Task 5.4: Create manual teardown workflow with safety gates and resource destruction
-- [ ] Epic 6: Health Checks, Probes & Graceful Shutdown (Pending)
-- [ ] Epic 7: Deployment Documentation & Runbooks (Pending)
-- [ ] Epic 8: Integration, Environment Configs & Makefile (Pending)
+- [x] Epic 6: Health Checks, Probes & Graceful Shutdown (Complete)
+- [x] Epic 7: Deployment Documentation & Runbooks (Complete)
+- [x] Epic 8: Integration, Environment Configs & Makefile (Complete)
