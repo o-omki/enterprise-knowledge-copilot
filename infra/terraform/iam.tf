@@ -29,6 +29,10 @@ resource "google_service_account_iam_binding" "workload_identity_binding" {
   service_account_id = google_service_account.app_sa.name
   role               = "roles/iam.workloadIdentityUser"
 
+  depends_on = [
+    google_container_cluster.primary
+  ]
+
   members = [
     "serviceAccount:${var.project_id}.svc.id.goog[ekc-staging/ekc-workload-sa]",
     "serviceAccount:${var.project_id}.svc.id.goog[ekc-prod/ekc-workload-sa]",

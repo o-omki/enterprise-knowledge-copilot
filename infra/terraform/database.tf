@@ -1,3 +1,8 @@
+import {
+  to = google_sql_database_instance.postgres
+  id = "projects/${var.project_id}/instances/ekc-db-${var.environment}"
+}
+
 resource "google_sql_database_instance" "postgres" {
   name             = "ekc-db-${var.environment}"
   database_version = "POSTGRES_16"
@@ -10,7 +15,8 @@ resource "google_sql_database_instance" "postgres" {
   ]
 
   settings {
-    tier = var.db_tier
+    tier    = var.db_tier
+    edition = "ENTERPRISE"
 
     ip_configuration {
       ipv4_enabled    = false

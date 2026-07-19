@@ -1,3 +1,23 @@
+import {
+  to = google_secret_manager_secret.gemini_api_key
+  id = "projects/${var.project_id}/secrets/ekc-gemini-api-key"
+}
+
+import {
+  to = google_secret_manager_secret.jwt_secret_key
+  id = "projects/${var.project_id}/secrets/ekc-jwt-secret-key"
+}
+
+import {
+  to = google_secret_manager_secret.postgres_password
+  id = "projects/${var.project_id}/secrets/ekc-postgres-password"
+}
+
+import {
+  to = google_secret_manager_secret.default_api_key
+  id = "projects/${var.project_id}/secrets/ekc-default-api-key"
+}
+
 resource "google_secret_manager_secret" "gemini_api_key" {
   secret_id  = "ekc-gemini-api-key"
   project    = var.project_id
