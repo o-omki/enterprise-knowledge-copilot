@@ -51,13 +51,13 @@ configMapGenerator:
       - alert_rules.yml=monitoring/prometheus/alert_rules.yml
   - name: ekc-grafana-provisioning
     files:
-      - datasources/prometheus.yml=monitoring/grafana/provisioning/datasources/prometheus.yml
-      - dashboards/dashboard.yml=monitoring/grafana/provisioning/dashboards/dashboard.yml
+      - prometheus.yml=monitoring/grafana/provisioning/datasources/prometheus.yml
+      - dashboard.yml=monitoring/grafana/provisioning/dashboards/dashboard.yml
   - name: ekc-grafana-dashboards
     files:
-      - dashboards/01-request-health.json=monitoring/grafana/dashboards/01-request-health.json
-      - dashboards/02-retrieval-performance.json=monitoring/grafana/dashboards/02-retrieval-performance.json
-      - dashboards/03-generation-performance.json=monitoring/grafana/dashboards/03-generation-performance.json
-      - dashboards/04-safety.json=monitoring/grafana/dashboards/04-safety.json
-      - dashboards/05-system-failures.json=monitoring/grafana/dashboards/05-system-failures.json
+      - 01-request-health.json=monitoring/grafana/dashboards/01-request-health.json
+      - 02-retrieval-performance.json=monitoring/grafana/dashboards/02-retrieval-performance.json
+      - 03-generation-performance.json=monitoring/grafana/dashboards/03-generation-performance.json
+      - 04-safety.json=monitoring/grafana/dashboards/04-safety.json
+      - 05-system-failures.json=monitoring/grafana/dashboards/05-system-failures.json
 

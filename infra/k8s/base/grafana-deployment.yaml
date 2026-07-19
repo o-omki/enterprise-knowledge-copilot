@@ -65,6 +65,11 @@ spec:
         - name: provisioning-volume
           configMap:
             name: ekc-grafana-provisioning
+            items:
+              - key: prometheus.yml
+                path: datasources/prometheus.yml
+              - key: dashboard.yml
+                path: dashboards/dashboard.yml
         - name: dashboards-volume
           configMap:
             name: ekc-grafana-dashboards
