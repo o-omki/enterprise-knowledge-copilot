@@ -40,13 +40,16 @@ enterprise-knowledge-copilot/
 │   │   ├── 0016-llm-abstraction-layer.md
 │   │   ├── 0017-model-routing-strategy.md
 │   │   ├── 0018-observability-stack.md
+│   │   ├── 0019-deployment-architecture.md
 │   │   └── 003_nemo_guardrails_integration.md
 │   ├── runbooks/
 │   │   ├── high_p95_latency.md
 │   │   ├── circuit_breaker_open.md
 │   │   ├── ingestion_failures.md
 │   │   ├── vector_db_connectivity.md
-│   │   └── safety_block_spike.md
+│   │   ├── safety_block_spike.md
+│   │   ├── secrets_rotation.md
+│   │   └── deployment_rollback.md
 │   ├── diagrams/
 │   │   ├── high-level-architecture.png
 │   │   ├── sequence-query-flow.png
@@ -100,32 +103,79 @@ enterprise-knowledge-copilot/
 │   ├── build_index.py
 │   ├── run_evals.py
 │   ├── load_test.py
-│   └── seed_demo_data.py
+│   ├── seed_demo_data.py
+│   └── sync_secrets.sh
 ├── infra/
 │   ├── docker/
 │   ├── k8s/
 │   │   ├── base/
-│   │   ├── overlays/dev/
-│   │   ├── overlays/staging/
-│   │   └── overlays/prod/
+│   │   │   ├── namespace.yaml
+│   │   │   ├── kustomization.yaml
+│   │   │   ├── api-deployment.yaml
+│   │   │   ├── api-service.yaml
+│   │   │   ├── api-hpa.yaml
+│   │   │   ├── worker-deployment.yaml
+│   │   │   ├── guardrails-deployment.yaml
+│   │   │   ├── guardrails-service.yaml
+│   │   │   ├── frontend-deployment.yaml
+│   │   │   ├── frontend-service.yaml
+│   │   │   ├── qdrant-statefulset.yaml
+│   │   │   ├── qdrant-service.yaml
+│   │   │   ├── redis-deployment.yaml
+│   │   │   ├── redis-service.yaml
+│   │   │   ├── jaeger-deployment.yaml
+│   │   │   ├── jaeger-service.yaml
+│   │   │   ├── prometheus-deployment.yaml
+│   │   │   ├── grafana-deployment.yaml
+│   │   │   ├── monitoring-services.yaml
+│   │   │   ├── configmap.yaml
+│   │   │   ├── secrets.yaml
+│   │   │   ├── service-account.yaml
+│   │   │   ├── network-policy.yaml
+│   │   │   └── monitoring/
+│   │   │       ├── prometheus/
+│   │   │       │   ├── prometheus.yml
+│   │   │       │   └── alert_rules.yml
+│   │   │       └── grafana/
+│   │   │           ├── provisioning/
+│   │   │           │   ├── dashboards/
+│   │   │           │   │   └── dashboard.yml
+│   │   │           │   └── datasources/
+│   │   │           │       └── prometheus.yml
+│   │   │           └── dashboards/
+│   │   │               ├── 01-request-health.json
+│   │   │               ├── 02-retrieval-performance.json
+│   │   │               ├── 03-generation-performance.json
+│   │   │               ├── 04-safety.json
+│   │   │               └── 05-system-failures.json
+│   │   └── overlays/
+│   │       ├── staging/
+│   │       │   ├── kustomization.yaml
+│   │       │   └── patches/
+│   │       │       ├── configmap.yaml
+│   │       │       ├── replicas.yaml
+│   │       │       └── resources.yaml
+│   │       └── prod/
+│   │           ├── kustomization.yaml
+│   │           ├── pdb.yaml
+│   │           └── patches/
+│   │               ├── configmap.yaml
+│   │               ├── replicas.yaml
+│   │               └── resources.yaml
 │   ├── terraform/
-│   ├── helm/
-│   └── monitoring/
-│       ├── prometheus/
-│       │   ├── prometheus.yml
-│       │   └── alert_rules.yml
-│       └── grafana/
-│           ├── provisioning/
-│           │   ├── dashboards/
-│           │   │   └── dashboard.yml
-│           │   └── datasources/
-│           │       └── prometheus.yml
-│           └── dashboards/
-│               ├── 01-request-health.json
-│               ├── 02-retrieval-performance.json
-│               ├── 03-generation-performance.json
-│               ├── 04-safety.json
-│               └── 05-system-failures.json
+│   │   ├── .gitignore
+│   │   ├── main.tf
+│   │   ├── variables.tf
+│   │   ├── outputs.tf
+│   │   ├── network.tf
+│   │   ├── iam.tf
+│   │   ├── registry.tf
+│   │   ├── secrets.tf
+│   │   ├── gke.tf
+│   │   ├── database.tf
+│   │   ├── cost_estimation.tf
+│   │   └── terraform.tfvars.example
+│   └── helm/
 ├── configs/
 │   ├── app.yaml
 │   ├── retrieval.yaml

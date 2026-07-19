@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: ekc-config
+data:
+  QDRANT_URL: "http://staging-ekc-qdrant:6333"
+  REDIS_URL: "redis://staging-ekc-redis:6379/0"
+  CELERY_BROKER_URL: "redis://staging-ekc-redis:6379/0"
+  CELERY_RESULT_BACKEND: "redis://staging-ekc-redis:6379/1"
+  GUARDRAILS_SERVICE_URL: "http://staging-ekc-guardrails:8001"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://staging-ekc-jaeger:4317"
+  DEPLOYMENT_ENVIRONMENT: "staging"
+  LOG_LEVEL: "DEBUG"

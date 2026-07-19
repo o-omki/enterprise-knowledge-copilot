@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: ekc
+---
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: ekc-quota
+  namespace: ekc
+spec:
+  hard:
+    pods: "20"
+    requests.cpu: "10"
+    requests.memory: "20Gi"
+    limits.cpu: "20"
+    limits.memory: "20Gi"

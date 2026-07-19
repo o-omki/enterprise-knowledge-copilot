@@ -1,6 +1,9 @@
 PYTHON ?= python
 
-.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report dashboards observability-check
+.PHONY: install install-dev format lint type-check test dev pre-commit-install ingest-docs run-evals worker eval-serving load-test load-test-report dashboards observability-check tf-init tf-validate tf-plan tf-apply tf-destroy docker-build docker-push k8s-apply-staging k8s-apply-prod k8s-teardown-staging k8s-status k8s-logs
+
+REGISTRY ?= us-central1-docker.pkg.dev/clean-carrier-500104-i0/ekc-images
+IMAGE_TAG ?= latest
 
 install:
 	$(PYTHON) -m pip install --upgrade pip
@@ -99,4 +102,55 @@ observability-check:
 	curl -sf http://localhost:9090/-/healthy && echo "Prometheus: OK" || echo "Prometheus: FAIL"
 	curl -sf http://localhost:3001/api/health && echo "Grafana: OK" || echo "Grafana: FAIL"
 	curl -sf http://localhost:16686/ && echo "Jaeger: OK" || echo "Jaeger: FAIL"
+
+tf-init:
+	terraform -chdir=infra/terraform init
+
+tf-validate:
+	terraform -chdir=infra/terraform validate
+
+tf-plan:
+	terraform -chdir=infra/terraform plan
+
+tf-apply:
+	terraform -chdir=infra/terraform apply
+
+tf-destroy:
+	@echo "WARNING: Running terraform destroy will tear down the infrastructure."
+	@read -p "Are you sure? [y/N]: " ans && [ $${ans:-N} = y ]
+	terraform -chdir=infra/terraform destroy
+
+docker-build:
+	docker build -t $(REGISTRY)/api:$(IMAGE_TAG) -f apps/api/Dockerfile .
+	docker build -t $(REGISTRY)/worker:$(IMAGE_TAG) -f apps/worker/Dockerfile .
+	docker build -t $(REGISTRY)/guardrails:$(IMAGE_TAG) -f apps/guardrails/Dockerfile .
+	docker build -t $(REGISTRY)/frontend:$(IMAGE_TAG) -f apps/frontend/Dockerfile .
+
+docker-push:
+	docker push $(REGISTRY)/api:$(IMAGE_TAG)
+	docker push $(REGISTRY)/worker:$(IMAGE_TAG)
+	docker push $(REGISTRY)/guardrails:$(IMAGE_TAG)
+	docker push $(REGISTRY)/frontend:$(IMAGE_TAG)
+
+k8s-apply-staging:
+	kubectl apply -k infra/k8s/overlays/staging
+
+k8s-apply-prod:
+	kubectl apply -k infra/k8s/overlays/prod
+
+k8s-teardown-staging:
+	kubectl delete -k infra/k8s/overlays/staging
+
+k8s-status:
+	@echo "=== Staging Status ==="
+	kubectl get all -n ekc-staging
+	@echo "\n=== Production Status ==="
+	kubectl get all -n ekc-prod
+
+k8s-logs:
+	@read -p "Enter service name (api/worker/guardrails/frontend): " svc; \
+	read -p "Enter namespace (ekc-staging/ekc-prod) [ekc-staging]: " ns; \
+	ns=$${ns:-ekc-staging}; \
+	kubectl logs -f -l app.kubernetes.io/name=$$svc -n $$ns
+
 

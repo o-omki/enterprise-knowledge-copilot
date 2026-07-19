@@ -358,7 +358,7 @@ export default function Home() {
 
                             {/* Citations & Metadata */}
                             {!msg.isStreaming && !msg.isSafetyViolation && (msg.citations?.length || msg.metadata) && (
-                              <Accordion type="single" collapsible className="w-full mt-4 border rounded-xl overflow-hidden bg-white dark:bg-slate-900">
+                              <Accordion className="w-full mt-4 border rounded-xl overflow-hidden bg-white dark:bg-slate-900">
                                 <AccordionItem value="diagnostics" className="border-none">
                                   <AccordionTrigger className="px-4 py-2 hover:no-underline hover:bg-slate-50 dark:hover:bg-slate-800 text-xs text-slate-500">
                                     <div className="flex items-center gap-4">

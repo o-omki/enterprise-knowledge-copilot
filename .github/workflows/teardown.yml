@@ -1,0 +1,105 @@
+name: Teardown Infrastructure
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirmation:
+        description: 'Type "DESTROY-INFRASTRUCTURE" to confirm complete teardown'
+        required: true
+        default: ''
+
+jobs:
+  teardown:
+    name: Teardown GCP Resources
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+
+    steps:
+      - name: Validate Confirmation Safety Gate
+        run: |
+          if [ "${{ github.event.inputs.confirmation }}" != "DESTROY-INFRASTRUCTURE" ]; then
+            echo "Error: Safety gate validation failed. Confirmation must match 'DESTROY-INFRASTRUCTURE'." >&2
+            exit 1
+          fi
+          echo "Safety gate passed. Proceeding with teardown..."
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Google Auth
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.GCP_WORKLOAD_IDENTITY_PROVIDER }}
+          service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
+          project_id: ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+
+      - name: Delete Kubernetes Workloads
+        run: |
+          # Get credentials if cluster exists
+          if gcloud container clusters describe ekc-cluster --region us-central1 --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }} &>/dev/null; then
+            echo "Fetching GKE cluster credentials..."
+            gcloud container clusters get-credentials ekc-cluster \
+              --region us-central1 \
+              --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}
+            
+            echo "Deleting workloads..."
+            kubectl delete -k infra/k8s/overlays/staging --ignore-not-found || true
+            kubectl delete -k infra/k8s/overlays/prod --ignore-not-found || true
+          else
+            echo "GKE cluster 'ekc-cluster' does not exist, skipping workload deletion."
+          fi
+
+      - name: Delete GKE Cluster
+        run: |
+          if gcloud container clusters describe ekc-cluster --region us-central1 --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }} &>/dev/null; then
+            echo "Deleting GKE cluster 'ekc-cluster'..."
+            gcloud container clusters delete ekc-cluster \
+              --region us-central1 \
+              --project ${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }} \
+              --quiet
+          else
+            echo "GKE cluster 'ekc-cluster' already deleted or does not exist."
+          fi
+
+      - name: Override Terraform Lifecycle Safeguards
+        run: |
+          echo "Temporarily overriding prevent_destroy = true rules in HCL..."
+          find infra/terraform -name "*.tf" -exec sed -i 's/prevent_destroy = true/prevent_destroy = false/g' {} +
+          git diff infra/terraform/ || echo "No changes or git tracking"
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: ">= 1.5.0"
+
+      - name: Terraform Destroy Remaining Infrastructure
+        run: |
+          cd infra/terraform
+          terraform init
+          terraform destroy -auto-approve -var="project_id=${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}"
+
+      - name: Delete Images from Artifact Registry
+        run: |
+          PROJECT_ID="${{ secrets.GCP_PROJECT_ID || 'clean-carrier-500104-i0' }}"
+          echo "Cleaning up Artifact Registry images in project: ${PROJECT_ID}..."
+          
+          # Force delete container repositories (removes all tagged and untagged images)
+          gcloud artifacts docker images delete us-central1-docker.pkg.dev/${PROJECT_ID}/ekc-images/api --quiet || true
+          gcloud artifacts docker images delete us-central1-docker.pkg.dev/${PROJECT_ID}/ekc-images/worker --quiet || true
+          gcloud artifacts docker images delete us-central1-docker.pkg.dev/${PROJECT_ID}/ekc-images/guardrails --quiet || true
+          gcloud artifacts docker images delete us-central1-docker.pkg.dev/${PROJECT_ID}/ekc-images/frontend --quiet || true
+
+      - name: Savings & Summary Report
+        run: |
+          echo "================================================================="
+          echo "🎉 Teardown Completed Successfully!"
+          echo "GKE cluster, databases, secrets, and networks have been destroyed."
+          echo "Estimated Monthly FinOps Savings: ~$85 - $250 / month"
+          echo "Remote state GCS bucket 'ekc-terraform-state' is preserved."
+          echo "To re-provision: run terraform apply from a staging terminal."
+          echo "================================================================="

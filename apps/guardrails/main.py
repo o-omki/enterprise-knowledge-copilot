@@ -1,8 +1,11 @@
+import asyncio
 import os
+import signal
 from contextlib import asynccontextmanager
 
 import structlog
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Request
+from google import genai
 from nemoguardrails import LLMRails, RailsConfig
 from prometheus_client import make_asgi_app
 from pydantic import BaseModel, Field
@@ -16,14 +19,16 @@ logger = structlog.get_logger(__name__)
 CONFIG_DIR = os.path.join(os.path.dirname(__file__), "config")
 
 rails_app = None
+genai_client = None
 
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    global rails_app
+    global rails_app, genai_client
     logger.info("guardrails.engine.initializing")
     try:
         gcp_project = os.getenv("GCP_PROJECT_ID")
+        gcp_location = os.getenv("GCP_LOCATION", "us-central1")
         if gcp_project:
             os.environ["GOOGLE_CLOUD_PROJECT"] = gcp_project
             os.environ["GCP_PROJECT"] = gcp_project
@@ -35,12 +40,89 @@ async def lifespan(app: FastAPI):
             config = RailsConfig.from_path(CONFIG_DIR)
             rails_app = LLMRails(config)
             logger.info("guardrails.engine.initialized")
+
+        # Initialize Vertex AI/GenAI Client
+        genai_client = genai.Client(
+            vertexai=True,
+            project=gcp_project,
+            location=gcp_location,
+        )
+        logger.info("guardrails.genai_client.initialized")
     except Exception as e:
         logger.error("guardrails.engine.init_failed", error=str(e), exc_info=True)
+
+    app.state.shutting_down = False
+    app.state.active_requests = 0
+
+    async def graceful_shutdown():
+        logger.info("guardrails.shutdown.graceful_start")
+        app.state.shutting_down = True
+        shutdown_grace_period = float(os.getenv("SHUTDOWN_GRACE_PERIOD", "20"))
+        logger.info(
+            "guardrails.shutdown.sleeping_for_grace_period",
+            period=shutdown_grace_period,
+        )
+        await asyncio.sleep(shutdown_grace_period)
+
+        drain_timeout = float(os.getenv("SHUTDOWN_DRAIN_TIMEOUT", "10"))
+        start_time = asyncio.get_event_loop().time()
+        logger.info(
+            "guardrails.shutdown.draining_active_requests",
+            active_requests=app.state.active_requests,
+        )
+        while app.state.active_requests > 0:
+            if asyncio.get_event_loop().time() - start_time > drain_timeout:
+                logger.warning(
+                    "guardrails.shutdown.drain_timeout_reached",
+                    active_requests=app.state.active_requests,
+                )
+                break
+            logger.info(
+                "guardrails.shutdown.waiting_for_active_requests",
+                active_requests=app.state.active_requests,
+            )
+            await asyncio.sleep(0.5)
+
+        logger.info("guardrails.shutdown.triggering_uvicorn_exit")
+        os.kill(os.getpid(), signal.SIGINT)
+
+    def handle_sigterm():
+        logger.info("guardrails.shutdown.sigterm_received")
+        asyncio.create_task(graceful_shutdown())
+
+    try:
+        loop = asyncio.get_running_loop()
+        loop.add_signal_handler(signal.SIGTERM, handle_sigterm)
+        logger.info("guardrails.shutdown.sigterm_handler_registered")
+    except ValueError as e:
+        logger.warning("guardrails.shutdown.sigterm_handler_registration_failed", error=str(e))
+
     yield
+    logger.info("guardrails.shutdown.completed")
 
 
 app = FastAPI(title="Safety Guardrails Microservice", version="1.0.0", lifespan=lifespan)
+
+
+@app.middleware("http")
+async def track_active_requests(request: Request, call_next):
+    if not hasattr(request.app.state, "active_requests"):
+        request.app.state.active_requests = 0
+
+    path = request.url.path
+    is_probe = path in ("/health", "/health/live", "/health/ready", "/readiness", "/metrics")
+
+    if not is_probe:
+        request.app.state.active_requests += 1
+
+    try:
+        response = await call_next(request)
+        return response
+    finally:
+        if not is_probe:
+            request.app.state.active_requests -= 1
+
+
 setup_tracing(app, service_name="guardrails")
 app.mount("/metrics", make_asgi_app())
 
@@ -85,11 +167,25 @@ async def liveness():
     return {"status": "ok"}
 
 
+@app.get("/readiness")
 @app.get("/health/ready")
 async def readiness():
-    """Check if guardrails model and engine are fully initialized."""
+    """Check if guardrails model, engine and Vertex AI are fully initialized and connected."""
+    if getattr(app.state, "shutting_down", False):
+        raise HTTPException(status_code=503, detail="Service is shutting down")
+
     if rails_app is None:
         raise HTTPException(status_code=503, detail="Guardrails engine not ready")
+
+    try:
+        if genai_client is None:
+            raise ValueError("Vertex AI client is not initialized")
+        # List models with page_size=1
+        await genai_client.aio.models.list(config={"page_size": 1})
+    except Exception as e:
+        logger.error("guardrails.readiness.vertex_ai_failed", error=str(e))
+        raise HTTPException(status_code=503, detail=f"Vertex AI connectivity failed: {str(e)}")
+
     return {"status": "ready"}
 
 

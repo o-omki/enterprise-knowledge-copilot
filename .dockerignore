@@ -1,0 +1,17 @@
+.git
+.venv
+.mypy_cache
+.pytest_cache
+.ruff_cache
+__pycache__
+*.egg-info
+node_modules
+data/
+.env
+.env.*
+!.env.example
+infra/
+docs/
+notebooks/
+*.md
+!README.md
