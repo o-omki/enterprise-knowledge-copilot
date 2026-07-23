@@ -8,6 +8,7 @@ class Chunk:
     index: int
     metadata: dict = field(default_factory=dict)
     parent_text: str | None = None
+    pdf_bytes: bytes | None = None
 
 
 def chunk_text(

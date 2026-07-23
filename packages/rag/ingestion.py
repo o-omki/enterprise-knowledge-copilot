@@ -1,8 +1,10 @@
 import asyncio
 import hashlib
+import io
 import uuid
 from pathlib import Path
 
+import pypdf
 import structlog
 from fastembed import SparseTextEmbedding
 from google import genai
@@ -41,6 +43,7 @@ class Document(BaseModel):
     content: str
     metadata: dict = Field(default_factory=dict)
     path: Path
+    pdf_bytes: bytes | None = None
 
 
 class IngestionPipeline:
@@ -84,41 +87,85 @@ class IngestionPipeline:
             "domain": domain,
         }
 
-    async def load_markdown_files(self, directory: Path) -> list[Document]:
-        """Loads all markdown files from a directory."""
+    async def load_documents(self, directory: Path) -> list[Document]:
+        """Loads markdown, plain text, and PDF files from a directory."""
         with tracer.start_as_current_span("ingestion.load_documents") as span:
             documents = []
-            for file_path in directory.glob("**/*.md"):
-                try:
-                    content = file_path.read_text(encoding="utf-8")
 
-                    # Extract metadata
+            for ext in ("**/*.md", "**/*.txt"):
+                for file_path in directory.glob(ext):
+                    try:
+                        content = file_path.read_text(encoding="utf-8")
+                        meta = self._parse_metadata_from_path(file_path, directory)
+                        meta["filename"] = file_path.name
+                        meta["extension"] = file_path.suffix
+                        documents.append(Document(content=content, path=file_path, metadata=meta))
+                    except Exception as e:
+                        logger.error(
+                            "ingestion.load_failed", file_path=str(file_path), error=str(e)
+                        )
+
+            for file_path in directory.glob("**/*.pdf"):
+                try:
+                    reader = pypdf.PdfReader(file_path)
                     meta = self._parse_metadata_from_path(file_path, directory)
                     meta["filename"] = file_path.name
+                    meta["extension"] = ".pdf"
 
-                    doc = Document(content=content, path=file_path, metadata=meta)
-                    documents.append(doc)
+                    for idx, page in enumerate(reader.pages):
+                        writer = pypdf.PdfWriter()
+                        writer.add_page(page)
+                        page_io = io.BytesIO()
+                        writer.write(page_io)
+                        page_bytes = page_io.getvalue()
+
+                        page_text = page.extract_text() or ""
+                        page_meta = meta.copy()
+                        page_meta["page_number"] = idx + 1
+
+                        page_path = Path(f"{file_path}#page={idx + 1}")
+
+                        doc = Document(
+                            content=page_text,
+                            path=page_path,
+                            metadata=page_meta,
+                            pdf_bytes=page_bytes,
+                        )
+                        documents.append(doc)
                 except Exception as e:
-                    logger.error("ingestion.load_failed", file_path=str(file_path), error=str(e))
+                    logger.error(
+                        "ingestion.pdf_load_failed", file_path=str(file_path), error=str(e)
+                    )
+
             span.set_attribute("ingestion.doc_count", len(documents))
             return documents
 
     async def process_documents(self, documents: list[Document]) -> list[Chunk]:
-        """Chunks documents based on configuration."""
+        """Chunks documents based on configuration, keeping PDF pages whole."""
         with tracer.start_as_current_span("ingestion.chunk_documents") as span:
             span.set_attribute("ingestion.doc_count", len(documents))
             all_chunks = []
             for doc in documents:
-                # We will use hierarchical chunking for finer retrieval but larger context mapping
-                chunks = chunk_text_hierarchical(
-                    doc.content,
-                    source=str(doc.path),
-                    parent_chunk_size=self.config.parent_chunk_size,
-                    child_chunk_size=self.config.child_chunk_size,
-                    child_chunk_overlap=self.config.child_chunk_overlap,
-                    metadata=doc.metadata,
-                )
-                all_chunks.extend(chunks)
+                if doc.pdf_bytes:
+                    chunk = Chunk(
+                        text=doc.content,
+                        source=str(doc.path),
+                        index=0,
+                        metadata=doc.metadata,
+                        parent_text=doc.content,
+                        pdf_bytes=doc.pdf_bytes,
+                    )
+                    all_chunks.append(chunk)
+                else:
+                    chunks = chunk_text_hierarchical(
+                        doc.content,
+                        source=str(doc.path),
+                        parent_chunk_size=self.config.parent_chunk_size,
+                        child_chunk_size=self.config.child_chunk_size,
+                        child_chunk_overlap=self.config.child_chunk_overlap,
+                        metadata=doc.metadata,
+                    )
+                    all_chunks.extend(chunks)
             span.set_attribute("ingestion.chunk_count", len(all_chunks))
             return all_chunks
 
@@ -152,18 +199,34 @@ class IngestionPipeline:
                 "ingestion.collection.initialized", collection=collection_name, status="exists"
             )
 
-    async def get_embeddings(self, texts: list[str]) -> list[list[float]]:
+    async def get_embeddings(self, chunks: list[Chunk]) -> list[list[float]]:
         semaphore = asyncio.Semaphore(8)
 
-        async def embed_one(text: str) -> list[float]:
+        async def embed_one(chunk: Chunk) -> list[float]:
             async with semaphore:
-                response = await self.genai_client.aio.models.embed_content(
-                    model=self.config.embedding_model_name,
-                    contents=f"task: search result | text: {text}",
-                    config=types.EmbedContentConfig(
-                        output_dimensionality=self.config.vector_size,
-                    ),
-                )
+                if chunk.pdf_bytes:
+                    # PDF page embedding (multimodal)
+                    response = await self.genai_client.aio.models.embed_content(
+                        model=self.config.embedding_model_name,
+                        contents=[
+                            types.Part.from_bytes(
+                                data=chunk.pdf_bytes,
+                                mime_type="application/pdf",
+                            ),
+                        ],
+                        config=types.EmbedContentConfig(
+                            task_type="RETRIEVAL_DOCUMENT",
+                            output_dimensionality=self.config.vector_size,
+                        ),
+                    )
+                else:
+                    response = await self.genai_client.aio.models.embed_content(
+                        model=self.config.embedding_model_name,
+                        contents=f"task: search result | text: {chunk.text}",
+                        config=types.EmbedContentConfig(
+                            output_dimensionality=self.config.vector_size,
+                        ),
+                    )
 
                 embedding = response.embeddings[0].values
 
@@ -175,7 +238,7 @@ class IngestionPipeline:
 
                 return embedding
 
-        return await asyncio.gather(*(embed_one(text) for text in texts))
+        return await asyncio.gather(*(embed_one(chunk) for chunk in chunks))
 
     def generate_id(self, text: str, source: str) -> str:
         """Creates a deterministic UUID based on content and source."""
@@ -193,7 +256,7 @@ class IngestionPipeline:
             with tracer.start_as_current_span("ingestion.embed_batch") as span:
                 span.set_attribute("ingestion.batch_index", batch_index)
                 span.set_attribute("ingestion.chunk_count", len(batch))
-                embeddings = await self.get_embeddings(texts)
+                embeddings = await self.get_embeddings(batch)
                 sparse_embeddings = list(self.sparse_model.embed(texts))
 
             points = [
@@ -254,7 +317,7 @@ class IngestionPipeline:
         for corpus_path in corpora:
             logger.info("ingestion.domain.started", domain=corpus_path.name)
 
-            docs = await self.load_markdown_files(corpus_path)
+            docs = await self.load_documents(corpus_path)
             if not docs:
                 logger.warning(
                     "ingestion.domain.no_documents", domain=corpus_path.name, path=str(corpus_path)
